@@ -1,44 +1,52 @@
 import Link from 'next/link';
 import { locales, type Locale } from '../i18n-config';
 
-interface Props {
+export default async function LocaleLayout({
+  children,
+  params
+}: {
   children: React.ReactNode;
-  params: Promise<{ locale: string }>; // 改为string，Turbopack自动推导的类型
-}
-
-export default async function LocaleLayout({ children, params }: Props) {
+  params: Promise<{ locale: string }>;
+}) {
   const { locale } = await params;
   
-  // 运行时验证locale有效性
   if (!(locales as readonly string[]).includes(locale)) {
-    return <div>404 - Language Not Supported</div>;
+    return <div className="p-20 text-center">404 - Language Not Found</div>;
   }
 
-  const typedLocale = locale as Locale; // 类型断言
+  const validLocale = locale as Locale;
 
   return (
-    <html lang={typedLocale}>
-      <body className="min-h-screen bg-slate-50">
-        <nav className="bg-white border-b px-6 py-4">
-          <div className="max-w-6xl mx-auto flex justify-between items-center">
-            <Link href={`/${typedLocale}`} className="text-2xl font-bold">MDLooker</Link>
-            <div className="flex gap-2">
-              {locales.map(loc => (
-                <Link
-                  key={loc}
-                  href={`/${loc}`}
-                  className={`px-3 py-1 rounded text-sm ${
-                    loc === typedLocale ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-100'
-                  }`}
-                >
-                  {loc === 'en' ? 'English' : '中文'}
-                </Link>
-              ))}
-            </div>
+    <>
+      <nav className="bg-white border-b border-[#339999]/20 px-6 py-4">
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <Link href={`/${validLocale}`} className="text-2xl font-bold text-[#339999]">
+            MDLooker
+          </Link>
+          <div className="flex gap-2">
+            {locales.map(loc => (
+              <Link
+                key={loc}
+                href={`/${loc}`}
+                className={`px-3 py-1 rounded text-sm ${
+                  loc === validLocale ? 'bg-[#339999] text-white' : 'text-slate-600 hover:bg-[#339999]/10'
+                }`}
+              >
+                {loc === 'en' ? 'English' : '中文'}
+              </Link>
+            ))}
           </div>
-        </nav>
-        {children}
-      </body>
-    </html>
+        </div>
+      </nav>
+      
+      <main>{children}</main>
+      
+      <footer className="bg-[#2a7a7a] py-8 mt-20">
+        <div className="max-w-6xl mx-auto px-6 text-center text-sm text-white/80">
+          <p>© 2026 MDLooker by Nanjing Freeman Health Technology Co., Ltd. All rights reserved.</p>
+          <p className="mt-2">All data from public regulatory databases. Disclaimer: All information is for reference only.</p>
+        </div>
+      </footer>
+    </>
   );
 }
