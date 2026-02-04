@@ -1,5 +1,5 @@
--- MDLooker Database Schema
--- 全球医疗器械合规数据平台
+-- MDLooker Database Schema (Simplified Version)
+-- 全球医疗器械合规数据平台 - 简化版（不含全文搜索索引）
 
 -- 公司基础信息表
 CREATE TABLE IF NOT EXISTS companies (
@@ -172,14 +172,6 @@ CREATE TABLE IF NOT EXISTS sync_logs (
     completed_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-
--- 搜索索引（用于全文搜索）
-CREATE INDEX IF NOT EXISTS idx_companies_name ON companies USING gin(to_tsvector('english', name::text));
-CREATE INDEX IF NOT EXISTS idx_companies_name_zh ON companies USING gin(to_tsvector('simple', COALESCE(name_zh, '')::text));
-CREATE INDEX IF NOT EXISTS idx_fda_device_name ON fda_registrations USING gin(to_tsvector('english', COALESCE(device_name, '')::text));
-CREATE INDEX IF NOT EXISTS idx_nmpa_product_name ON nmpa_registrations USING gin(to_tsvector('simple', COALESCE(product_name_zh, '')::text));
-CREATE INDEX IF NOT EXISTS idx_pmda_product_name ON pmda_registrations USING gin(to_tsvector('simple', COALESCE(product_name_jp, '')::text));
-CREATE INDEX IF NOT EXISTS idx_health_canada_device_name ON health_canada_registrations USING gin(to_tsvector('english', COALESCE(device_name, '')::text));
 
 -- 更新时间触发器
 CREATE OR REPLACE FUNCTION update_updated_at_column()

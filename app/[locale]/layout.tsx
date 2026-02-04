@@ -16,13 +16,32 @@ export default async function LocaleLayout({
 
   const validLocale = locale as Locale;
 
+  const navItems = [
+    { href: `/${validLocale}/compliance-profile`, labelEn: 'Compliance Profile', labelZh: '合规档案' },
+    { href: `/${validLocale}/market-access`, labelEn: 'Market Access', labelZh: '准入导航' },
+    { href: `/${validLocale}/guides`, labelEn: 'Guides', labelZh: '指南' },
+  ];
+
   return (
     <>
       <nav className="bg-white border-b border-[#339999]/20 px-6 py-4">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <Link href={`/${validLocale}`} className="text-2xl font-bold text-[#339999]">
-            MDLooker
-          </Link>
+          <div className="flex items-center gap-8">
+            <Link href={`/${validLocale}`} className="text-2xl font-bold text-[#339999]">
+              MDLooker
+            </Link>
+            <div className="hidden md:flex items-center gap-6">
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="text-sm text-slate-600 hover:text-[#339999] transition-colors"
+                >
+                  {validLocale === 'zh' ? item.labelZh : item.labelEn}
+                </Link>
+              ))}
+            </div>
+          </div>
           <div className="flex gap-2">
             {locales.map(loc => (
               <Link
