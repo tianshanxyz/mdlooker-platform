@@ -1,3 +1,5 @@
+import SessionProvider from './components/SessionProvider';
+
 export const metadata = {
   title: 'MDLooker Platform',
   description: 'Global Medical Device Compliance Intelligence',
@@ -10,7 +12,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <SessionProvider>{children}</SessionProvider>
+      </body>
     </html>
   );
 }

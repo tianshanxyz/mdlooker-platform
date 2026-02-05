@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 import { locales, type Locale } from '../../i18n-config';
 import {
   generateAccessPathway,
@@ -10,6 +12,7 @@ import {
   deviceClasses,
   type MarketAccessPathway,
 } from '@/app/lib/market-access-data';
+import { checkPermission, trackDownload } from '@/app/lib/auth';
 
 // Download icon component
 function DownloadIcon({ className }: { className?: string }) {
@@ -43,6 +46,7 @@ export default function MarketAccessPage({
 }: {
   params: Promise<{ locale: string }>;
 }) {
+  const { data: session, status } = useSession();
   const [locale, setLocale] = useState<Locale>('en');
   const [productCategory, setProductCategory] = useState('');
   const [sourceCountry, setSourceCountry] = useState('');
@@ -50,12 +54,30 @@ export default function MarketAccessPage({
   const [deviceClass, setDeviceClass] = useState('');
   const [pathway, setPathway] = useState<MarketAccessPathway | null>(null);
   const [showResults, setShowResults] = useState(false);
+  const [canDownload, setCanDownload] = useState(false);
+  const [isCheckingPermission, setIsCheckingPermission] = useState(true);
 
-  params.then((p) => {
-    if (locales.includes(p.locale as Locale)) {
-      setLocale(p.locale as Locale);
+  useEffect(() => {
+    params.then((p) => {
+      if (locales.includes(p.locale as Locale)) {
+        setLocale(p.locale as Locale);
+      }
+    });
+  }, [params]);
+
+  useEffect(() => {
+    async function checkDownloadPermission() {
+      setIsCheckingPermission(true);
+      const hasPermission = await checkPermission(
+        session?.user?.id,
+        'market_access',
+        'download'
+      );
+      setCanDownload(hasPermission);
+      setIsCheckingPermission(false);
     }
-  });
+    checkDownloadPermission();
+  }, [session]);
 
   const generatePathway = () => {
     if (!productCategory || !sourceCountry || !targetMarket || !deviceClass) {
@@ -83,8 +105,32 @@ export default function MarketAccessPage({
   };
 
   // Generate and download pathway report
-  const downloadPathwayReport = () => {
+  const downloadPathwayReport = async () => {
     if (!pathway) return;
+
+    // Check permission before downloading
+    const hasPermission = await checkPermission(
+      session?.user?.id,
+      'market_access',
+      'download'
+    );
+
+    if (!hasPermission) {
+      alert(locale === 'zh'
+        ? '请登录或升级账户以下载报告'
+        : 'Please sign in or upgrade your account to download reports');
+      return;
+    }
+
+    // Track download
+    if (session?.user?.id) {
+      await trackDownload(
+        session.user.id,
+        'market_access_report',
+        targetMarket,
+        `market-access-pathway-${targetMarket}.md`
+      );
+    }
 
     const categoryName = productCategories.find((c: { id: string; name: string; nameZh: string }) => c.id === productCategory);
     const countryName = sourceCountries.find((c: { id: string; name: string; nameZh: string }) => c.id === sourceCountry);
@@ -325,13 +371,24 @@ ${pathway.regulationLinks.map((link: { name: string; nameZh: string; url: string
 
             {/* Download Report Button */}
             <div className="mt-6 flex justify-end">
-              <button
-                onClick={downloadPathwayReport}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-[#339999] text-white rounded-lg font-medium hover:bg-[#2a7a7a] transition-colors shadow-md"
-              >
-                <DownloadIcon className="w-5 h-5" />
-                {locale === 'en' ? 'Download Full Report' : '下载完整报告'}
-              </button>
+              {canDownload ? (
+                <button
+                  onClick={downloadPathwayReport}
+                  disabled={isCheckingPermission}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#339999] text-white rounded-lg font-medium hover:bg-[#2a7a7a] transition-colors shadow-md disabled:opacity-50"
+                >
+                  <DownloadIcon className="w-5 h-5" />
+                  {locale === 'en' ? 'Download Full Report' : '下载完整报告'}
+                </button>
+              ) : (
+                <Link
+                  href={`/${locale}/auth/signin?callbackUrl=/${locale}/market-access`}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition-colors"
+                >
+                  <DownloadIcon className="w-5 h-5" />
+                  {locale === 'en' ? 'Sign in to Download' : '登录后下载'}
+                </Link>
+              )}
             </div>
           </div>
 
