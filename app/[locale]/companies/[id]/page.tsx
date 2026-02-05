@@ -3,7 +3,59 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { locales, type Locale } from '../../../i18n-config';
-import type { CompanyWithRegistrations, DataSourceStats } from '../../../lib/types';
+
+interface CompanyDetail {
+  id: string;
+  name: string;
+  name_zh?: string;
+  country?: string;
+  address?: string;
+  website?: string;
+  email?: string;
+  phone?: string;
+  description?: string;
+  description_zh?: string;
+  business_type?: string;
+  established_year?: number;
+  employee_count?: string;
+  legal_representative?: string;
+  registered_capital?: string;
+  registration_number?: string;
+  unified_social_credit_code?: string;
+  business_status?: string;
+  business_scope?: string;
+  gmp_certificates?: string[];
+  iso_certificates?: string[];
+  shareholders?: Array<{ name: string; percentage: number }>;
+  intellectual_property?: { patents?: number; trademarks?: number };
+  contact_info?: { phone?: string; fax?: string; email?: string };
+  fda_registrations: any[];
+  nmpa_registrations: any[];
+  eudamed_registrations: any[];
+  pmda_registrations: any[];
+  health_canada_registrations: any[];
+  products: any[];
+  branches: any[];
+  patents: any[];
+  trademarks: any[];
+  litigations: any[];
+  abnormal_operations: any[];
+  changes: any[];
+  risk_score?: { score: number; level: 'low' | 'medium' | 'high'; factors: string[] };
+  registration_summary?: {
+    total_registrations: number;
+    fda_count: number;
+    nmpa_count: number;
+    eudamed_count: number;
+    pmda_count: number;
+    health_canada_count: number;
+  };
+  intellectual_property_summary?: {
+    patents_count: number;
+    trademarks_count: number;
+    branches_count: number;
+  };
+}
 
 export default function CompanyDetailPage({
   params
@@ -12,10 +64,10 @@ export default function CompanyDetailPage({
 }) {
   const [locale, setLocale] = useState<Locale>('en');
   const [companyId, setCompanyId] = useState<string>('');
-  const [company, setCompany] = useState<CompanyWithRegistrations | null>(null);
+  const [company, setCompany] = useState<CompanyDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'fda' | 'nmpa' | 'eudamed' | 'pmda' | 'healthcanada' | 'products'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'registrations' | 'ip' | 'risk' | 'branches'>('overview');
 
   useEffect(() => {
     params.then(p => {
@@ -73,27 +125,27 @@ export default function CompanyDetailPage({
 
   const t = {
     overview: locale === 'en' ? 'Overview' : '概览',
-    fda: 'FDA',
-    nmpa: 'NMPA',
-    eudamed: 'EUDAMED',
-    pmda: 'PMDA',
-    healthcanada: 'Health Canada',
-    products: locale === 'en' ? 'Products' : '产品',
-    companyInfo: locale === 'en' ? 'Company Information' : '企业信息',
     registrations: locale === 'en' ? 'Registrations' : '注册信息',
+    ip: locale === 'en' ? 'Intellectual Property' : '知识产权',
+    risk: locale === 'en' ? 'Risk Assessment' : '风险评估',
+    branches: locale === 'en' ? 'Branches' : '分支机构',
+    companyInfo: locale === 'en' ? 'Company Information' : '企业信息',
     noData: locale === 'en' ? 'No data available' : '暂无数据',
     source: locale === 'en' ? 'Source' : '来源',
+    basicInfo: locale === 'en' ? 'Basic Information' : '基本信息',
+    contactInfo: locale === 'en' ? 'Contact Information' : '联系信息',
+    businessInfo: locale === 'en' ? 'Business Information' : '经营信息',
+    shareholders: locale === 'en' ? 'Shareholders' : '股东信息',
+    certificates: locale === 'en' ? 'Certificates' : '资质证书',
   };
 
-  const dataSourceStats: DataSourceStats[] = [
-    { source: 'FDA', count: company.fda_registrations.length, lastUpdated: '2024-01', icon: '🇺🇸', color: 'blue' },
-    { source: 'NMPA', count: company.nmpa_registrations.length, lastUpdated: '2024-01', icon: '🇨🇳', color: 'green' },
-    { source: 'EUDAMED', count: company.eudamed_registrations.length, lastUpdated: '2024-01', icon: '🇪🇺', color: 'purple' },
-    { source: 'PMDA', count: company.pmda_registrations.length, lastUpdated: '2024-01', icon: '🇯🇵', color: 'red' },
-    { source: 'Health Canada', count: company.health_canada_registrations.length, lastUpdated: '2024-01', icon: '🇨🇦', color: 'orange' },
-  ];
-
-  const totalRegistrations = dataSourceStats.reduce((sum, stat) => sum + stat.count, 0);
+  const getRiskColor = (level: string) => {
+    switch (level) {
+      case 'high': return 'text-red-600 bg-red-50';
+      case 'medium': return 'text-yellow-600 bg-yellow-50';
+      default: return 'text-green-600 bg-green-50';
+    }
+  };
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
@@ -104,10 +156,19 @@ export default function CompanyDetailPage({
       {/* Company Header */}
       <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 border border-slate-100">
         <div className="flex justify-between items-start mb-6">
-          <div>
+          <div className="flex-1">
             <h1 className="text-3xl font-bold text-slate-900">{company.name}</h1>
             {company.name_zh && (
               <p className="text-xl text-slate-600 mt-1">{company.name_zh}</p>
+            )}
+            {company.business_status && (
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mt-3 ${
+                company.business_status === 'Active' 
+                  ? 'bg-green-100 text-green-800' 
+                  : 'bg-slate-100 text-slate-800'
+              }`}>
+                {company.business_status}
+              </span>
             )}
           </div>
           {company.country && (
@@ -117,145 +178,256 @@ export default function CompanyDetailPage({
           )}
         </div>
 
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-slate-50 rounded-xl p-4 text-center">
+            <p className="text-2xl font-bold text-[#339999]">
+              {company.registration_summary?.total_registrations || 0}
+            </p>
+            <p className="text-sm text-slate-600">
+              {locale === 'en' ? 'Registrations' : '注册数'}
+            </p>
+          </div>
+          <div className="bg-slate-50 rounded-xl p-4 text-center">
+            <p className="text-2xl font-bold text-[#339999]">
+              {company.intellectual_property_summary?.patents_count || 0}
+            </p>
+            <p className="text-sm text-slate-600">
+              {locale === 'en' ? 'Patents' : '专利'}
+            </p>
+          </div>
+          <div className="bg-slate-50 rounded-xl p-4 text-center">
+            <p className="text-2xl font-bold text-[#339999]">
+              {company.intellectual_property_summary?.trademarks_count || 0}
+            </p>
+            <p className="text-sm text-slate-600">
+              {locale === 'en' ? 'Trademarks' : '商标'}
+            </p>
+          </div>
+          <div className="bg-slate-50 rounded-xl p-4 text-center">
+            <p className="text-2xl font-bold text-[#339999]">
+              {company.intellectual_property_summary?.branches_count || 0}
+            </p>
+            <p className="text-sm text-slate-600">
+              {locale === 'en' ? 'Branches' : '分支机构'}
+            </p>
+          </div>
+        </div>
+
         {company.description && (
           <p className="text-slate-700 mb-6 leading-relaxed">
             {locale === 'zh' && company.description_zh ? company.description_zh : company.description}
           </p>
         )}
-
-        <div className="grid md:grid-cols-2 gap-6 text-sm">
-          {company.website && (
-            <div>
-              <span className="text-slate-500">{locale === 'en' ? 'Website: ' : '网站: '}</span>
-              <a href={company.website} target="_blank" rel="noopener noreferrer" className="text-[#339999] hover:underline">
-                {company.website}
-              </a>
-            </div>
-          )}
-          {company.email && (
-            <div>
-              <span className="text-slate-500">{locale === 'en' ? 'Email: ' : '邮箱: '}</span>
-              <a href={`mailto:${company.email}`} className="text-[#339999] hover:underline">
-                {company.email}
-              </a>
-            </div>
-          )}
-          {company.phone && (
-            <div>
-              <span className="text-slate-500">{locale === 'en' ? 'Phone: ' : '电话: '}</span>
-              <span className="text-slate-700">{company.phone}</span>
-            </div>
-          )}
-          {company.business_type && (
-            <div>
-              <span className="text-slate-500">{locale === 'en' ? 'Business Type: ' : '业务类型: '}</span>
-              <span className="text-slate-700">{company.business_type}</span>
-            </div>
-          )}
-          {company.established_year && (
-            <div>
-              <span className="text-slate-500">{locale === 'en' ? 'Established: ' : '成立年份: '}</span>
-              <span className="text-slate-700">{company.established_year}</span>
-            </div>
-          )}
-          {company.employee_count && (
-            <div>
-              <span className="text-slate-500">{locale === 'en' ? 'Employees: ' : '员工数量: '}</span>
-              <span className="text-slate-700">{company.employee_count}</span>
-            </div>
-          )}
-        </div>
-
-        {company.address && (
-          <div className="mt-4 text-sm">
-            <span className="text-slate-500">{locale === 'en' ? 'Address: ' : '地址: '}</span>
-            <span className="text-slate-700">{company.address}</span>
-          </div>
-        )}
       </div>
 
-      {/* Data Sources Overview */}
+      {/* Main Content Tabs */}
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-slate-100">
         <div className="border-b border-slate-200">
           <nav className="flex flex-wrap">
-            {(['overview', 'fda', 'nmpa', 'eudamed', 'pmda', 'healthcanada', 'products'] as const).map((tab) => {
-              const count = tab === 'overview' ? totalRegistrations :
-                tab === 'fda' ? company.fda_registrations.length :
-                tab === 'nmpa' ? company.nmpa_registrations.length :
-                tab === 'eudamed' ? company.eudamed_registrations.length :
-                tab === 'pmda' ? company.pmda_registrations.length :
-                tab === 'healthcanada' ? company.health_canada_registrations.length :
-                company.products.length;
-              
-              return (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                    activeTab === tab
-                      ? 'border-[#339999] text-[#339999]'
-                      : 'border-transparent text-slate-500 hover:text-slate-700'
-                  }`}
-                >
-                  {t[tab]}
-                  <span className="ml-2 bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full text-xs">
-                    {count}
-                  </span>
-                </button>
-              );
-            })}
+            {(['overview', 'registrations', 'ip', 'risk', 'branches'] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                  activeTab === tab
+                    ? 'border-[#339999] text-[#339999]'
+                    : 'border-transparent text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                {t[tab]}
+              </button>
+            ))}
           </nav>
         </div>
 
         <div className="p-6">
+          {/* Overview Tab */}
           {activeTab === 'overview' && (
             <div className="space-y-6">
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                {dataSourceStats.map((stat) => (
-                  <div 
-                    key={stat.source}
-                    className={`bg-${stat.color}-50 rounded-xl p-4 border border-${stat.color}-100 cursor-pointer hover:shadow-md transition-all`}
-                    onClick={() => {
-                      const tabMap: Record<string, 'fda' | 'nmpa' | 'eudamed' | 'pmda' | 'healthcanada'> = {
-                        'FDA': 'fda',
-                        'NMPA': 'nmpa',
-                        'EUDAMED': 'eudamed',
-                        'PMDA': 'pmda',
-                        'Health Canada': 'healthcanada',
-                      };
-                      setActiveTab(tabMap[stat.source]);
-                    }}
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-2xl">{stat.icon}</span>
-                      <h3 className="font-semibold text-slate-700">{stat.source}</h3>
+              {/* Basic Information */}
+              <div className="bg-slate-50 rounded-xl p-6">
+                <h3 className="font-semibold text-slate-800 mb-4">{t.basicInfo}</h3>
+                <div className="grid md:grid-cols-2 gap-4 text-sm">
+                  {company.legal_representative && (
+                    <div>
+                      <span className="text-slate-500">{locale === 'en' ? 'Legal Representative: ' : '法定代表人: '}</span>
+                      <span className="text-slate-700">{company.legal_representative}</span>
                     </div>
-                    <p className="text-3xl font-bold text-[#339999]">{stat.count}</p>
-                    <p className="text-xs text-slate-500 mt-1">
-                      {locale === 'en' ? 'Registrations' : '注册'}
-                    </p>
+                  )}
+                  {company.registered_capital && (
+                    <div>
+                      <span className="text-slate-500">{locale === 'en' ? 'Registered Capital: ' : '注册资本: '}</span>
+                      <span className="text-slate-700">{company.registered_capital}</span>
+                    </div>
+                  )}
+                  {company.established_year && (
+                    <div>
+                      <span className="text-slate-500">{locale === 'en' ? 'Established: ' : '成立年份: '}</span>
+                      <span className="text-slate-700">{company.established_year}</span>
+                    </div>
+                  )}
+                  {company.employee_count && (
+                    <div>
+                      <span className="text-slate-500">{locale === 'en' ? 'Employees: ' : '员工数量: '}</span>
+                      <span className="text-slate-700">{company.employee_count}</span>
+                    </div>
+                  )}
+                  {company.registration_number && (
+                    <div>
+                      <span className="text-slate-500">{locale === 'en' ? 'Registration Number: ' : '注册号: '}</span>
+                      <span className="text-slate-700">{company.registration_number}</span>
+                    </div>
+                  )}
+                  {company.unified_social_credit_code && (
+                    <div>
+                      <span className="text-slate-500">{locale === 'en' ? 'Unified Code: ' : '统一社会信用代码: '}</span>
+                      <span className="text-slate-700">{company.unified_social_credit_code}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Contact Information */}
+              {(company.website || company.email || company.phone || company.contact_info) && (
+                <div className="bg-slate-50 rounded-xl p-6">
+                  <h3 className="font-semibold text-slate-800 mb-4">{t.contactInfo}</h3>
+                  <div className="grid md:grid-cols-2 gap-4 text-sm">
+                    {company.website && (
+                      <div>
+                        <span className="text-slate-500">{locale === 'en' ? 'Website: ' : '网站: '}</span>
+                        <a href={company.website} target="_blank" rel="noopener noreferrer" className="text-[#339999] hover:underline">
+                          {company.website}
+                        </a>
+                      </div>
+                    )}
+                    {(company.email || company.contact_info?.email) && (
+                      <div>
+                        <span className="text-slate-500">{locale === 'en' ? 'Email: ' : '邮箱: '}</span>
+                        <a href={`mailto:${company.email || company.contact_info?.email}`} className="text-[#339999] hover:underline">
+                          {company.email || company.contact_info?.email}
+                        </a>
+                      </div>
+                    )}
+                    {(company.phone || company.contact_info?.phone) && (
+                      <div>
+                        <span className="text-slate-500">{locale === 'en' ? 'Phone: ' : '电话: '}</span>
+                        <span className="text-slate-700">{company.phone || company.contact_info?.phone}</span>
+                      </div>
+                    )}
+                    {company.contact_info?.fax && (
+                      <div>
+                        <span className="text-slate-500">{locale === 'en' ? 'Fax: ' : '传真: '}</span>
+                        <span className="text-slate-700">{company.contact_info.fax}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Business Scope */}
+              {company.business_scope && (
+                <div className="bg-slate-50 rounded-xl p-6">
+                  <h3 className="font-semibold text-slate-800 mb-4">{t.businessInfo}</h3>
+                  <p className="text-slate-700 text-sm">{company.business_scope}</p>
+                </div>
+              )}
+
+              {/* Address */}
+              {company.address && (
+                <div className="bg-slate-50 rounded-xl p-6">
+                  <h3 className="font-semibold text-slate-800 mb-2">{locale === 'en' ? 'Address' : '地址'}</h3>
+                  <p className="text-slate-700 text-sm">{company.address}</p>
+                </div>
+              )}
+
+              {/* Shareholders */}
+              {company.shareholders && company.shareholders.length > 0 && (
+                <div className="bg-slate-50 rounded-xl p-6">
+                  <h3 className="font-semibold text-slate-800 mb-4">{t.shareholders}</h3>
+                  <div className="space-y-3">
+                    {company.shareholders.map((shareholder, index) => (
+                      <div key={index} className="flex justify-between items-center">
+                        <span className="text-slate-700">{shareholder.name}</span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-32 bg-slate-200 rounded-full h-2">
+                            <div 
+                              className="bg-[#339999] h-2 rounded-full"
+                              style={{ width: `${shareholder.percentage}%` }}
+                            />
+                          </div>
+                          <span className="text-slate-600 text-sm w-12 text-right">{shareholder.percentage}%</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Certificates */}
+              {(company.gmp_certificates?.length || company.iso_certificates?.length) > 0 && (
+                <div className="bg-slate-50 rounded-xl p-6">
+                  <h3 className="font-semibold text-slate-800 mb-4">{t.certificates}</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {company.gmp_certificates?.map((cert, index) => (
+                      <span key={`gmp-${index}`} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                        {cert}
+                      </span>
+                    ))}
+                    {company.iso_certificates?.map((cert, index) => (
+                      <span key={`iso-${index}`} className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+                        {cert}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Registrations Tab */}
+          {activeTab === 'registrations' && (
+            <div className="space-y-6">
+              {/* Registration Summary */}
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                {[
+                  { source: 'FDA', count: company.registration_summary?.fda_count || 0, icon: '🇺🇸', color: 'blue' },
+                  { source: 'NMPA', count: company.registration_summary?.nmpa_count || 0, icon: '🇨🇳', color: 'green' },
+                  { source: 'EUDAMED', count: company.registration_summary?.eudamed_count || 0, icon: '🇪🇺', color: 'purple' },
+                  { source: 'PMDA', count: company.registration_summary?.pmda_count || 0, icon: '🇯🇵', color: 'red' },
+                  { source: 'Health Canada', count: company.registration_summary?.health_canada_count || 0, icon: '🇨🇦', color: 'orange' },
+                ].map((stat) => (
+                  <div key={stat.source} className="bg-slate-50 rounded-xl p-4 text-center">
+                    <span className="text-2xl">{stat.icon}</span>
+                    <p className="text-2xl font-bold text-[#339999] mt-2">{stat.count}</p>
+                    <p className="text-xs text-slate-600">{stat.source}</p>
                   </div>
                 ))}
               </div>
 
-              {totalRegistrations > 0 && (
-                <div className="bg-slate-50 rounded-xl p-6">
-                  <h3 className="font-semibold text-slate-800 mb-4">
-                    {locale === 'en' ? 'Registration Distribution' : '注册分布'}
-                  </h3>
+              {/* Registration Details */}
+              {company.fda_registrations.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-4">🇺🇸 FDA Registrations</h3>
                   <div className="space-y-3">
-                    {dataSourceStats.filter(s => s.count > 0).map((stat) => (
-                      <div key={stat.source} className="flex items-center gap-4">
-                        <span className="text-sm text-slate-600 w-24">{stat.source}</span>
-                        <div className="flex-1 bg-slate-200 rounded-full h-2">
-                          <div 
-                            className="bg-[#339999] h-2 rounded-full transition-all"
-                            style={{ width: `${(stat.count / totalRegistrations) * 100}%` }}
-                          />
-                        </div>
-                        <span className="text-sm font-medium text-slate-700 w-12 text-right">
-                          {Math.round((stat.count / totalRegistrations) * 100)}%
-                        </span>
+                    {company.fda_registrations.slice(0, 3).map((reg) => (
+                      <div key={reg.id} className="border border-slate-200 rounded-xl p-4">
+                        <h4 className="font-medium text-slate-900">{reg.device_name}</h4>
+                        <p className="text-sm text-slate-500">{reg.registration_number}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {company.nmpa_registrations.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-4">🇨🇳 NMPA Registrations</h3>
+                  <div className="space-y-3">
+                    {company.nmpa_registrations.slice(0, 3).map((reg) => (
+                      <div key={reg.id} className="border border-slate-200 rounded-xl p-4">
+                        <h4 className="font-medium text-slate-900">{reg.product_name}</h4>
+                        <p className="text-sm text-slate-500">{reg.registration_number}</p>
                       </div>
                     ))}
                   </div>
@@ -264,287 +436,148 @@ export default function CompanyDetailPage({
             </div>
           )}
 
-          {activeTab === 'fda' && (
-            <div className="space-y-4">
-              {company.fda_registrations.length > 0 ? (
-                company.fda_registrations.map((reg) => (
-                  <div key={reg.id} className="border border-slate-200 rounded-xl p-5 hover:shadow-md transition-shadow">
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <h3 className="font-semibold text-slate-900 text-lg">{reg.device_name}</h3>
-                        <p className="text-slate-500 text-sm">{reg.registration_number}</p>
+          {/* IP Tab */}
+          {activeTab === 'ip' && (
+            <div className="space-y-6">
+              {/* Patents */}
+              {company.patents.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-4">
+                    {locale === 'en' ? 'Patents' : '专利'} ({company.patents.length})
+                  </h3>
+                  <div className="space-y-3">
+                    {company.patents.map((patent) => (
+                      <div key={patent.id} className="border border-slate-200 rounded-xl p-4">
+                        <h4 className="font-medium text-slate-900">{patent.patent_name}</h4>
+                        <p className="text-sm text-slate-500">{patent.patent_number}</p>
+                        <div className="flex gap-4 mt-2 text-xs text-slate-600">
+                          <span>{patent.patent_type}</span>
+                          <span>{patent.application_date}</span>
+                          <span className={`px-2 py-0.5 rounded ${patent.status === 'Granted' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                            {patent.status}
+                          </span>
+                        </div>
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        reg.registration_status === 'Active' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-slate-100 text-slate-800'
-                      }`}>
-                        {reg.registration_status}
-                      </span>
-                    </div>
-                    <p className="text-slate-600 mb-4">{reg.device_description}</p>
-                    <div className="grid md:grid-cols-4 gap-4 text-sm bg-slate-50 p-3 rounded-lg">
-                      <div>
-                        <span className="text-slate-500 block text-xs">Device Class</span>
-                        <span className="font-medium">{reg.device_class}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 block text-xs">Product Code</span>
-                        <span className="font-medium">{reg.product_code}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 block text-xs">Regulation</span>
-                        <span className="font-medium">{reg.regulation_number}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 block text-xs">FEI Number</span>
-                        <span className="font-medium">{reg.fei_number}</span>
-                      </div>
-                    </div>
-                    {reg.source_url && (
-                      <a href={reg.source_url} target="_blank" rel="noopener noreferrer" 
-                         className="text-[#339999] hover:underline text-sm mt-4 inline-flex items-center gap-1">
-                        {t.source} →
-                      </a>
-                    )}
+                    ))}
                   </div>
-                ))
-              ) : (
-                <div className="text-center py-12 text-slate-500">
-                  <p>{t.noData}</p>
+                </div>
+              )}
+
+              {/* Trademarks */}
+              {company.trademarks.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-4">
+                    {locale === 'en' ? 'Trademarks' : '商标'} ({company.trademarks.length})
+                  </h3>
+                  <div className="space-y-3">
+                    {company.trademarks.map((trademark) => (
+                      <div key={trademark.id} className="border border-slate-200 rounded-xl p-4">
+                        <h4 className="font-medium text-slate-900">{trademark.trademark_name}</h4>
+                        <p className="text-sm text-slate-500">{trademark.registration_number}</p>
+                        <div className="flex gap-4 mt-2 text-xs text-slate-600">
+                          <span>{trademark.category}</span>
+                          <span>{trademark.application_date}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
           )}
 
-          {activeTab === 'nmpa' && (
-            <div className="space-y-4">
-              {company.nmpa_registrations.length > 0 ? (
-                company.nmpa_registrations.map((reg) => (
-                  <div key={reg.id} className="border border-slate-200 rounded-xl p-5 hover:shadow-md transition-shadow">
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <h3 className="font-semibold text-slate-900 text-lg">
-                          {locale === 'zh' && reg.product_name_zh ? reg.product_name_zh : reg.product_name}
-                        </h3>
-                        <p className="text-slate-500 text-sm font-mono">{reg.registration_number}</p>
-                      </div>
-                      <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium">
-                        {reg.device_classification}
-                      </span>
+          {/* Risk Tab */}
+          {activeTab === 'risk' && (
+            <div className="space-y-6">
+              {/* Risk Score */}
+              {company.risk_score && (
+                <div className={`rounded-xl p-6 ${getRiskColor(company.risk_score.level)}`}>
+                  <h3 className="font-semibold mb-2">
+                    {locale === 'en' ? 'Risk Assessment' : '风险评估'}
+                  </h3>
+                  <p className="text-3xl font-bold">{company.risk_score.score}</p>
+                  <p className="text-sm mt-1">
+                    {locale === 'en' 
+                      ? `Risk Level: ${company.risk_score.level.toUpperCase()}` 
+                      : `风险等级: ${company.risk_score.level === 'high' ? '高' : company.risk_score.level === 'medium' ? '中' : '低'}`}
+                  </p>
+                  {company.risk_score.factors.length > 0 && (
+                    <div className="mt-4">
+                      <p className="text-sm font-medium">
+                        {locale === 'en' ? 'Risk Factors:' : '风险因素:'}
+                      </p>
+                      <ul className="mt-2 space-y-1">
+                        {company.risk_score.factors.map((factor, index) => (
+                          <li key={index} className="text-sm">• {factor}</li>
+                        ))}
+                      </ul>
                     </div>
-                    <p className="text-slate-600 mb-4">{reg.product_description}</p>
-                    <div className="grid md:grid-cols-2 gap-4 text-sm bg-slate-50 p-3 rounded-lg">
-                      <div>
-                        <span className="text-slate-500 block text-xs">Manufacturer</span>
-                        <span className="font-medium">{reg.manufacturer_zh || reg.manufacturer}</span>
+                  )}
+                </div>
+              )}
+
+              {/* Litigations */}
+              {company.litigations.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-4">
+                    {locale === 'en' ? 'Litigations' : '法律诉讼'} ({company.litigations.length})
+                  </h3>
+                  <div className="space-y-3">
+                    {company.litigations.map((litigation) => (
+                      <div key={litigation.id} className="border border-slate-200 rounded-xl p-4">
+                        <h4 className="font-medium text-slate-900">{litigation.case_number}</h4>
+                        <p className="text-sm text-slate-600">{litigation.case_type}</p>
+                        <div className="flex gap-4 mt-2 text-xs text-slate-500">
+                          <span>{litigation.court}</span>
+                          <span>{litigation.case_date}</span>
+                          <span className={`px-2 py-0.5 rounded ${litigation.case_status === 'Active' ? 'bg-red-100 text-red-800' : 'bg-slate-100 text-slate-800'}`}>
+                            {litigation.case_status}
+                          </span>
+                        </div>
                       </div>
-                      <div>
-                        <span className="text-slate-500 block text-xs">Registration Holder</span>
-                        <span className="font-medium">{reg.registration_holder_zh || reg.registration_holder}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 block text-xs">Approval Date</span>
-                        <span className="font-medium">{reg.approval_date}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 block text-xs">Expiration Date</span>
-                        <span className="font-medium">{reg.expiration_date}</span>
-                      </div>
-                    </div>
-                    {reg.source_url && (
-                      <a href={reg.source_url} target="_blank" rel="noopener noreferrer" 
-                         className="text-[#339999] hover:underline text-sm mt-4 inline-flex items-center gap-1">
-                        {t.source} →
-                      </a>
-                    )}
+                    ))}
                   </div>
-                ))
-              ) : (
-                <div className="text-center py-12 text-slate-500">
-                  <p>{t.noData}</p>
+                </div>
+              )}
+
+              {/* Abnormal Operations */}
+              {company.abnormal_operations.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-4">
+                    {locale === 'en' ? 'Abnormal Operations' : '经营异常'} ({company.abnormal_operations.length})
+                  </h3>
+                  <div className="space-y-3">
+                    {company.abnormal_operations.map((op) => (
+                      <div key={op.id} className="border border-slate-200 rounded-xl p-4">
+                        <p className="text-slate-700">{op.reason}</p>
+                        <div className="flex gap-4 mt-2 text-xs text-slate-500">
+                          <span>{op.decision_authority}</span>
+                          <span>{op.decision_date}</span>
+                          {op.removal_date && <span className="text-green-600">已移除: {op.removal_date}</span>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
           )}
 
-          {activeTab === 'eudamed' && (
-            <div className="space-y-4">
-              {company.eudamed_registrations.length > 0 ? (
-                company.eudamed_registrations.map((reg) => (
-                  <div key={reg.id} className="border border-slate-200 rounded-xl p-5 hover:shadow-md transition-shadow">
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <h3 className="font-semibold text-slate-900 text-lg">{reg.device_name}</h3>
-                        <p className="text-slate-500 text-sm">{reg.certificate_number}</p>
-                      </div>
-                      <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-xs font-medium">
-                        {reg.notified_body}
+          {/* Branches Tab */}
+          {activeTab === 'branches' && (
+            <div>
+              {company.branches.length > 0 ? (
+                <div className="grid md:grid-cols-2 gap-4">
+                  {company.branches.map((branch) => (
+                    <div key={branch.id} className="border border-slate-200 rounded-xl p-4">
+                      <h4 className="font-medium text-slate-900">{branch.branch_name}</h4>
+                      <p className="text-sm text-slate-600 mt-1">{branch.branch_address}</p>
+                      <span className={`inline-block mt-2 px-2 py-0.5 rounded text-xs ${branch.branch_status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-800'}`}>
+                        {branch.branch_status}
                       </span>
                     </div>
-                    <p className="text-slate-600 mb-4">{reg.device_description}</p>
-                    <div className="grid md:grid-cols-3 gap-4 text-sm bg-slate-50 p-3 rounded-lg">
-                      <div>
-                        <span className="text-slate-500 block text-xs">SRN</span>
-                        <span className="font-medium">{reg.srn}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 block text-xs">NCA</span>
-                        <span className="font-medium">{reg.nca}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 block text-xs">UDI-DI</span>
-                        <span className="font-medium text-xs">{reg.udi_di}</span>
-                      </div>
-                    </div>
-                    {reg.source_url && (
-                      <a href={reg.source_url} target="_blank" rel="noopener noreferrer" 
-                         className="text-[#339999] hover:underline text-sm mt-4 inline-flex items-center gap-1">
-                        {t.source} →
-                      </a>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-12 text-slate-500">
-                  <p>{t.noData}</p>
+                  ))}
                 </div>
-              )}
-            </div>
-          )}
-
-          {activeTab === 'pmda' && (
-            <div className="space-y-4">
-              {company.pmda_registrations.length > 0 ? (
-                company.pmda_registrations.map((reg) => (
-                  <div key={reg.id} className="border border-slate-200 rounded-xl p-5 hover:shadow-md transition-shadow">
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <h3 className="font-semibold text-slate-900 text-lg">
-                          {reg.product_name_jp || reg.product_name}
-                        </h3>
-                        <p className="text-slate-500 text-sm font-mono">{reg.approval_number}</p>
-                      </div>
-                      <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-medium">
-                        {reg.device_classification}
-                      </span>
-                    </div>
-                    <p className="text-slate-600 mb-4">{reg.product_description}</p>
-                    <div className="grid md:grid-cols-2 gap-4 text-sm bg-slate-50 p-3 rounded-lg">
-                      <div>
-                        <span className="text-slate-500 block text-xs">Manufacturer</span>
-                        <span className="font-medium">{reg.manufacturer_jp || reg.manufacturer}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 block text-xs">MA Holder</span>
-                        <span className="font-medium">{reg.marketing_authorization_holder_jp || reg.marketing_authorization_holder}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 block text-xs">Approval Date</span>
-                        <span className="font-medium">{reg.approval_date}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 block text-xs">Expiration Date</span>
-                        <span className="font-medium">{reg.expiration_date}</span>
-                      </div>
-                    </div>
-                    {reg.source_url && (
-                      <a href={reg.source_url} target="_blank" rel="noopener noreferrer" 
-                         className="text-[#339999] hover:underline text-sm mt-4 inline-flex items-center gap-1">
-                        {t.source} →
-                      </a>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-12 text-slate-500">
-                  <p>{t.noData}</p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {activeTab === 'healthcanada' && (
-            <div className="space-y-4">
-              {company.health_canada_registrations.length > 0 ? (
-                company.health_canada_registrations.map((reg) => (
-                  <div key={reg.id} className="border border-slate-200 rounded-xl p-5 hover:shadow-md transition-shadow">
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <h3 className="font-semibold text-slate-900 text-lg">{reg.device_name}</h3>
-                        <p className="text-slate-500 text-sm">{reg.licence_number}</p>
-                      </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        reg.licence_status === 'Active' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-slate-100 text-slate-800'
-                      }`}>
-                        {reg.licence_status}
-                      </span>
-                    </div>
-                    <p className="text-slate-600 mb-4">{reg.device_description}</p>
-                    <div className="grid md:grid-cols-3 gap-4 text-sm bg-slate-50 p-3 rounded-lg">
-                      <div>
-                        <span className="text-slate-500 block text-xs">Device Class</span>
-                        <span className="font-medium">{reg.device_class}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 block text-xs">Issue Date</span>
-                        <span className="font-medium">{reg.issue_date}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500 block text-xs">Expiry Date</span>
-                        <span className="font-medium">{reg.expiry_date}</span>
-                      </div>
-                    </div>
-                    {reg.source_url && (
-                      <a href={reg.source_url} target="_blank" rel="noopener noreferrer" 
-                         className="text-[#339999] hover:underline text-sm mt-4 inline-flex items-center gap-1">
-                        {t.source} →
-                      </a>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-12 text-slate-500">
-                  <p>{t.noData}</p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {activeTab === 'products' && (
-            <div className="space-y-4">
-              {company.products.length > 0 ? (
-                company.products.map((product) => (
-                  <div key={product.id} className="border border-slate-200 rounded-xl p-5 hover:shadow-md transition-shadow">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-semibold text-slate-900 text-lg">
-                        {locale === 'zh' && product.name_zh ? product.name_zh : product.name}
-                      </h3>
-                      {product.brand_name && (
-                        <span className="bg-[#339999]/10 text-[#339999] px-3 py-1 rounded-full text-xs font-medium">
-                          {product.brand_name}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-slate-600 mb-3">
-                      {locale === 'zh' && product.description_zh ? product.description_zh : product.description}
-                    </p>
-                    <div className="flex flex-wrap gap-4 text-sm">
-                      {product.model_number && (
-                        <span className="text-slate-500">
-                          <span className="font-medium text-slate-700">Model:</span> {product.model_number}
-                        </span>
-                      )}
-                      {product.category && (
-                        <span className="text-slate-500">
-                          <span className="font-medium text-slate-700">Category:</span> {product.category}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))
               ) : (
                 <div className="text-center py-12 text-slate-500">
                   <p>{t.noData}</p>

@@ -1,6 +1,5 @@
 'use client';
 
-// MDLooker Platform - Global Medical Device Compliance Intelligence
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { translations, locales, type Locale } from '../i18n-config';
@@ -68,11 +67,15 @@ export default function HomePage({
 
   return (
     <main className="max-w-6xl mx-auto px-6 py-20">
-      <h1 className="text-4xl font-bold text-slate-900 mb-6">{t.hero.title}</h1>
-      <p className="text-lg text-slate-600 mb-8 max-w-2xl mx-auto">
-        {t.hero.subtitle}
-      </p>
+      {/* 标题居中 */}
+      <div className="text-center mb-12">
+        <h1 className="text-4xl font-bold text-slate-900 mb-6">{t.hero.title}</h1>
+        <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+          {t.hero.subtitle}
+        </p>
+      </div>
 
+      {/* 搜索框 */}
       <div className="relative max-w-2xl mx-auto mb-12">
         <div className="flex gap-2">
           <input
@@ -105,8 +108,9 @@ export default function HomePage({
         </div>
       </div>
 
+      {/* 搜索结果 */}
       {hasSearched && results && (
-        <div className="mb-12">
+        <div>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-slate-800">
               {locale === 'en' ? `Found ${results.total} companies` : `找到 ${results.total} 家企业`}
@@ -182,32 +186,6 @@ export default function HomePage({
               </p>
             </div>
           )}
-        </div>
-      )}
-
-      {!hasSearched && (
-        <div className="grid md:grid-cols-3 gap-6 mt-12">
-          <Link href={`/${locale}/guides/fda-510k-export`} className="bg-white p-6 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-100 group">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
-              <span className="text-blue-600 font-bold">FDA</span>
-            </div>
-            <h3 className="font-bold text-lg mb-2 text-slate-900">FDA 510(k) Guide</h3>
-            <p className="text-sm text-slate-600">{locale === 'en' ? 'Export to USA roadmap' : '出口美国指南'}</p>
-          </Link>
-          <Link href={`/${locale}/guides/nmpa-registration`} className="bg-white p-6 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-100 group">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-green-200 transition-colors">
-              <span className="text-green-600 font-bold">NMPA</span>
-            </div>
-            <h3 className="font-bold text-lg mb-2 text-slate-900">NMPA Registration</h3>
-            <p className="text-sm text-slate-600">{locale === 'en' ? 'China market access guide' : '中国市场准入指南'}</p>
-          </Link>
-          <Link href={`/${locale}/guides/eudamed-registration`} className="bg-white p-6 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-100 group">
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-purple-200 transition-colors">
-              <span className="text-purple-600 font-bold">EU</span>
-            </div>
-            <h3 className="font-bold text-lg mb-2 text-slate-900">EUDAMED Registration</h3>
-            <p className="text-sm text-slate-600">{locale === 'en' ? 'EU MDR compliance guide' : '欧盟MDR合规指南'}</p>
-          </Link>
         </div>
       )}
     </main>

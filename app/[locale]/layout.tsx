@@ -1,25 +1,29 @@
-import Link from 'next/link';
-import { locales, type Locale } from '../i18n-config';
+'use client';
 
-export default async function LocaleLayout({
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { locales, type Locale } from '../i18n-config';
+import Image from 'next/image';
+
+export default function LocaleLayout({
   children,
   params
 }: {
   children: React.ReactNode;
-  params: Promise<{ locale: string }>;
+  params: { locale: string };
 }) {
-  const { locale } = await params;
+  const pathname = usePathname();
+  const locale = params.locale as Locale;
   
   if (!(locales as readonly string[]).includes(locale)) {
     return <div className="p-20 text-center">404 - Language Not Found</div>;
   }
 
-  const validLocale = locale as Locale;
-
   const navItems = [
-    { href: `/${validLocale}/compliance-profile`, labelEn: 'Compliance Profile', labelZh: '合规档案' },
-    { href: `/${validLocale}/market-access`, labelEn: 'Market Access', labelZh: '准入导航' },
-    { href: `/${validLocale}/guides`, labelEn: 'Guides', labelZh: '指南' },
+    { href: `/${locale}`, labelEn: 'Home', labelZh: '首页' },
+    { href: `/${locale}/compliance-profile`, labelEn: 'Compliance Profile', labelZh: '合规档案' },
+    { href: `/${locale}/market-access`, labelEn: 'Market Access', labelZh: '准入导航' },
+    { href: `/${locale}/guides`, labelEn: 'Guides', labelZh: '指南' },
   ];
 
   return (
@@ -27,19 +31,33 @@ export default async function LocaleLayout({
       <nav className="bg-white border-b border-[#339999]/20 px-6 py-4">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-8">
-            <Link href={`/${validLocale}`} className="text-2xl font-bold text-[#339999]">
-              MDLooker
+            <Link href={`/${locale}`} className="flex items-center gap-2">
+              <Image 
+                src="/logo.png" 
+                alt="MDLooker" 
+                width={40} 
+                height={40}
+                className="rounded-lg"
+              />
+              <span className="text-2xl font-bold text-[#339999]">MDLooker</span>
             </Link>
-            <div className="hidden md:flex items-center gap-6">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="text-sm text-slate-600 hover:text-[#339999] transition-colors"
-                >
-                  {validLocale === 'zh' ? item.labelZh : item.labelEn}
-                </Link>
-              ))}
+            <div className="hidden md:flex items-center gap-2">
+              {navItems.map((item) => {
+                const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      isActive 
+                        ? 'bg-[#339999] text-white' 
+                        : 'text-slate-600 hover:bg-[#339999]/10 hover:text-[#339999]'
+                    }`}
+                  >
+                    {locale === 'zh' ? item.labelZh : item.labelEn}
+                  </Link>
+                );
+              })}
             </div>
           </div>
           <div className="flex gap-2">
@@ -48,7 +66,7 @@ export default async function LocaleLayout({
                 key={loc}
                 href={`/${loc}`}
                 className={`px-3 py-1 rounded text-sm ${
-                  loc === validLocale ? 'bg-[#339999] text-white' : 'text-slate-600 hover:bg-[#339999]/10'
+                  loc === locale ? 'bg-[#339999] text-white' : 'text-slate-600 hover:bg-[#339999]/10'
                 }`}
               >
                 {loc === 'en' ? 'English' : '中文'}
