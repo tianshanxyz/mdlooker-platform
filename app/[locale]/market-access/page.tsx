@@ -9,7 +9,34 @@ import {
   sourceCountries,
   deviceClasses,
   type MarketAccessPathway,
-} from '../../lib/market-access-data';
+} from '@/app/lib/market-access-data';
+
+// Download icon component
+function DownloadIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+  );
+}
+
+// External link icon component
+function ExternalLinkIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+    </svg>
+  );
+}
+
+// File text icon component
+function FileTextIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+  );
+}
 
 export default function MarketAccessPage({
   params,
@@ -46,13 +73,85 @@ export default function MarketAccessPage({
   };
 
   const getMarketFlag = (marketId: string) => {
-    const market = targetMarkets.find((m) => m.id === marketId);
+    const market = targetMarkets.find((m: { id: string; flag?: string }) => m.id === marketId);
     return market?.flag || '🌍';
   };
 
   const getMarketName = (marketId: string) => {
-    const market = targetMarkets.find((m) => m.id === marketId);
+    const market = targetMarkets.find((m: { id: string; name?: string; nameZh?: string }) => m.id === marketId);
     return locale === 'zh' ? market?.nameZh : market?.name;
+  };
+
+  // Generate and download pathway report
+  const downloadPathwayReport = () => {
+    if (!pathway) return;
+
+    const categoryName = productCategories.find((c: { id: string; name: string; nameZh: string }) => c.id === productCategory);
+    const countryName = sourceCountries.find((c: { id: string; name: string; nameZh: string }) => c.id === sourceCountry);
+    const marketName = targetMarkets.find((m: { id: string; name: string; nameZh: string }) => m.id === targetMarket);
+    const className = deviceClasses.find((c: { id: string; name: string; nameZh: string }) => c.id === deviceClass);
+
+    const reportContent = `
+# ${locale === 'en' ? 'Market Access Pathway Report' : '市场准入路径报告'}
+## ${pathway.targetMarket} - ${locale === 'zh' ? pathway.targetMarketZh : pathway.targetMarket}
+
+---
+
+### ${locale === 'en' ? 'Product Information' : '产品信息'}
+- **${locale === 'en' ? 'Category' : '类别'}:** ${locale === 'zh' ? categoryName?.nameZh : categoryName?.name}
+- **${locale === 'en' ? 'Source Country' : '来源国'}:** ${locale === 'zh' ? countryName?.nameZh : countryName?.name}
+- **${locale === 'en' ? 'Target Market' : '目标市场'}:** ${locale === 'zh' ? marketName?.nameZh : marketName?.name}
+- **${locale === 'en' ? 'Device Class' : '设备分类'}:** ${locale === 'zh' ? className?.nameZh : className?.name}
+
+---
+
+### ${locale === 'en' ? 'Requirements Summary' : '要求概要'}
+- **${locale === 'en' ? 'Total Steps' : '总步骤'}:** ${pathway.requirements.length}
+- **${locale === 'en' ? 'Local Representative Required' : '需要本地代表'}:** ${pathway.localRepresentativeRequired ? (locale === 'en' ? 'Yes' : '是') : (locale === 'en' ? 'No' : '否')}
+- **${locale === 'en' ? 'Clinical Data Required' : '需要临床数据'}:** ${pathway.clinicalDataRequired ? (locale === 'en' ? 'Yes' : '是') : (locale === 'en' ? 'No' : '否')}
+
+---
+
+### ${locale === 'en' ? 'Access Pathway Steps' : '准入路径步骤'}
+${pathway.requirements.map((req: { step: number; title: string; titleZh: string; description: string; descriptionZh: string; documents: string[]; documentsZh: string[]; timeline: string; timelineZh: string; cost: string; costZh: string }) => `
+#### ${locale === 'zh' ? req.titleZh : req.title}
+**${locale === 'en' ? 'Step' : '步骤'} ${req.step}**
+
+${locale === 'zh' ? req.descriptionZh : req.description}
+
+**${locale === 'en' ? 'Required Documents' : '所需文件'}:**
+${(locale === 'zh' ? req.documentsZh : req.documents).map((doc: string) => `- ${doc}`).join('\n')}
+
+- **${locale === 'en' ? 'Timeline' : '时间'}:** ${locale === 'zh' ? req.timelineZh : req.timeline}
+- **${locale === 'en' ? 'Estimated Cost' : '预估成本'}:** ${locale === 'zh' ? req.costZh : req.cost}
+`).join('\n---\n')}
+
+---
+
+### ${locale === 'en' ? 'Key Regulations' : '核心法规'}
+${(locale === 'zh' ? pathway.keyRegulationsZh : pathway.keyRegulations).map((reg: string, idx: number) => `${idx + 1}. ${reg}`).join('\n')}
+
+---
+
+### ${locale === 'en' ? 'Regulation Links' : '法规链接'}
+${pathway.regulationLinks.map((link: { name: string; nameZh: string; url: string; description?: string; descriptionZh?: string }) => `- **${locale === 'zh' ? link.nameZh : link.name}**: ${link.url}
+  ${locale === 'zh' ? (link.descriptionZh || '') : (link.description || '')}`).join('\n')}
+
+---
+
+*${locale === 'en' ? 'Report generated by MDLooker Market Access Navigator' : '报告由MDLooker市场准入导航生成'}*
+*${new Date().toLocaleString()}*
+`;
+
+    const blob = new Blob([reportContent], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `market-access-pathway-${targetMarket}-${new Date().toISOString().split('T')[0]}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -82,7 +181,7 @@ export default function MarketAccessPage({
               <option value="">
                 {locale === 'en' ? 'Select category...' : '选择类别...'}
               </option>
-              {productCategories.map((cat) => (
+              {productCategories.map((cat: { id: string; name: string; nameZh: string }) => (
                 <option key={cat.id} value={cat.id}>
                   {locale === 'zh' ? cat.nameZh : cat.name}
                 </option>
@@ -103,7 +202,7 @@ export default function MarketAccessPage({
               <option value="">
                 {locale === 'en' ? 'Select country...' : '选择国家...'}
               </option>
-              {sourceCountries.map((country) => (
+              {sourceCountries.map((country: { id: string; name: string; nameZh: string }) => (
                 <option key={country.id} value={country.id}>
                   {locale === 'zh' ? country.nameZh : country.name}
                 </option>
@@ -124,7 +223,7 @@ export default function MarketAccessPage({
               <option value="">
                 {locale === 'en' ? 'Select market...' : '选择市场...'}
               </option>
-              {targetMarkets.map((market) => (
+              {targetMarkets.map((market: { id: string; name: string; nameZh: string; flag: string }) => (
                 <option key={market.id} value={market.id}>
                   {market.flag} {locale === 'zh' ? market.nameZh : market.name}
                 </option>
@@ -145,7 +244,7 @@ export default function MarketAccessPage({
               <option value="">
                 {locale === 'en' ? 'Select class...' : '选择分类...'}
               </option>
-              {deviceClasses.map((cls) => (
+              {deviceClasses.map((cls: { id: string; name: string; nameZh: string }) => (
                 <option key={cls.id} value={cls.id}>
                   {locale === 'zh' ? cls.nameZh : cls.name}
                 </option>
@@ -223,6 +322,17 @@ export default function MarketAccessPage({
                 </p>
               </div>
             </div>
+
+            {/* Download Report Button */}
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={downloadPathwayReport}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-[#339999] text-white rounded-lg font-medium hover:bg-[#2a7a7a] transition-colors shadow-md"
+              >
+                <DownloadIcon className="w-5 h-5" />
+                {locale === 'en' ? 'Download Full Report' : '下载完整报告'}
+              </button>
+            </div>
           </div>
 
           {/* Steps Timeline */}
@@ -231,7 +341,7 @@ export default function MarketAccessPage({
               {locale === 'en' ? 'Access Pathway Steps' : '准入路径步骤'}
             </h3>
             <div className="space-y-6">
-              {pathway.requirements.map((req, index) => (
+              {pathway.requirements.map((req: { step: number; title: string; titleZh: string; description: string; descriptionZh: string; documents: string[]; documentsZh: string[]; timeline: string; timelineZh: string; cost: string; costZh: string }, index: number) => (
                 <div key={req.step} className="relative">
                   {index !== pathway.requirements.length - 1 && (
                     <div className="absolute left-6 top-14 w-0.5 h-full bg-[#339999]/20" />
@@ -254,7 +364,7 @@ export default function MarketAccessPage({
                           {locale === 'en' ? 'Required Documents:' : '所需文件：'}
                         </p>
                         <ul className="mt-1 space-y-1">
-                          {(locale === 'zh' ? req.documentsZh : req.documents).map((doc, i) => (
+                          {(locale === 'zh' ? req.documentsZh : req.documents).map((doc: string, i: number) => (
                             <li key={i} className="text-sm text-slate-600 flex items-center gap-2">
                               <span className="w-1.5 h-1.5 bg-[#339999] rounded-full" />
                               {doc}
@@ -285,25 +395,71 @@ export default function MarketAccessPage({
             </div>
           </div>
 
-          {/* Key Regulations */}
+          {/* Key Regulations with Links */}
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-100">
             <h3 className="text-xl font-bold text-slate-900 mb-4">
-              {locale === 'en' ? 'Key Regulations' : '核心法规'}
+              {locale === 'en' ? 'Key Regulations & Official Links' : '核心法规与官方链接'}
             </h3>
-            <div className="grid md:grid-cols-2 gap-3">
+            <div className="space-y-4">
               {(locale === 'zh' ? pathway.keyRegulationsZh : pathway.keyRegulations).map(
-                (reg, index) => (
+                (reg: string, index: number) => (
                   <div
                     key={index}
-                    className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg"
+                    className="flex items-start gap-3 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
                   >
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#339999]/10 text-[#339999] flex items-center justify-center text-sm font-medium">
+                    <span className="flex-shrink-0 w-8 h-8 rounded-full bg-[#339999]/10 text-[#339999] flex items-center justify-center text-sm font-bold">
                       {index + 1}
                     </span>
-                    <span className="text-slate-700">{reg}</span>
+                    <div className="flex-1">
+                      <span className="text-slate-800 font-medium block">{reg}</span>
+                      {pathway.regulationLinks[index] && (
+                        <a
+                          href={pathway.regulationLinks[index].url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 mt-2 text-sm text-[#339999] hover:text-[#2a7a7a] hover:underline"
+                        >
+                          <ExternalLinkIcon className="w-4 h-4" />
+                          {locale === 'zh'
+                            ? pathway.regulationLinks[index].nameZh
+                            : pathway.regulationLinks[index].name}
+                        </a>
+                      )}
+                    </div>
                   </div>
                 )
               )}
+            </div>
+
+            {/* All Regulation Links */}
+            <div className="mt-6 pt-6 border-t border-slate-200">
+              <h4 className="text-lg font-semibold text-slate-900 mb-3">
+                {locale === 'en' ? 'Additional Resources' : '更多资源'}
+              </h4>
+              <div className="grid md:grid-cols-2 gap-3">
+                {pathway.regulationLinks.map((link: { name: string; nameZh: string; url: string; description?: string; descriptionZh?: string }, idx: number) => (
+                  <a
+                    key={idx}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors group"
+                  >
+                    <FileTextIcon className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-blue-900 group-hover:text-blue-800">
+                        {locale === 'zh' ? link.nameZh : link.name}
+                      </p>
+                      {link.description && (
+                        <p className="text-xs text-blue-700 mt-1">
+                          {locale === 'zh' ? link.descriptionZh : link.description}
+                        </p>
+                      )}
+                    </div>
+                    <ExternalLinkIcon className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -314,7 +470,7 @@ export default function MarketAccessPage({
                 {locale === 'en' ? 'Recommended Notified Bodies' : '推荐公告机构'}
               </h3>
               <div className="flex flex-wrap gap-2">
-                {pathway.notifiedBodies.map((body, index) => (
+                {pathway.notifiedBodies.map((body: string, index: number) => (
                   <span
                     key={index}
                     className="px-4 py-2 bg-purple-50 text-purple-700 rounded-full text-sm font-medium"

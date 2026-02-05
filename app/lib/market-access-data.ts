@@ -15,6 +15,14 @@ export interface AccessRequirement {
   costZh: string;
 }
 
+export interface RegulationLink {
+  name: string;
+  nameZh: string;
+  url: string;
+  description?: string;
+  descriptionZh?: string;
+}
+
 export interface MarketAccessPathway {
   targetMarket: string;
   targetMarketZh: string;
@@ -24,6 +32,7 @@ export interface MarketAccessPathway {
   requirements: AccessRequirement[];
   keyRegulations: string[];
   keyRegulationsZh: string[];
+  regulationLinks: RegulationLink[];
   notifiedBodies?: string[];
   localRepresentativeRequired: boolean;
   clinicalDataRequired: boolean;
@@ -181,6 +190,43 @@ function generateUSAPathway(
       '21 CFR Part 801 - 标签',
       '21 CFR Part 814 - 上市前批准',
     ],
+    regulationLinks: [
+      {
+        name: '21 CFR Part 820 - QSR',
+        nameZh: '21 CFR Part 820 - 质量体系法规',
+        url: 'https://www.ecfr.gov/current/title-21/chapter-I/subchapter-H/part-820',
+        description: 'FDA Quality System Regulation',
+        descriptionZh: 'FDA质量体系法规',
+      },
+      {
+        name: '21 CFR Part 807 - Registration',
+        nameZh: '21 CFR Part 807 - 企业注册',
+        url: 'https://www.ecfr.gov/current/title-21/chapter-I/subchapter-H/part-807',
+        description: 'Establishment Registration and Device Listing',
+        descriptionZh: '企业注册和设备列名',
+      },
+      {
+        name: '21 CFR Part 801 - Labeling',
+        nameZh: '21 CFR Part 801 - 标签',
+        url: 'https://www.ecfr.gov/current/title-21/chapter-I/subchapter-H/part-801',
+        description: 'Device Labeling Requirements',
+        descriptionZh: '设备标签要求',
+      },
+      {
+        name: '21 CFR Part 814 - PMA',
+        nameZh: '21 CFR Part 814 - 上市前批准',
+        url: 'https://www.ecfr.gov/current/title-21/chapter-I/subchapter-H/part-814',
+        description: 'Premarket Approval of Medical Devices',
+        descriptionZh: '医疗器械上市前批准',
+      },
+      {
+        name: 'FDA Device Advice',
+        nameZh: 'FDA设备指南',
+        url: 'https://www.fda.gov/medical-devices/device-advice-comprehensive-regulatory-assistance',
+        description: 'Comprehensive Regulatory Assistance',
+        descriptionZh: '综合监管协助',
+      },
+    ],
     localRepresentativeRequired: true,
     clinicalDataRequired: isClassIII,
   };
@@ -266,6 +312,43 @@ function generateEUPathway(
       'MDCG指南',
       'EN ISO 13485 - 质量管理',
       'EN ISO 14971 - 风险管理',
+    ],
+    regulationLinks: [
+      {
+        name: 'MDR 2017/745',
+        nameZh: 'MDR 2017/745 - 医疗器械法规',
+        url: 'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32017R0745',
+        description: 'Medical Device Regulation (EU)',
+        descriptionZh: '欧盟医疗器械法规',
+      },
+      {
+        name: 'MDCG Guidelines',
+        nameZh: 'MDCG指南',
+        url: 'https://health.ec.europa.eu/medical-devices-sector/new-regulations/guidance-mdcg-endorsed-documents-and-other-guidance_en',
+        description: 'Medical Device Coordination Group Guidelines',
+        descriptionZh: '医疗器械协调组指南',
+      },
+      {
+        name: 'EUDAMED',
+        nameZh: 'EUDAMED数据库',
+        url: 'https://ec.europa.eu/tools/eudamed',
+        description: 'European Database on Medical Devices',
+        descriptionZh: '欧洲医疗器械数据库',
+      },
+      {
+        name: 'NANDO Database',
+        nameZh: 'NANDO公告机构数据库',
+        url: 'https://ec.europa.eu/growth/tools-databases/nando/',
+        description: 'Notified Bodies Database',
+        descriptionZh: '公告机构数据库',
+      },
+      {
+        name: 'ISO 13485:2016',
+        nameZh: 'ISO 13485:2016',
+        url: 'https://www.iso.org/standard/59752.html',
+        description: 'Medical devices - Quality management systems',
+        descriptionZh: '医疗器械-质量管理体系',
+      },
     ],
     notifiedBodies: [
       'BSI Group (0086)',
@@ -368,6 +451,43 @@ function generateChinaPathway(
       'GB/T 16886 - 生物学评价',
       'YY/T 0316 - 风险管理',
     ],
+    regulationLinks: [
+      {
+        name: 'Medical Device Regulations',
+        nameZh: '医疗器械监督管理条例',
+        url: 'https://www.nmpa.gov.cn/xxgk/fgwj/flxzhfg/20210308160000153.html',
+        description: 'State Council Order No. 739',
+        descriptionZh: '国务院令第739号',
+      },
+      {
+        name: 'Registration Measures',
+        nameZh: '医疗器械注册管理办法',
+        url: 'https://www.nmpa.gov.cn/xxgk/fgwj/bmgzh/20210308160001153.html',
+        description: 'NMPA Order No. 47',
+        descriptionZh: '国家市场监督管理总局令第47号',
+      },
+      {
+        name: 'NMPA Database',
+        nameZh: 'NMPA数据查询',
+        url: 'https://www.nmpa.gov.cn/datasearch/home-index.html',
+        description: 'Medical Device Registration Database',
+        descriptionZh: '医疗器械注册证信息查询',
+      },
+      {
+        name: 'CMDE Guidelines',
+        nameZh: 'CMDE技术审查指导原则',
+        url: 'https://www.cmde.org.cn/flfg/zdyz/index.html',
+        description: 'Center for Medical Device Evaluation Guidelines',
+        descriptionZh: '医疗器械技术审评中心指导原则',
+      },
+      {
+        name: 'GB/T 16886.1',
+        nameZh: 'GB/T 16886.1 生物学评价',
+        url: 'https://openstd.samr.gov.cn/bzgk/gb/newGbInfo?hcno=5C8A8A8A8A8A8A8A8A8A8A8A8A8A8A8A',
+        description: 'Biological evaluation of medical devices',
+        descriptionZh: '医疗器械生物学评价',
+      },
+    ],
     localRepresentativeRequired: isImport,
     clinicalDataRequired: isClassIII || deviceClass === 'class_iib',
   };
@@ -445,6 +565,43 @@ function generateJapanPathway(
       'JIS T 14971 - 风险管理',
       'JIS T 13485 - 质量管理',
     ],
+    regulationLinks: [
+      {
+        name: 'PMD Act (Act No. 145)',
+        nameZh: '药事法（昭和35年法律第145号）',
+        url: 'https://www.mhlw.go.jp/english/topics/medicaldevices/',
+        description: 'Pharmaceutical and Medical Device Act',
+        descriptionZh: '医薬品、医療機器等の品質、有効性及び安全性の確保等に関する法律',
+      },
+      {
+        name: 'PMDA Guidelines',
+        nameZh: 'PMDA指导原则',
+        url: 'https://www.pmda.go.jp/english/review-services/regulatory-info/0002.html',
+        description: 'Pharmaceuticals and Medical Devices Agency',
+        descriptionZh: '医药品医疗器械综合机构',
+      },
+      {
+        name: 'MHLW Medical Devices',
+        nameZh: 'MHLW医疗器械',
+        url: 'https://www.mhlw.go.jp/english/policy/health-medical/medical-care/medical-devices/',
+        description: 'Ministry of Health, Labour and Welfare',
+        descriptionZh: '厚生劳动省医疗器械',
+      },
+      {
+        name: 'JIS Standards',
+        nameZh: 'JIS标准',
+        url: 'https://www.jisc.go.jp/eng/',
+        description: 'Japanese Industrial Standards',
+        descriptionZh: '日本工业标准',
+      },
+      {
+        name: 'Nihonbashi Portal',
+        nameZh: '日本桥医疗器械门户',
+        url: 'https://www.nihonbashi-pmda.jp/english/',
+        description: 'Regulatory Consultation Portal',
+        descriptionZh: '监管咨询门户',
+      },
+    ],
     localRepresentativeRequired: true,
     clinicalDataRequired: isClassIV,
   };
@@ -515,6 +672,43 @@ function generateCanadaPathway(
       '医疗器械法规 (SOR/98-282)',
       'ISO 13485 - 质量管理体系',
       'CMDR - 加拿大医疗器械法规',
+    ],
+    regulationLinks: [
+      {
+        name: 'Medical Devices Regulations',
+        nameZh: '医疗器械法规',
+        url: 'https://laws-lois.justice.gc.ca/eng/regulations/SOR-98-282/',
+        description: 'SOR/98-282 - Canada Justice Laws',
+        descriptionZh: 'SOR/98-282 - 加拿大司法部',
+      },
+      {
+        name: 'Health Canada Devices',
+        nameZh: 'Health Canada医疗器械',
+        url: 'https://www.canada.ca/en/health-canada/services/medical-devices.html',
+        description: 'Medical Devices Overview',
+        descriptionZh: '医疗器械概览',
+      },
+      {
+        name: 'MDL Application',
+        nameZh: 'MDL许可证申请',
+        url: 'https://www.canada.ca/en/health-canada/services/drugs-health-products/medical-devices/application-information/guidance-documents/medical-device-licence-application.html',
+        description: 'Medical Device Licence Guidance',
+        descriptionZh: '医疗器械许可证指南',
+      },
+      {
+        name: 'Canadian Medical Devices',
+        nameZh: '加拿大医疗器械数据库',
+        url: 'https://health-products.canada.ca/mdall-limh/',
+        description: 'MDALL - Medical Devices Active Licence Listing',
+        descriptionZh: '医疗器械活跃许可证清单',
+      },
+      {
+        name: 'ISO 13485:2016',
+        nameZh: 'ISO 13485:2016',
+        url: 'https://www.iso.org/standard/59752.html',
+        description: 'Quality management systems for medical devices',
+        descriptionZh: '医疗器械质量管理体系',
+      },
     ],
     localRepresentativeRequired: sourceCountry !== 'canada',
     clinicalDataRequired: isClassIII,
