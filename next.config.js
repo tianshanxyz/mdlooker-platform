@@ -5,8 +5,11 @@ const nextConfig = {
     return [{ source: '/', destination: '/en', permanent: true }];
   },
   // 明确指定编译入口（Turbopack优化）
-  transpilePackages: []
+  transpilePackages: [],
+  // 图片优化配置
+  images: {
+    unoptimized: true
+  }
 };
 
 export default nextConfig;
-
