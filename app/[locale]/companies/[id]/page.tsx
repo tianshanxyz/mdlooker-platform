@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { locales, type Locale } from '../../../i18n-config';
+import CompanyComments from '@/app/components/CompanyComments';
+import DueDiligenceReport from '@/app/components/DueDiligenceReport';
 
 interface CompanyDetail {
   id: string;
@@ -586,6 +588,12 @@ export default function CompanyDetailPage({
             </div>
           )}
         </div>
+
+        {/* Comments Section */}
+        <CompanyComments companyId={id} locale={locale} />
+
+        {/* Due Diligence Report Section */}
+        <DueDiligenceReport companyId={id} locale={locale} />
       </div>
     </div>
   );
