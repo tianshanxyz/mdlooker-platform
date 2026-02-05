@@ -1,5 +1,6 @@
 'use client';
 
+// MDLooker Platform - Global Medical Device Compliance Intelligence
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { translations, locales, type Locale } from '../i18n-config';
