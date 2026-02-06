@@ -21,10 +21,10 @@ export async function GET(
       .select(
         `
         *,
-        user:profiles(id, full_name, avatar_url, role),
+        user:profiles(id, full_name, email, avatar_url, role),
         replies:company_comments!parent_id(
           *,
-          user:profiles(id, full_name, avatar_url, role)
+          user:profiles(id, full_name, email, avatar_url, role)
         )
       `,
         { count: 'exact' }
@@ -134,7 +134,7 @@ export async function POST(
       .select(
         `
         *,
-        user:profiles(id, full_name, avatar_url, role)
+        user:profiles(id, full_name, email, avatar_url, role)
       `
       )
       .single();
