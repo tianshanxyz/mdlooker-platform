@@ -590,10 +590,10 @@ export default function CompanyDetailPage({
         </div>
 
         {/* Comments Section */}
-        <CompanyComments companyId={id} locale={locale} />
+        <CompanyComments companyId={companyId} locale={locale} />
 
         {/* Due Diligence Report Section */}
-        <DueDiligenceReport companyId={id} locale={locale} />
+        <DueDiligenceReport companyId={companyId} locale={locale} />
       </div>
     </div>
   );
