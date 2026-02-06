@@ -383,7 +383,7 @@ export default function CompanyDetailPage({
                     ))}
                   </div>
                 </div>
-              )}
+              ) : null}
             </div>
           )}
 
