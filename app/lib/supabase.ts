@@ -1,10 +1,28 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
+// 创建 Supabase 客户端的工厂函数
+export function createClient() {
+  return createSupabaseClient(supabaseUrl, supabaseKey, {
+    global: {
+      headers: {
+        'x-application-name': 'mdlooker-prod',
+      },
+    },
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+    db: {
+      schema: 'public',
+    },
+  });
+}
+
 // 生产级配置：连接池 + 超时 + 重试
-export const supabase = createClient(supabaseUrl, supabaseKey, {
+export const supabase = createSupabaseClient(supabaseUrl, supabaseKey, {
   global: {
     headers: {
       'x-application-name': 'mdlooker-prod',
