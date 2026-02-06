@@ -6,6 +6,8 @@ import { locales, type Locale } from '../../../i18n-config';
 import CompanyComments from '@/app/components/CompanyComments';
 import DueDiligenceReport from '@/app/components/DueDiligenceReport';
 
+// Fix: Ensure proper JSX syntax for certificates section
+
 interface CompanyDetail {
   id: string;
   name: string;
