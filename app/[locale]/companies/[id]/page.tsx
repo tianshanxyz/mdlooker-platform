@@ -364,10 +364,10 @@ export default function CompanyDetailPage({
                     ))}
                   </div>
                 </div>
-              )}
+              ) : null}
 
               {/* Certificates */}
-              {((company.gmp_certificates?.length || 0) + (company.iso_certificates?.length || 0)) > 0 && (
+              {(company.gmp_certificates && company.gmp_certificates.length > 0) || (company.iso_certificates && company.iso_certificates.length > 0) ? (
                 <div className="bg-slate-50 rounded-xl p-6">
                   <h3 className="font-semibold text-slate-800 mb-4">{t.certificates}</h3>
                   <div className="flex flex-wrap gap-2">
