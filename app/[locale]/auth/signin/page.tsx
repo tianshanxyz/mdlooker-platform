@@ -198,7 +198,6 @@ export default function SignInPage({
               </span>
             </button>
 
-            {/* LinkedIn login temporarily disabled - requires company page
             <button
               onClick={() => handleSocialSignIn('linkedin')}
               disabled={isLoading}
@@ -209,7 +208,6 @@ export default function SignInPage({
                 {locale === 'zh' ? '使用 LinkedIn 继续' : 'Continue with LinkedIn'}
               </span>
             </button>
-            */}
           </div>
 
           {/* Divider */}
