@@ -366,7 +366,7 @@ export default function CompanyDetailPage({
                     ))}
                   </div>
                 </div>
-              ) : null}
+              )}
 
               {/* Certificates */}
               {(company.gmp_certificates && company.gmp_certificates.length > 0) || (company.iso_certificates && company.iso_certificates.length > 0) ? (
