@@ -2,10 +2,20 @@
 -- 用户认证和权限管理系统数据库结构
 
 -- User roles enum
-CREATE TYPE user_role AS ENUM ('guest', 'user', 'vip');
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role') THEN
+        CREATE TYPE user_role AS ENUM ('guest', 'user', 'vip');
+    END IF;
+END $$;
 
 -- User subscription status
-CREATE TYPE subscription_status AS ENUM ('inactive', 'active', 'expired', 'cancelled');
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'subscription_status') THEN
+        CREATE TYPE subscription_status AS ENUM ('inactive', 'active', 'expired', 'cancelled');
+    END IF;
+END $$;
 
 -- Users table extending Supabase auth.users
 CREATE TABLE IF NOT EXISTS public.profiles (
