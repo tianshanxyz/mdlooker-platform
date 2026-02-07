@@ -67,10 +67,12 @@ export default function HomePage({
 
   return (
     <main className="max-w-6xl mx-auto px-6 py-20">
-      {/* 标题居中 */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-slate-900 mb-6">{t.hero.title}</h1>
-        <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+      {/* 标题居中 - 使用flex确保完全居中 */}
+      <div className="flex flex-col items-center justify-center text-center mb-12 w-full">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 mb-6 leading-tight">
+          {t.hero.title}
+        </h1>
+        <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto px-4">
           {t.hero.subtitle}
         </p>
       </div>
