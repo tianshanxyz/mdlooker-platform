@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { translations, locales, type Locale } from '../i18n-config';
 import type { Company } from '../lib/types';
 
@@ -12,11 +13,8 @@ interface SearchResult {
   pageSize: number;
 }
 
-export default function HomePage({
-  params
-}: {
-  params: Promise<{ locale: string }>
-}) {
+export default function HomePage() {
+  const params = useParams();
   const [locale, setLocale] = useState<Locale>('en');
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult | null>(null);
@@ -24,11 +22,10 @@ export default function HomePage({
   const [hasSearched, setHasSearched] = useState(false);
 
   useEffect(() => {
-    params.then(p => {
-      if (locales.includes(p.locale as Locale)) {
-        setLocale(p.locale as Locale);
-      }
-    });
+    const localeParam = params?.locale as string;
+    if (localeParam && locales.includes(localeParam as Locale)) {
+      setLocale(localeParam as Locale);
+    }
   }, [params]);
 
   const t = translations[locale];
