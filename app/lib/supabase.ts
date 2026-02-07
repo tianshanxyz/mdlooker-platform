@@ -1,10 +1,13 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 // 创建 Supabase 客户端的工厂函数
 export function createClient() {
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error('Supabase URL and Key are required. Please check your environment variables.');
+  }
   return createSupabaseClient(supabaseUrl, supabaseKey, {
     global: {
       headers: {

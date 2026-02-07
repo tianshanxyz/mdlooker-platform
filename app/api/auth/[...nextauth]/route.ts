@@ -3,26 +3,35 @@ import GoogleProvider from 'next-auth/providers/google';
 import LinkedInProvider from 'next-auth/providers/linkedin';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// 延迟初始化 Supabase 客户端
+function getSupabaseClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  
+  if (!url || !key) {
+    throw new Error('Supabase URL and Service Role Key are required');
+  }
+  
+  return createClient(url, key);
+}
 
 const handler = NextAuth({
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
     }),
     LinkedInProvider({
-      clientId: process.env.LINKEDIN_CLIENT_ID!,
-      clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
+      clientId: process.env.LINKEDIN_CLIENT_ID || '',
+      clientSecret: process.env.LINKEDIN_CLIENT_SECRET || '',
     }),
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
       if (account?.provider === 'google' || account?.provider === 'linkedin') {
         try {
+          const supabase = getSupabaseClient();
+          
           // Check if user exists in Supabase
           const { data: existingUser } = await supabase
             .from('profiles')
@@ -81,27 +90,33 @@ const handler = NextAuth({
     },
     async session({ session, token }) {
       if (session.user?.email) {
-        // Fetch user profile from Supabase
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('email', session.user.email)
-          .single();
+        try {
+          const supabase = getSupabaseClient();
+          
+          // Fetch user profile from Supabase
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('email', session.user.email)
+            .single();
 
-        if (profile) {
-          session.user.id = profile.id;
-          session.user.role = profile.role;
-          session.user.subscriptionStatus = profile.subscription_status;
+          if (profile) {
+            (session.user as any).id = profile.id;
+            (session.user as any).role = profile.role;
+            (session.user as any).subscriptionStatus = profile.subscription_status;
+          }
+        } catch (error) {
+          console.error('Error fetching user profile:', error);
         }
       }
       return session;
     },
     async jwt({ token, user, account }) {
       if (user) {
-        token.id = user.id;
+        (token as any).id = user.id;
       }
       if (account) {
-        token.accessToken = account.access_token;
+        (token as any).accessToken = account.access_token;
       }
       return token;
     },
