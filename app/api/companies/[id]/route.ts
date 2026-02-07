@@ -34,6 +34,11 @@ export async function GET(
       { data: healthCanadaRegistrations },
       { data: emaRegistrations },
       { data: mhraRegistrations },
+      { data: tgaRegistrations },
+      { data: hsaRegistrations },
+      { data: swissmedicRegistrations },
+      { data: mfdsRegistrations },
+      { data: anvisaRegistrations },
       { data: warningLetters },
       { data: recalls },
       { data: products },
@@ -51,6 +56,11 @@ export async function GET(
       supabase.from('health_canada_registrations').select('*').eq('company_id', id),
       supabase.from('ema_registrations').select('*').eq('company_id', id),
       supabase.from('mhra_registrations').select('*').eq('company_id', id),
+      supabase.from('tga_registrations').select('*').eq('company_id', id),
+      supabase.from('hsa_registrations').select('*').eq('company_id', id),
+      supabase.from('swissmedic_registrations').select('*').eq('company_id', id),
+      supabase.from('mfds_registrations').select('*').eq('company_id', id),
+      supabase.from('anvisa_registrations').select('*').eq('company_id', id),
       supabase.from('regulatory_warning_letters').select('*').eq('company_id', id).order('letter_date', { ascending: false }),
       supabase.from('regulatory_recalls').select('*').eq('company_id', id).order('recall_initiation_date', { ascending: false }),
       supabase.from('products').select('*').eq('company_id', id),
@@ -77,6 +87,11 @@ export async function GET(
       health_canada_registrations: healthCanadaRegistrations || [],
       ema_registrations: emaRegistrations || [],
       mhra_registrations: mhraRegistrations || [],
+      tga_registrations: tgaRegistrations || [],
+      hsa_registrations: hsaRegistrations || [],
+      swissmedic_registrations: swissmedicRegistrations || [],
+      mfds_registrations: mfdsRegistrations || [],
+      anvisa_registrations: anvisaRegistrations || [],
       warning_letters: warningLetters || [],
       recalls: recalls || [],
       products: products || [],
@@ -88,20 +103,30 @@ export async function GET(
       changes: changes || [],
       risk_score: riskScore,
       registration_summary: {
-        total_registrations: (fdaRegistrations?.length || 0) + 
-                           (nmpaRegistrations?.length || 0) + 
-                           (eudamedRegistrations?.length || 0) + 
-                           (pmdaRegistrations?.length || 0) + 
+        total_registrations: (fdaRegistrations?.length || 0) +
+                           (nmpaRegistrations?.length || 0) +
+                           (eudamedRegistrations?.length || 0) +
+                           (pmdaRegistrations?.length || 0) +
                            (healthCanadaRegistrations?.length || 0) +
                            (emaRegistrations?.length || 0) +
-                           (mhraRegistrations?.length || 0),
+                           (mhraRegistrations?.length || 0) +
+                           (tgaRegistrations?.length || 0) +
+                           (hsaRegistrations?.length || 0) +
+                           (swissmedicRegistrations?.length || 0) +
+                           (mfdsRegistrations?.length || 0) +
+                           (anvisaRegistrations?.length || 0),
         fda_count: fdaRegistrations?.length || 0,
         nmpa_count: nmpaRegistrations?.length || 0,
         eudamed_count: eudamedRegistrations?.length || 0,
         pmda_count: pmdaRegistrations?.length || 0,
         health_canada_count: healthCanadaRegistrations?.length || 0,
         ema_count: emaRegistrations?.length || 0,
-        mhra_count: mhraRegistrations?.length || 0
+        mhra_count: mhraRegistrations?.length || 0,
+        tga_count: tgaRegistrations?.length || 0,
+        hsa_count: hsaRegistrations?.length || 0,
+        swissmedic_count: swissmedicRegistrations?.length || 0,
+        mfds_count: mfdsRegistrations?.length || 0,
+        anvisa_count: anvisaRegistrations?.length || 0
       },
       compliance_summary: {
         warning_letters_count: warningLetters?.length || 0,

@@ -38,6 +38,11 @@ interface CompanyDetail {
   health_canada_registrations: any[];
   ema_registrations: any[];
   mhra_registrations: any[];
+  tga_registrations: any[];
+  hsa_registrations: any[];
+  swissmedic_registrations: any[];
+  mfds_registrations: any[];
+  anvisa_registrations: any[];
   warning_letters: any[];
   recalls: any[];
   products: any[];
@@ -57,6 +62,11 @@ interface CompanyDetail {
     health_canada_count: number;
     ema_count: number;
     mhra_count: number;
+    tga_count: number;
+    hsa_count: number;
+    swissmedic_count: number;
+    mfds_count: number;
+    anvisa_count: number;
   };
   compliance_summary?: {
     warning_letters_count: number;
@@ -402,7 +412,7 @@ export default function CompanyDetailPage({
           {activeTab === 'registrations' && (
             <div className="space-y-6">
               {/* Registration Summary */}
-              <div className="grid grid-cols-2 md:grid-cols-7 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 {[
                   { source: 'FDA', count: company.registration_summary?.fda_count || 0, icon: '🇺🇸', color: 'blue' },
                   { source: 'NMPA', count: company.registration_summary?.nmpa_count || 0, icon: '🇨🇳', color: 'green' },
@@ -411,6 +421,11 @@ export default function CompanyDetailPage({
                   { source: 'PMDA', count: company.registration_summary?.pmda_count || 0, icon: '🇯🇵', color: 'red' },
                   { source: 'Health Canada', count: company.registration_summary?.health_canada_count || 0, icon: '🇨🇦', color: 'orange' },
                   { source: 'MHRA', count: company.registration_summary?.mhra_count || 0, icon: '🇬🇧', color: 'teal' },
+                  { source: 'TGA', count: company.registration_summary?.tga_count || 0, icon: '🇦🇺', color: 'yellow' },
+                  { source: 'HSA', count: company.registration_summary?.hsa_count || 0, icon: '🇸🇬', color: 'red' },
+                  { source: 'Swissmedic', count: company.registration_summary?.swissmedic_count || 0, icon: '🇨🇭', color: 'red' },
+                  { source: 'MFDS', count: company.registration_summary?.mfds_count || 0, icon: '🇰🇷', color: 'blue' },
+                  { source: 'ANVISA', count: company.registration_summary?.anvisa_count || 0, icon: '🇧🇷', color: 'green' },
                 ].map((stat) => (
                   <div key={stat.source} className="bg-slate-50 rounded-xl p-4 text-center">
                     <span className="text-2xl">{stat.icon}</span>
@@ -486,6 +501,116 @@ export default function CompanyDetailPage({
                         )}
                         {reg.uk_responsible_person && (
                           <p className="text-xs text-slate-500 mt-1">UKRP: {reg.uk_responsible_person}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {company.tga_registrations.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-4">🇦🇺 TGA Registrations</h3>
+                  <div className="space-y-3">
+                    {company.tga_registrations.slice(0, 3).map((reg) => (
+                      <div key={reg.id} className="border border-slate-200 rounded-xl p-4">
+                        <h4 className="font-medium text-slate-900">{reg.product_name}</h4>
+                        <p className="text-sm text-slate-500">ARTG: {reg.artg_number}</p>
+                        {reg.device_class && (
+                          <span className="inline-block mt-2 px-2 py-0.5 rounded text-xs bg-yellow-100 text-yellow-800">
+                            Class {reg.device_class}
+                          </span>
+                        )}
+                        {reg.sponsor_name && (
+                          <p className="text-xs text-slate-500 mt-1">Sponsor: {reg.sponsor_name}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {company.hsa_registrations.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-4">🇸🇬 HSA Registrations</h3>
+                  <div className="space-y-3">
+                    {company.hsa_registrations.slice(0, 3).map((reg) => (
+                      <div key={reg.id} className="border border-slate-200 rounded-xl p-4">
+                        <h4 className="font-medium text-slate-900">{reg.device_name}</h4>
+                        <p className="text-sm text-slate-500">{reg.registration_number}</p>
+                        {reg.device_class && (
+                          <span className="inline-block mt-2 px-2 py-0.5 rounded text-xs bg-red-100 text-red-800">
+                            Class {reg.device_class}
+                          </span>
+                        )}
+                        {reg.registrant_name && (
+                          <p className="text-xs text-slate-500 mt-1">Registrant: {reg.registrant_name}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {company.swissmedic_registrations.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-4">🇨🇭 Swissmedic Registrations</h3>
+                  <div className="space-y-3">
+                    {company.swissmedic_registrations.slice(0, 3).map((reg) => (
+                      <div key={reg.id} className="border border-slate-200 rounded-xl p-4">
+                        <h4 className="font-medium text-slate-900">{reg.product_name}</h4>
+                        <p className="text-sm text-slate-500">{reg.swissmedic_number}</p>
+                        {reg.device_risk_class && (
+                          <span className="inline-block mt-2 px-2 py-0.5 rounded text-xs bg-red-100 text-red-800">
+                            Class {reg.device_risk_class}
+                          </span>
+                        )}
+                        {reg.swiss_authorized_representative && (
+                          <p className="text-xs text-slate-500 mt-1">CH-REP: {reg.swiss_authorized_representative}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {company.mfds_registrations.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-4">🇰🇷 MFDS Registrations</h3>
+                  <div className="space-y-3">
+                    {company.mfds_registrations.slice(0, 3).map((reg) => (
+                      <div key={reg.id} className="border border-slate-200 rounded-xl p-4">
+                        <h4 className="font-medium text-slate-900">{reg.product_name}</h4>
+                        <p className="text-sm text-slate-500">{reg.product_approval_number}</p>
+                        {reg.device_class && (
+                          <span className="inline-block mt-2 px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-800">
+                            Class {reg.device_class}
+                          </span>
+                        )}
+                        {reg.korea_license_holder && (
+                          <p className="text-xs text-slate-500 mt-1">License Holder: {reg.korea_license_holder}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {company.anvisa_registrations.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-4">🇧🇷 ANVISA Registrations</h3>
+                  <div className="space-y-3">
+                    {company.anvisa_registrations.slice(0, 3).map((reg) => (
+                      <div key={reg.id} className="border border-slate-200 rounded-xl p-4">
+                        <h4 className="font-medium text-slate-900">{reg.product_name}</h4>
+                        <p className="text-sm text-slate-500">{reg.registration_number}</p>
+                        {reg.risk_class && (
+                          <span className="inline-block mt-2 px-2 py-0.5 rounded text-xs bg-green-100 text-green-800">
+                            Class {reg.risk_class}
+                          </span>
+                        )}
+                        {reg.brazil_registration_holder && (
+                          <p className="text-xs text-slate-500 mt-1">BRH: {reg.brazil_registration_holder}</p>
                         )}
                       </div>
                     ))}
