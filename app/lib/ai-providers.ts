@@ -1,11 +1,32 @@
 // AI Providers Configuration
 // 支持多种AI服务提供商：京医千询、百度翻译、Octoparse、BioBERT等
+// 
+// 使用说明：
+// 1. 所有AI服务默认关闭（未配置环境变量时自动禁用，不影响系统运行）
+// 2. 需要时配置对应的环境变量即可启用
+// 3. 建议优先级：百度翻译（免费）> 京医千询（付费）> Octoparse（付费）> BioBERT（自部署）
+//
+// 环境变量配置示例：
+// 百度翻译（推荐优先申请，有免费额度）：
+//   BAIDU_TRANSLATE_APP_ID=your_app_id
+//   BAIDU_TRANSLATE_SECRET_KEY=your_secret_key
+//
+// 京医千询（医疗AI，需要时申请）：
+//   JINGYI_API_KEY=your_api_key
+//   JINGYI_API_ENDPOINT=https://api.jingyi.com/v1
+//
+// Octoparse（可视化爬虫，需要时申请）：
+//   OCTOPARSE_API_KEY=your_api_key
+//
+// BioBERT（医疗NLP，开源可自部署）：
+//   BIOBERT_API_ENDPOINT=http://localhost:8000
 
 // 京医千询配置
 interface JingyiQianxunConfig {
   apiKey: string;
   apiEndpoint: string;
   model: string;
+  enabled: boolean;
 }
 
 // 百度翻译配置
@@ -13,18 +34,21 @@ interface BaiduTranslateConfig {
   appId: string;
   secretKey: string;
   apiEndpoint: string;
+  enabled: boolean;
 }
 
 // Octoparse配置
 interface OctoparseConfig {
   apiKey: string;
   apiEndpoint: string;
+  enabled: boolean;
 }
 
 // BioBERT配置（医疗领域NLP）
 interface BioBERTConfig {
   apiEndpoint: string;
   modelPath?: string;
+  enabled: boolean;
 }
 
 // AI解析结果
@@ -59,6 +83,7 @@ export class JingyiQianxunProvider {
       apiKey: process.env.JINGYI_API_KEY || '',
       apiEndpoint: process.env.JINGYI_API_ENDPOINT || 'https://api.jingyi.com/v1',
       model: process.env.JINGYI_MODEL || 'jingyi-medical-v1',
+      enabled: !!process.env.JINGYI_API_KEY,
       ...config,
     };
   }
@@ -172,6 +197,7 @@ export class BaiduTranslateProvider {
       appId: process.env.BAIDU_TRANSLATE_APP_ID || '',
       secretKey: process.env.BAIDU_TRANSLATE_SECRET_KEY || '',
       apiEndpoint: 'https://fanyi-api.baidu.com/api/trans/vip/translate',
+      enabled: !!(process.env.BAIDU_TRANSLATE_APP_ID && process.env.BAIDU_TRANSLATE_SECRET_KEY),
       ...config,
     };
   }
@@ -266,6 +292,7 @@ export class OctoparseProvider {
     this.config = {
       apiKey: process.env.OCTOPARSE_API_KEY || '',
       apiEndpoint: 'https://dataapi.octoparse.com',
+      enabled: !!process.env.OCTOPARSE_API_KEY,
       ...config,
     };
   }
@@ -352,7 +379,8 @@ export class BioBERTProvider {
   constructor(config?: Partial<BioBERTConfig>) {
     this.config = {
       apiEndpoint: process.env.BIOBERT_API_ENDPOINT || 'http://localhost:8000',
-      modelPath: process.env.BIOBERT_MODEL_PATH,
+      modelPath: process.env.BIOBERT_MODEL_PATH || '',
+      enabled: !!process.env.BIOBERT_API_ENDPOINT,
       ...config,
     };
   }
