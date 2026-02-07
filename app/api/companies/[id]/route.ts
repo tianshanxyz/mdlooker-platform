@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '../../../lib/supabase';
+import { getSupabaseClient } from '../../../lib/supabase';
 
 export async function GET(
   request: NextRequest,
@@ -8,6 +8,8 @@ export async function GET(
   const { id } = await params;
 
   try {
+    const supabase = getSupabaseClient();
+    
     // 获取公司基本信息
     const { data: company, error: companyError } = await supabase
       .from('companies')

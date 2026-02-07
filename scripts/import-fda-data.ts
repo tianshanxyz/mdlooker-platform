@@ -2,7 +2,7 @@
 // This script demonstrates how to import FDA registration data
 // Note: FDA provides open data through their API and downloadable files
 
-import { supabase } from '../app/lib/supabase';
+import { getSupabaseClient } from '../app/lib/supabase';
 
 // FDA Open Data API endpoints
 const FDA_API_BASE = 'https://api.fda.gov/device/registrationlisting.json';
@@ -64,6 +64,7 @@ export async function searchFDARegistrations(query: string): Promise<FDADeviceDa
  */
 export async function importFDARegistration(fdaData: FDADeviceData, companyId: string) {
   try {
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('fda_registrations')
       .upsert({

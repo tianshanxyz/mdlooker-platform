@@ -1,7 +1,7 @@
 // Data Synchronization Script for MDLooker
 // Supports FDA, NMPA, EUDAMED, PMDA, Health Canada
 
-import { supabase } from '../app/lib/supabase';
+import { getSupabaseClient } from '../app/lib/supabase';
 
 interface SyncConfig {
   source: string;
@@ -66,6 +66,7 @@ async function logSync(logData: {
   error_message?: string;
 }) {
   try {
+    const supabase = getSupabaseClient();
     await supabase.from('sync_logs').insert({
       ...logData,
       completed_at: new Date().toISOString(),
@@ -81,6 +82,7 @@ async function logSync(logData: {
 async function syncFDAData(): Promise<SyncResult> {
   const startTime = Date.now();
   const config = syncConfigs.fda;
+  const supabase = getSupabaseClient();
   
   if (!config.enabled) {
     return {
@@ -249,6 +251,7 @@ export async function syncAllData(): Promise<SyncResult[]> {
  * Get sync status and statistics
  */
 export async function getSyncStatus() {
+  const supabase = getSupabaseClient();
   const { data: logs, error } = await supabase
     .from('sync_logs')
     .select('*')

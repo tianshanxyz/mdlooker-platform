@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '../../lib/supabase';
+import { getSupabaseClient } from '../../lib/supabase';
 
 // 计算字符串相似度 (Levenshtein Distance)
 function levenshteinDistance(str1: string, str2: string): number {
@@ -62,6 +62,7 @@ export async function GET(request: NextRequest) {
   const hasEUDAMED = searchParams.get('hasEUDAMED') === 'true';
 
   try {
+    const supabase = getSupabaseClient();
     let dbQuery = supabase
       .from('companies')
       .select('*', { count: 'exact' });
@@ -102,7 +103,7 @@ export async function GET(request: NextRequest) {
       const queryLower = query.toLowerCase();
       
       // 计算每个公司的匹配分数
-      const scoredCompanies = filteredCompanies.map(company => {
+      const scoredCompanies = filteredCompanies.map((company: any) => {
         let score = 0;
         const name = (company.name || '').toLowerCase();
         const nameZh = (company.name_zh || '').toLowerCase();
@@ -135,41 +136,41 @@ export async function GET(request: NextRequest) {
       });
       
       // 按匹配分数排序
-      scoredCompanies.sort((a, b) => b.matchScore - a.matchScore);
+      scoredCompanies.sort((a: any, b: any) => b.matchScore - a.matchScore);
       filteredCompanies = scoredCompanies;
     }
 
     // 过滤有特定注册的公司
     if (hasFDA || hasNMPA || hasEUDAMED) {
-      const companyIds = filteredCompanies.map(c => c.id);
+      const companyIds = filteredCompanies.map((c: any) => c.id);
       
       if (hasFDA && companyIds.length > 0) {
         const { data: fdaData } = await supabase
           .from('fda_registrations')
           .select('company_id')
           .in('company_id', companyIds);
-        const fdaCompanyIds = new Set(fdaData?.map(r => r.company_id) || []);
-        filteredCompanies = filteredCompanies.filter(c => fdaCompanyIds.has(c.id));
+        const fdaCompanyIds = new Set(fdaData?.map((r: any) => r.company_id) || []);
+        filteredCompanies = filteredCompanies.filter((c: any) => fdaCompanyIds.has(c.id));
       }
       
       if (hasNMPA && filteredCompanies.length > 0) {
-        const companyIds = filteredCompanies.map(c => c.id);
+        const companyIds = filteredCompanies.map((c: any) => c.id);
         const { data: nmpaData } = await supabase
           .from('nmpa_registrations')
           .select('company_id')
           .in('company_id', companyIds);
-        const nmpaCompanyIds = new Set(nmpaData?.map(r => r.company_id) || []);
-        filteredCompanies = filteredCompanies.filter(c => nmpaCompanyIds.has(c.id));
+        const nmpaCompanyIds = new Set(nmpaData?.map((r: any) => r.company_id) || []);
+        filteredCompanies = filteredCompanies.filter((c: any) => nmpaCompanyIds.has(c.id));
       }
       
       if (hasEUDAMED && filteredCompanies.length > 0) {
-        const companyIds = filteredCompanies.map(c => c.id);
+        const companyIds = filteredCompanies.map((c: any) => c.id);
         const { data: eudamedData } = await supabase
           .from('eudamed_registrations')
           .select('company_id')
           .in('company_id', companyIds);
-        const eudamedCompanyIds = new Set(eudamedData?.map(r => r.company_id) || []);
-        filteredCompanies = filteredCompanies.filter(c => eudamedCompanyIds.has(c.id));
+        const eudamedCompanyIds = new Set(eudamedData?.map((r: any) => r.company_id) || []);
+        filteredCompanies = filteredCompanies.filter((c: any) => eudamedCompanyIds.has(c.id));
       }
     }
 

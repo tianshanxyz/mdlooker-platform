@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '../../lib/supabase';
+import { getSupabaseClient } from '../../lib/supabase';
 
 interface ComplianceProfile {
   company: {
@@ -36,6 +36,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    const supabase = getSupabaseClient();
     let companyIds: string[] = [];
 
     // 根据查询类型搜索
