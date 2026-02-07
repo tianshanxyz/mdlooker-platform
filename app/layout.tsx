@@ -1,4 +1,5 @@
 import SessionProvider from './components/SessionProvider';
+import './globals.css';
 
 export const metadata = {
   title: 'MDLooker Platform',
