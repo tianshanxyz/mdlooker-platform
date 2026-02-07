@@ -32,6 +32,10 @@ export async function GET(
       { data: eudamedRegistrations },
       { data: pmdaRegistrations },
       { data: healthCanadaRegistrations },
+      { data: emaRegistrations },
+      { data: mhraRegistrations },
+      { data: warningLetters },
+      { data: recalls },
       { data: products },
       { data: branches },
       { data: patents },
@@ -45,6 +49,10 @@ export async function GET(
       supabase.from('eudamed_registrations').select('*').eq('company_id', id),
       supabase.from('pmda_registrations').select('*').eq('company_id', id),
       supabase.from('health_canada_registrations').select('*').eq('company_id', id),
+      supabase.from('ema_registrations').select('*').eq('company_id', id),
+      supabase.from('mhra_registrations').select('*').eq('company_id', id),
+      supabase.from('regulatory_warning_letters').select('*').eq('company_id', id).order('letter_date', { ascending: false }),
+      supabase.from('regulatory_recalls').select('*').eq('company_id', id).order('recall_initiation_date', { ascending: false }),
       supabase.from('products').select('*').eq('company_id', id),
       supabase.from('company_branches').select('*').eq('company_id', id),
       supabase.from('company_patents').select('*').eq('company_id', id).order('application_date', { ascending: false }),
@@ -67,6 +75,10 @@ export async function GET(
       eudamed_registrations: eudamedRegistrations || [],
       pmda_registrations: pmdaRegistrations || [],
       health_canada_registrations: healthCanadaRegistrations || [],
+      ema_registrations: emaRegistrations || [],
+      mhra_registrations: mhraRegistrations || [],
+      warning_letters: warningLetters || [],
+      recalls: recalls || [],
       products: products || [],
       branches: branches || [],
       patents: patents || [],
@@ -80,12 +92,21 @@ export async function GET(
                            (nmpaRegistrations?.length || 0) + 
                            (eudamedRegistrations?.length || 0) + 
                            (pmdaRegistrations?.length || 0) + 
-                           (healthCanadaRegistrations?.length || 0),
+                           (healthCanadaRegistrations?.length || 0) +
+                           (emaRegistrations?.length || 0) +
+                           (mhraRegistrations?.length || 0),
         fda_count: fdaRegistrations?.length || 0,
         nmpa_count: nmpaRegistrations?.length || 0,
         eudamed_count: eudamedRegistrations?.length || 0,
         pmda_count: pmdaRegistrations?.length || 0,
-        health_canada_count: healthCanadaRegistrations?.length || 0
+        health_canada_count: healthCanadaRegistrations?.length || 0,
+        ema_count: emaRegistrations?.length || 0,
+        mhra_count: mhraRegistrations?.length || 0
+      },
+      compliance_summary: {
+        warning_letters_count: warningLetters?.length || 0,
+        recalls_count: recalls?.length || 0,
+        total_violations: (warningLetters?.length || 0) + (recalls?.length || 0)
       },
       intellectual_property_summary: {
         patents_count: patents?.length || company.intellectual_property?.patents || 0,

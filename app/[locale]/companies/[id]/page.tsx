@@ -36,6 +36,10 @@ interface CompanyDetail {
   eudamed_registrations: any[];
   pmda_registrations: any[];
   health_canada_registrations: any[];
+  ema_registrations: any[];
+  mhra_registrations: any[];
+  warning_letters: any[];
+  recalls: any[];
   products: any[];
   branches: any[];
   patents: any[];
@@ -51,6 +55,13 @@ interface CompanyDetail {
     eudamed_count: number;
     pmda_count: number;
     health_canada_count: number;
+    ema_count: number;
+    mhra_count: number;
+  };
+  compliance_summary?: {
+    warning_letters_count: number;
+    recalls_count: number;
+    total_violations: number;
   };
   intellectual_property_summary?: {
     patents_count: number;
@@ -391,13 +402,15 @@ export default function CompanyDetailPage({
           {activeTab === 'registrations' && (
             <div className="space-y-6">
               {/* Registration Summary */}
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-7 gap-4">
                 {[
                   { source: 'FDA', count: company.registration_summary?.fda_count || 0, icon: '🇺🇸', color: 'blue' },
                   { source: 'NMPA', count: company.registration_summary?.nmpa_count || 0, icon: '🇨🇳', color: 'green' },
                   { source: 'EUDAMED', count: company.registration_summary?.eudamed_count || 0, icon: '🇪🇺', color: 'purple' },
+                  { source: 'EMA', count: company.registration_summary?.ema_count || 0, icon: '🇪🇺', color: 'indigo' },
                   { source: 'PMDA', count: company.registration_summary?.pmda_count || 0, icon: '🇯🇵', color: 'red' },
                   { source: 'Health Canada', count: company.registration_summary?.health_canada_count || 0, icon: '🇨🇦', color: 'orange' },
+                  { source: 'MHRA', count: company.registration_summary?.mhra_count || 0, icon: '🇬🇧', color: 'teal' },
                 ].map((stat) => (
                   <div key={stat.source} className="bg-slate-50 rounded-xl p-4 text-center">
                     <span className="text-2xl">{stat.icon}</span>
@@ -430,6 +443,50 @@ export default function CompanyDetailPage({
                       <div key={reg.id} className="border border-slate-200 rounded-xl p-4">
                         <h4 className="font-medium text-slate-900">{reg.product_name}</h4>
                         <p className="text-sm text-slate-500">{reg.registration_number}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {company.ema_registrations.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-4">🇪🇺 EMA/EUDAMED Registrations</h3>
+                  <div className="space-y-3">
+                    {company.ema_registrations.slice(0, 3).map((reg) => (
+                      <div key={reg.id} className="border border-slate-200 rounded-xl p-4">
+                        <h4 className="font-medium text-slate-900">{reg.device_name || reg.device_name_en}</h4>
+                        <p className="text-sm text-slate-500">SRN: {reg.srn}</p>
+                        {reg.device_risk_class && (
+                          <span className="inline-block mt-2 px-2 py-0.5 rounded text-xs bg-indigo-100 text-indigo-800">
+                            Class {reg.device_risk_class}
+                          </span>
+                        )}
+                        {reg.notified_body_name && (
+                          <p className="text-xs text-slate-500 mt-1">Notified Body: {reg.notified_body_name}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {company.mhra_registrations.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-4">🇬🇧 MHRA Registrations</h3>
+                  <div className="space-y-3">
+                    {company.mhra_registrations.slice(0, 3).map((reg) => (
+                      <div key={reg.id} className="border border-slate-200 rounded-xl p-4">
+                        <h4 className="font-medium text-slate-900">{reg.device_name}</h4>
+                        <p className="text-sm text-slate-500">{reg.registration_number}</p>
+                        {reg.device_class && (
+                          <span className="inline-block mt-2 px-2 py-0.5 rounded text-xs bg-teal-100 text-teal-800">
+                            Class {reg.device_class}
+                          </span>
+                        )}
+                        {reg.uk_responsible_person && (
+                          <p className="text-xs text-slate-500 mt-1">UKRP: {reg.uk_responsible_person}</p>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -499,8 +556,8 @@ export default function CompanyDetailPage({
                   </h3>
                   <p className="text-3xl font-bold">{company.risk_score.score}</p>
                   <p className="text-sm mt-1">
-                    {locale === 'en' 
-                      ? `Risk Level: ${company.risk_score.level.toUpperCase()}` 
+                    {locale === 'en'
+                      ? `Risk Level: ${company.risk_score.level.toUpperCase()}`
                       : `风险等级: ${company.risk_score.level === 'high' ? '高' : company.risk_score.level === 'medium' ? '中' : '低'}`}
                   </p>
                   {company.risk_score.factors.length > 0 && (
@@ -515,6 +572,91 @@ export default function CompanyDetailPage({
                       </ul>
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* Compliance Summary */}
+              {company.compliance_summary && company.compliance_summary.total_violations > 0 && (
+                <div className="bg-red-50 rounded-xl p-6 border border-red-200">
+                  <h3 className="font-semibold text-red-800 mb-4">
+                    {locale === 'en' ? 'Regulatory Violations' : '监管违规记录'}
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center">
+                      <p className="text-3xl font-bold text-red-600">{company.compliance_summary.warning_letters_count}</p>
+                      <p className="text-sm text-red-700">{locale === 'en' ? 'Warning Letters' : '警告信'}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-3xl font-bold text-red-600">{company.compliance_summary.recalls_count}</p>
+                      <p className="text-sm text-red-700">{locale === 'en' ? 'Recalls' : '召回记录'}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Warning Letters */}
+              {company.warning_letters.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-4">
+                    {locale === 'en' ? 'Warning Letters' : '警告信'} ({company.warning_letters.length})
+                  </h3>
+                  <div className="space-y-3">
+                    {company.warning_letters.map((letter) => (
+                      <div key={letter.id} className="border border-red-200 rounded-xl p-4 bg-red-50">
+                        <div className="flex justify-between items-start">
+                          <h4 className="font-medium text-slate-900">{letter.issuing_agency}</h4>
+                          <span className={`px-2 py-0.5 rounded text-xs ${letter.status === 'Open' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+                            {letter.status}
+                          </span>
+                        </div>
+                        <p className="text-sm text-slate-600 mt-1">{letter.letter_number}</p>
+                        <p className="text-sm text-slate-700 mt-2">{letter.violation_summary}</p>
+                        <div className="flex gap-4 mt-2 text-xs text-slate-500">
+                          <span>{letter.letter_date}</span>
+                          <span>{letter.facility_name}</span>
+                        </div>
+                        {letter.letter_url && (
+                          <a href={letter.letter_url} target="_blank" rel="noopener noreferrer" className="text-sm text-[#339999] hover:underline mt-2 inline-block">
+                            {locale === 'en' ? 'View Letter' : '查看信件'}
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Recalls */}
+              {company.recalls.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-slate-800 mb-4">
+                    {locale === 'en' ? 'Product Recalls' : '产品召回'} ({company.recalls.length})
+                  </h3>
+                  <div className="space-y-3">
+                    {company.recalls.map((recall) => (
+                      <div key={recall.id} className="border border-orange-200 rounded-xl p-4 bg-orange-50">
+                        <div className="flex justify-between items-start">
+                          <h4 className="font-medium text-slate-900">{recall.product_name}</h4>
+                          <span className={`px-2 py-0.5 rounded text-xs ${recall.recall_classification === 'Class I' || recall.recall_classification === 'High' ? 'bg-red-100 text-red-800' : 'bg-orange-100 text-orange-800'}`}>
+                            {recall.recall_classification}
+                          </span>
+                        </div>
+                        <p className="text-sm text-slate-600 mt-1">{recall.issuing_agency}</p>
+                        <p className="text-sm text-slate-700 mt-2">{recall.recall_reason}</p>
+                        <div className="flex gap-4 mt-2 text-xs text-slate-500">
+                          <span>{recall.recall_initiation_date}</span>
+                          <span className={`px-2 py-0.5 rounded ${recall.recall_status === 'Ongoing' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+                            {recall.recall_status}
+                          </span>
+                        </div>
+                        {recall.recall_url && (
+                          <a href={recall.recall_url} target="_blank" rel="noopener noreferrer" className="text-sm text-[#339999] hover:underline mt-2 inline-block">
+                            {locale === 'en' ? 'View Recall Details' : '查看召回详情'}
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
