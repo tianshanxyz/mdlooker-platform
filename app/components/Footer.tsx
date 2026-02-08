@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Mail, MapPin, Phone, Github, Twitter, Linkedin, ExternalLink, Shield, Globe, FileText, BookOpen } from 'lucide-react';
+import { Mail, MapPin, Github, Twitter, Linkedin, ExternalLink, Shield, Globe, BookOpen } from 'lucide-react';
 
 interface FooterProps {
   locale: string;
@@ -37,14 +37,6 @@ export default function Footer({ locale }: FooterProps) {
         { label: isZh ? 'FDA 510(k) 出口' : 'FDA 510(k) Export', href: `/${locale}/guides/fda-510k-export` },
         { label: isZh ? 'NMPA 注册' : 'NMPA Registration', href: `/${locale}/guides/nmpa-registration` },
         { label: isZh ? 'EUDAMED 注册' : 'EUDAMED Registration', href: `/${locale}/guides/eudamed-registration` },
-      ],
-    },
-    resources: {
-      title: isZh ? '资源' : 'Resources',
-      links: [
-        { label: isZh ? 'FDA 官网' : 'FDA Official', href: 'https://www.fda.gov', external: true },
-        { label: isZh ? 'NMPA 官网' : 'NMPA Official', href: 'https://www.nmpa.gov.cn', external: true },
-        { label: isZh ? 'EUDAMED' : 'EUDAMED', href: 'https://ec.europa.eu/tools/eudamed', external: true },
       ],
     },
     company: {
@@ -100,7 +92,6 @@ export default function Footer({ locale }: FooterProps) {
               <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
                 {key === 'product' && <Shield className="w-4 h-4 text-[#339999]" />}
                 {key === 'guides' && <BookOpen className="w-4 h-4 text-[#339999]" />}
-                {key === 'resources' && <FileText className="w-4 h-4 text-[#339999]" />}
                 {key === 'company' && <MapPin className="w-4 h-4 text-[#339999]" />}
                 {section.title}
               </h3>
