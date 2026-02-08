@@ -41,11 +41,7 @@ function FileTextIcon({ className }: { className?: string }) {
   );
 }
 
-export default function MarketAccessPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default function MarketAccessPage() {
   const { data: session, status } = useSession();
   const [locale, setLocale] = useState<Locale>('en');
   const [productCategory, setProductCategory] = useState('');
@@ -56,14 +52,6 @@ export default function MarketAccessPage({
   const [showResults, setShowResults] = useState(false);
   const [canDownload, setCanDownload] = useState(false);
   const [isCheckingPermission, setIsCheckingPermission] = useState(true);
-
-  useEffect(() => {
-    params.then((p) => {
-      if (locales.includes(p.locale as Locale)) {
-        setLocale(p.locale as Locale);
-      }
-    });
-  }, [params]);
 
   useEffect(() => {
     async function checkDownloadPermission() {

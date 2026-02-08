@@ -80,26 +80,13 @@ interface CompanyDetail {
   };
 }
 
-export default function CompanyDetailPage({
-  params
-}: {
-  params: Promise<{ locale: string; id: string }>
-}) {
+export default function CompanyDetailPage() {
   const [locale, setLocale] = useState<Locale>('en');
   const [companyId, setCompanyId] = useState<string>('');
   const [company, setCompany] = useState<CompanyDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'registrations' | 'ip' | 'risk' | 'branches'>('overview');
-
-  useEffect(() => {
-    params.then(p => {
-      if (locales.includes(p.locale as Locale)) {
-        setLocale(p.locale as Locale);
-      }
-      setCompanyId(p.id);
-    });
-  }, [params]);
 
   useEffect(() => {
     if (!companyId) return;

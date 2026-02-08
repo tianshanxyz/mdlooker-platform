@@ -26,23 +26,13 @@ interface ComplianceProfile {
   };
 }
 
-export default function ComplianceProfilePage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default function ComplianceProfilePage() {
   const [locale, setLocale] = useState<Locale>('en');
   const [query, setQuery] = useState('');
   const [searchType, setSearchType] = useState<'company' | 'product' | 'udi'>('company');
   const [results, setResults] = useState<ComplianceProfile[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
-
-  params.then((p) => {
-    if (locales.includes(p.locale as Locale)) {
-      setLocale(p.locale as Locale);
-    }
-  });
 
   const searchProfiles = async () => {
     if (!query.trim()) return;
