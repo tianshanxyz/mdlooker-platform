@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { locales, type Locale } from '../../../i18n-config';
 import CompanyComments from '@/app/components/CompanyComments';
 import DueDiligenceReport from '@/app/components/DueDiligenceReport';
@@ -81,12 +82,21 @@ interface CompanyDetail {
 }
 
 export default function CompanyDetailPage() {
+  const params = useParams();
   const [locale, setLocale] = useState<Locale>('en');
   const [companyId, setCompanyId] = useState<string>('');
   const [company, setCompany] = useState<CompanyDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'registrations' | 'ip' | 'risk' | 'branches'>('overview');
+
+  // Get companyId from URL params
+  useEffect(() => {
+    const id = params?.id as string;
+    if (id) {
+      setCompanyId(id);
+    }
+  }, [params]);
 
   useEffect(() => {
     if (!companyId) return;
