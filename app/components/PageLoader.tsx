@@ -43,15 +43,15 @@ export default function PageLoader() {
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white transition-opacity duration-500">
       {/* Logo动画 */}
-      <div className="relative mb-8">
-        <div className="animate-pulse">
+      <div className="relative mb-8 w-20 h-20">
+        <div className="animate-pulse w-full h-full">
           <Image 
             src="/logo.png" 
             alt="MDLooker" 
-            width={80} 
-            height={80}
-            className="animate-bounce"
+            fill
+            className="animate-bounce object-contain"
             style={{ animationDuration: '2s' }}
+            priority
           />
         </div>
         {/* 旋转光环 */}

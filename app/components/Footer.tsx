@@ -67,13 +67,14 @@ export default function Footer({ locale }: FooterProps) {
           {/* 品牌区域 */}
           <div className="lg:col-span-2">
             <Link href={`/${locale}`} className="flex items-center gap-3 mb-4">
-              <Image 
-                src="/logo.png" 
-                alt="MDLooker" 
-                width={48} 
-                height={48}
-                className="rounded-lg"
-              />
+              <div className="relative w-12 h-12">
+                <Image 
+                  src="/logo.png" 
+                  alt="MDLooker" 
+                  fill
+                  className="rounded-lg object-contain"
+                />
+              </div>
               <span className="text-2xl font-bold">MDLooker</span>
             </Link>
             <p className="text-slate-400 text-sm leading-relaxed mb-6 max-w-sm">

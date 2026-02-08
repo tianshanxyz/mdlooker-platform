@@ -41,13 +41,13 @@ export default function LocaleLayout({
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-8">
             <Link href={`/${locale}`} className="flex items-center gap-3 group">
-              <div className="relative">
+              <div className="relative w-11 h-11">
                 <Image 
                   src="/logo.png" 
                   alt="MDLooker" 
-                  width={44} 
-                  height={44}
-                  className="rounded-xl transition-transform group-hover:scale-105"
+                  fill
+                  className="rounded-xl transition-transform group-hover:scale-105 object-contain"
+                  priority
                 />
                 {/* 发光效果 */}
                 <div className="absolute inset-0 rounded-xl bg-[#339999]/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
