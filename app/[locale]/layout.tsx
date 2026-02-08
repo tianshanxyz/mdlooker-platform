@@ -46,7 +46,11 @@ export default function LocaleLayout({
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-2">
               {navItems.map((item) => {
-                const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+                // Home page should only be active when exactly on home page
+                const isHome = item.href === `/${locale}`;
+                const isActive = isHome 
+                  ? pathname === item.href 
+                  : pathname === item.href || pathname.startsWith(`${item.href}/`);
                 return (
                   <Link
                     key={item.href}
@@ -110,7 +114,11 @@ export default function LocaleLayout({
           <div className="md:hidden mt-4 pb-4 border-t border-[#339999]/10 pt-4">
             <div className="flex flex-col gap-2">
               {navItems.map((item) => {
-                const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+                // Home page should only be active when exactly on home page
+                const isHome = item.href === `/${locale}`;
+                const isActive = isHome 
+                  ? pathname === item.href 
+                  : pathname === item.href || pathname.startsWith(`${item.href}/`);
                 return (
                   <Link
                     key={item.href}

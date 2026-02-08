@@ -4,20 +4,37 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { translations, locales, type Locale } from '../i18n-config';
-import type { Company } from '../lib/types';
 
 interface SearchResult {
-  companies: Company[];
+  id: string;
+  name: string;
+  name_zh?: string;
+  description?: string;
+  description_zh?: string;
+  country?: string;
+  business_type?: string;
+  resultType: 'company' | 'product' | 'udi';
+  company_name?: string;
+  company_name_zh?: string;
+  company_country?: string;
+}
+
+interface SearchResponse {
+  results: SearchResult[];
   total: number;
   page: number;
   pageSize: number;
+  suggestions: string[];
+  detectedType: string;
+  query: string;
+  hasMore: boolean;
 }
 
 export default function HomePage() {
   const params = useParams();
   const [locale, setLocale] = useState<Locale>('en');
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<SearchResult | null>(null);
+  const [results, setResults] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
@@ -30,7 +47,7 @@ export default function HomePage() {
 
   const t = translations[locale];
 
-  const searchCompanies = useCallback(async (searchQuery: string) => {
+  const searchItems = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) {
       setResults(null);
       setHasSearched(false);
@@ -39,7 +56,7 @@ export default function HomePage() {
 
     setLoading(true);
     try {
-      const response = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}&page=1&pageSize=10`);
+      const response = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}&page=1&pageSize=10&type=auto`);
       if (response.ok) {
         const data = await response.json();
         setResults(data);
@@ -53,13 +70,18 @@ export default function HomePage() {
   }, []);
 
   const handleSearch = () => {
-    searchCompanies(query);
+    searchItems(query);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSearch();
     }
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setQuery(suggestion);
+    searchItems(suggestion);
   };
 
   return (
@@ -82,7 +104,7 @@ export default function HomePage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={t.hero.placeholder}
+            placeholder={locale === 'en' ? 'Search companies, products, UDI...' : '搜索企业、产品、UDI...'}
             className="flex-1 px-6 py-4 rounded-lg border border-slate-300 text-lg focus:outline-none focus:ring-2 focus:ring-[#339999] focus:border-transparent"
           />
           <button
@@ -110,52 +132,116 @@ export default function HomePage() {
       {/* 搜索结果 */}
       {hasSearched && results && (
         <div>
+          {/* 搜索结果统计 */}
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-slate-800">
-              {locale === 'en' ? `Found ${results.total} companies` : `找到 ${results.total} 家企业`}
-            </h2>
+            <div>
+              <h2 className="text-xl font-semibold text-slate-800">
+                {locale === 'en' 
+                  ? `Found ${results.total} results` 
+                  : `找到 ${results.total} 条结果`}
+              </h2>
+              {results.detectedType !== 'general' && (
+                <p className="text-sm text-slate-500 mt-1">
+                  {locale === 'en' 
+                    ? `Detected: ${results.detectedType}` 
+                    : `检测到: ${results.detectedType === 'company' ? '企业' : results.detectedType === 'product' ? '产品' : results.detectedType === 'udi' ? 'UDI' : '通用'}`}
+                </p>
+              )}
+            </div>
             {results.total > 0 && (
               <span className="text-sm text-slate-500">
-                {locale === 'en' ? `Showing ${results.companies.length} results` : `显示 ${results.companies.length} 条结果`}
+                {locale === 'en' 
+                  ? `Showing ${Math.min(results.results.length, 10)} results` 
+                  : `显示 ${Math.min(results.results.length, 10)} 条结果`}
               </span>
             )}
           </div>
+
+          {/* 搜索建议 */}
+          {results.suggestions && results.suggestions.length > 0 && (
+            <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+              <p className="text-sm text-amber-800 mb-2">
+                {locale === 'en' ? 'Did you mean:' : '您是否想找:'}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {results.suggestions.map((suggestion, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleSuggestionClick(suggestion)}
+                    className="px-3 py-1 bg-white text-amber-700 rounded-full text-sm border border-amber-300 hover:bg-amber-100 transition-colors"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           
-          {results.companies.length > 0 ? (
+          {results.results.length > 0 ? (
             <div className="grid gap-4">
-              {results.companies.map((company) => (
+              {results.results.map((item) => (
                 <Link
-                  key={company.id}
-                  href={`/${locale}/companies/${company.id}`}
+                  key={`${item.resultType}-${item.id}`}
+                  href={item.resultType === 'company' 
+                    ? `/${locale}/companies/${item.id}` 
+                    : item.resultType === 'product'
+                    ? `/${locale}/companies/${item.id}` // 产品链接到公司详情
+                    : `/${locale}/compliance-profile?q=${encodeURIComponent(item.name || '')}`
+                  }
                   className="bg-white p-6 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-100 group"
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="font-bold text-lg text-slate-900 group-hover:text-[#339999] transition-colors">
-                          {company.name}
+                          {item.name}
                         </h3>
-                        {company.name_zh && (
-                          <span className="text-slate-500 text-sm">{company.name_zh}</span>
+                        {item.name_zh && (
+                          <span className="text-slate-500 text-sm">{item.name_zh}</span>
                         )}
+                        {/* 结果类型标签 */}
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                          item.resultType === 'company' 
+                            ? 'bg-blue-100 text-blue-700'
+                            : item.resultType === 'product'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-purple-100 text-purple-700'
+                        }`}>
+                          {item.resultType === 'company' 
+                            ? (locale === 'en' ? 'Company' : '企业')
+                            : item.resultType === 'product'
+                            ? (locale === 'en' ? 'Product' : '产品')
+                            : 'UDI'}
+                        </span>
                       </div>
+                      
+                      {/* 如果是产品，显示所属公司 */}
+                      {item.resultType === 'product' && item.company_name && (
+                        <p className="text-sm text-slate-500 mb-2">
+                          {locale === 'en' ? 'By: ' : '制造商: '}
+                          <span className="text-slate-700">{item.company_name}</span>
+                          {item.company_country && (
+                            <span className="ml-2 text-slate-400">({item.company_country})</span>
+                          )}
+                        </p>
+                      )}
                       
                       <div className="flex flex-wrap gap-3 mb-3">
-                        {company.country && (
+                        {item.country && (
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#339999]/10 text-[#339999]">
-                            {company.country}
+                            {item.country}
                           </span>
                         )}
-                        {company.business_type && (
+                        {item.business_type && (
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
-                            {company.business_type}
+                            {item.business_type}
                           </span>
                         )}
                       </div>
                       
-                      {company.description && (
+                      {item.description && (
                         <p className="text-slate-600 text-sm line-clamp-2 leading-relaxed">
-                          {locale === 'zh' && company.description_zh ? company.description_zh : company.description}
+                          {locale === 'zh' && item.description_zh ? item.description_zh : item.description}
                         </p>
                       )}
                     </div>
@@ -178,10 +264,12 @@ export default function HomePage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <p className="text-slate-500 text-lg">
-                {locale === 'en' ? 'No companies found' : '未找到企业'}
+                {locale === 'en' ? 'No results found' : '未找到结果'}
               </p>
               <p className="text-slate-400 text-sm mt-2">
-                {locale === 'en' ? 'Try a different search term' : '请尝试其他关键词'}
+                {locale === 'en' 
+                  ? 'Try different keywords or check the suggestions above' 
+                  : '请尝试其他关键词或查看上方建议'}
               </p>
             </div>
           )}
