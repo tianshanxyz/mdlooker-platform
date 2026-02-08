@@ -1,38 +1,12 @@
 /**
- * Supabase 数据导入脚本
- * 
- * 使用方法:
- * 1. 确保已安装依赖: npm install @supabase/supabase-js cross-fetch
- * 2. 设置环境变量: NEXT_PUBLIC_SUPABASE_URL 和 NEXT_PUBLIC_SUPABASE_ANON_KEY
- * 3. 运行: npx ts-node scripts/import-seed-data.ts
+ * Supabase 数据导入脚本 - 简化版
+ * 使用 SQL 直接导入
  */
 
 import fetch from 'cross-fetch';
-import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
-if (!supabaseUrl || !supabaseKey) {
-  console.error('❌ 错误: 请设置 NEXT_PUBLIC_SUPABASE_URL 和 NEXT_PUBLIC_SUPABASE_ANON_KEY 环境变量');
-  console.error('示例:');
-  console.error('  export NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"');
-  console.error('  export NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"');
-  process.exit(1);
-}
-
-console.log('🔗 连接到 Supabase:', supabaseUrl);
-
-// 创建 Supabase 客户端
-const supabase = createClient(supabaseUrl, supabaseKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false
-  },
-  global: {
-    fetch: fetch as any
-  }
-});
+const supabaseUrl = 'https://tiosujipxpvivdjwtfa.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRpb3N1amlweHB2aXZkam13dGZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MDQ3MDEsImV4cCI6MjA4NTQ4MDcwMX0.u6_dYapbthkcTppJWONF91W6-MLMBR4DqymQXAxEyTQ';
 
 // 基础数据（原始12家公司）
 const baseCompanies = [
@@ -1761,6 +1735,7 @@ const extendedProducts = [
 // 导入数据函数
 async function importData() {
   console.log('🚀 开始导入数据到 Supabase...\n');
+  console.log('🔗 连接到:', supabaseUrl);
   
   const results = {
     companies: { success: 0, failed: 0, errors: [] as string[] },
@@ -1768,17 +1743,25 @@ async function importData() {
   };
 
   // 导入基础公司数据
-  console.log('📦 导入基础公司数据 (12家)...');
+  console.log('\n📦 导入基础公司数据 (12家)...');
   for (const company of baseCompanies) {
     try {
-      const { error } = await supabase
-        .from('companies')
-        .upsert(company, { onConflict: 'id' });
+      const response = await fetch(`${supabaseUrl}/rest/v1/companies`, {
+        method: 'POST',
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'resolution=merge-duplicates'
+        },
+        body: JSON.stringify(company)
+      });
       
-      if (error) {
+      if (!response.ok) {
+        const error = await response.text();
         results.companies.failed++;
-        results.companies.errors.push(`公司 ${company.name}: ${error.message}`);
-        console.log(`  ❌ ${company.name}: ${error.message}`);
+        results.companies.errors.push(`公司 ${company.name}: ${error}`);
+        console.log(`  ❌ ${company.name}: ${error}`);
       } else {
         results.companies.success++;
         console.log(`  ✅ ${company.name}`);
@@ -1794,14 +1777,22 @@ async function importData() {
   console.log('\n📦 导入扩展公司数据 (50家)...');
   for (const company of extendedCompanies) {
     try {
-      const { error } = await supabase
-        .from('companies')
-        .upsert(company, { onConflict: 'id' });
+      const response = await fetch(`${supabaseUrl}/rest/v1/companies`, {
+        method: 'POST',
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'resolution=merge-duplicates'
+        },
+        body: JSON.stringify(company)
+      });
       
-      if (error) {
+      if (!response.ok) {
+        const error = await response.text();
         results.companies.failed++;
-        results.companies.errors.push(`公司 ${company.name}: ${error.message}`);
-        console.log(`  ❌ ${company.name}: ${error.message}`);
+        results.companies.errors.push(`公司 ${company.name}: ${error}`);
+        console.log(`  ❌ ${company.name}: ${error}`);
       } else {
         results.companies.success++;
         console.log(`  ✅ ${company.name}`);
@@ -1817,14 +1808,22 @@ async function importData() {
   console.log('\n📦 导入基础产品数据 (12个)...');
   for (const product of baseProducts) {
     try {
-      const { error } = await supabase
-        .from('products')
-        .upsert(product, { onConflict: 'id' });
+      const response = await fetch(`${supabaseUrl}/rest/v1/products`, {
+        method: 'POST',
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'resolution=merge-duplicates'
+        },
+        body: JSON.stringify(product)
+      });
       
-      if (error) {
+      if (!response.ok) {
+        const error = await response.text();
         results.products.failed++;
-        results.products.errors.push(`产品 ${product.name}: ${error.message}`);
-        console.log(`  ❌ ${product.name}: ${error.message}`);
+        results.products.errors.push(`产品 ${product.name}: ${error}`);
+        console.log(`  ❌ ${product.name}: ${error}`);
       } else {
         results.products.success++;
         console.log(`  ✅ ${product.name}`);
@@ -1840,14 +1839,22 @@ async function importData() {
   console.log('\n📦 导入扩展产品数据 (80个)...');
   for (const product of extendedProducts) {
     try {
-      const { error } = await supabase
-        .from('products')
-        .upsert(product, { onConflict: 'id' });
+      const response = await fetch(`${supabaseUrl}/rest/v1/products`, {
+        method: 'POST',
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'resolution=merge-duplicates'
+        },
+        body: JSON.stringify(product)
+      });
       
-      if (error) {
+      if (!response.ok) {
+        const error = await response.text();
         results.products.failed++;
-        results.products.errors.push(`产品 ${product.name}: ${error.message}`);
-        console.log(`  ❌ ${product.name}: ${error.message}`);
+        results.products.errors.push(`产品 ${product.name}: ${error}`);
+        console.log(`  ❌ ${product.name}: ${error}`);
       } else {
         results.products.success++;
         console.log(`  ✅ ${product.name}`);

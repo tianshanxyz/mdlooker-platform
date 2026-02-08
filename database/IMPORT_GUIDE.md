@@ -27,7 +27,24 @@
 
 ## 导入方法
 
-### 方法一：使用 TypeScript 脚本（推荐）
+### 方法一：使用 SQL 文件（最简单，推荐）
+
+如果 TypeScript 脚本遇到问题，直接使用 SQL 文件是最可靠的方法：
+
+1. **登录 Supabase Dashboard**
+   - 访问 https://app.supabase.io
+   - 选择你的项目
+
+2. **打开 SQL Editor**
+   - 点击左侧菜单 "SQL Editor"
+   - 选择 "New query"
+
+3. **执行 SQL 文件**
+   - 复制 `database/seed_data_backup.sql` 的内容
+   - 粘贴到 SQL Editor
+   - 点击 "Run"
+
+### 方法二：使用 TypeScript 脚本
 
 1. **安装依赖**
 ```bash
@@ -46,7 +63,7 @@ export NEXT_PUBLIC_SUPABASE_ANON_KEY="你的Supabase Anon Key"
 npx ts-node scripts/import-seed-data.ts
 ```
 
-### 方法二：使用 SQL 文件
+**注意**：如果遇到 `TypeError: fetch failed` 错误，请使用方法一（SQL文件）导入。
 
 1. **登录 Supabase Dashboard**
    - 访问 https://app.supabase.io

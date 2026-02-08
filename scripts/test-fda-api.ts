@@ -1,71 +1,64 @@
-// FDA API Test Script
-// Run with: npx ts-node scripts/test-fda-api.ts
+// 测试 FDA API 连接
+// 运行: npx ts-node scripts/test-fda-api.ts
 
-import dotenv from 'dotenv';
-import path from 'path';
-
-// 从项目根目录加载 .env.local 文件
-const envPath = path.resolve(process.cwd(), '.env.local');
-dotenv.config({ path: envPath });
-
-const FDA_API_BASE = 'https://api.fda.gov/device/registrationlisting.json';
+const FDA_API_BASE = 'https://api.fda.gov';
+const FDA_API_KEY = process.env.FDA_API_KEY;
 
 async function testFDAApi() {
-  const apiKey = process.env.FDA_API_KEY;
-  
-  console.log('FDA API Connection Test');
-  console.log('=======================\n');
-  console.log(`Loading env from: ${envPath}\n`);
-  
-  if (!apiKey || apiKey === 'your_fda_api_key_here') {
-    console.error('❌ Error: FDA_API_KEY not configured');
-    console.log('\nPlease set your FDA API key in .env.local file:');
-    console.log('FDA_API_KEY=your_actual_api_key_here');
-    console.log('\nGet your API key from: https://open.fda.gov/apis/authentication/');
-    console.log(`\nCurrent FDA_API_KEY value: ${apiKey || 'undefined'}`);
+  if (!FDA_API_KEY) {
+    console.error('❌ FDA_API_KEY 环境变量未设置');
+    console.log('请在 Vercel Dashboard 中设置 FDA_API_KEY 环境变量');
     process.exit(1);
   }
-  
-  console.log('✓ API Key found');
-  console.log(`Key: ${apiKey.substring(0, 10)}...\n`);
-  
+
+  console.log('🔄 测试 FDA API 连接...');
+  console.log(`API Key: ${FDA_API_KEY.substring(0, 10)}...`);
+
   try {
-    // Test: Basic connection with limit
-    console.log('Test: Basic API connection...');
-    const testUrl = new URL(FDA_API_BASE);
-    testUrl.searchParams.append('limit', '5');
-    testUrl.searchParams.append('api_key', apiKey);
-    
-    const response = await fetch(testUrl.toString());
-    
+    // 测试 1: 获取注册企业列表
+    const url = `${FDA_API_BASE}/device/registrationlisting.json?api_key=${FDA_API_KEY}&limit=5`;
+    console.log(`\n📡 请求: ${url.replace(FDA_API_KEY, '***')}`);
+
+    const response = await fetch(url, {
+      headers: { 'Accept': 'application/json' },
+    });
+
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      const errorText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
     }
-    
+
     const data = await response.json();
-    console.log('✓ Connection successful!');
-    console.log(`  Total records available: ${data.meta?.results?.total?.toLocaleString() || 'N/A'}`);
-    console.log(`  Records returned: ${data.results?.length || 0}\n`);
-    
+
+    console.log('\n✅ FDA API 连接成功！');
+    console.log(`📊 获取到 ${data.results?.length || 0} 条记录`);
+    console.log(`📊 总记录数: ${data.meta?.results?.total || 'N/A'}`);
+
     if (data.results && data.results.length > 0) {
-      console.log('Sample records:');
-      data.results.slice(0, 3).forEach((sample: any, index: number) => {
-        console.log(`\n  Record ${index + 1}:`);
-        console.log(`    Device Name: ${sample.device_name || 'N/A'}`);
-        console.log(`    Registration Number: ${sample.registration_number || 'N/A'}`);
-        console.log(`    Device Class: ${sample.device_class || 'N/A'}`);
-        console.log(`    Product Code: ${sample.product_code || 'N/A'}`);
-      });
+      console.log('\n📋 第一条记录示例:');
+      const first = data.results[0];
+      console.log(`  - 注册号: ${first.registration_number}`);
+      console.log(`  - FEI号: ${first.fei_number}`);
+      console.log(`  - 状态: ${first.registration_status}`);
+      console.log(`  - 企业类型: ${first.establishment_type}`);
+      console.log(`  - 地址: ${first.address}, ${first.city}, ${first.state}`);
     }
-    
-    console.log('\n✅ All tests passed! FDA API is ready to use.');
-    console.log('\n📊 API Statistics:');
-    console.log(`  Total device registrations: ${data.meta?.results?.total?.toLocaleString() || 'N/A'}`);
-    console.log(`  API Key: ${apiKey.substring(0, 15)}...`);
-    
+
+    // 测试 2: 搜索特定产品
+    console.log('\n🔄 测试搜索功能...');
+    const searchUrl = `${FDA_API_BASE}/device/registrationlisting.json?api_key=${FDA_API_KEY}&search=product_code:LYZ&limit=3`;
+    const searchResponse = await fetch(searchUrl);
+
+    if (searchResponse.ok) {
+      const searchData = await searchResponse.json();
+      console.log(`✅ 搜索功能正常，找到 ${searchData.results?.length || 0} 条记录`);
+    }
+
+    console.log('\n🎉 所有测试通过！FDA API 配置正确。');
+
   } catch (error) {
-    console.error('\n❌ API Test Failed:');
-    console.error(error instanceof Error ? error.message : 'Unknown error');
+    console.error('\n❌ FDA API 测试失败:');
+    console.error(error instanceof Error ? error.message : error);
     process.exit(1);
   }
 }

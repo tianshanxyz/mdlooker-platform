@@ -1,38 +1,14 @@
 /**
- * Supabase 数据导入脚本
- * 
+ * 生成 SQL 导入文件
  * 使用方法:
- * 1. 确保已安装依赖: npm install @supabase/supabase-js cross-fetch
- * 2. 设置环境变量: NEXT_PUBLIC_SUPABASE_URL 和 NEXT_PUBLIC_SUPABASE_ANON_KEY
- * 3. 运行: npx ts-node scripts/import-seed-data.ts
+ * 1. 运行: npx ts-node scripts/generate-sql-import.ts
+ * 2. 打开 database/seed_data.sql
+ * 3. 复制内容到 Supabase Dashboard -> SQL Editor -> New Query
+ * 4. 执行 SQL
  */
 
-import fetch from 'cross-fetch';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
-if (!supabaseUrl || !supabaseKey) {
-  console.error('❌ 错误: 请设置 NEXT_PUBLIC_SUPABASE_URL 和 NEXT_PUBLIC_SUPABASE_ANON_KEY 环境变量');
-  console.error('示例:');
-  console.error('  export NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"');
-  console.error('  export NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"');
-  process.exit(1);
-}
-
-console.log('🔗 连接到 Supabase:', supabaseUrl);
-
-// 创建 Supabase 客户端
-const supabase = createClient(supabaseUrl, supabaseKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false
-  },
-  global: {
-    fetch: fetch as any
-  }
-});
+import * as fs from 'fs';
+import * as path from 'path';
 
 // 基础数据（原始12家公司）
 const baseCompanies = [
@@ -1758,130 +1734,145 @@ const extendedProducts = [
   }
 ];
 
-// 导入数据函数
-async function importData() {
-  console.log('🚀 开始导入数据到 Supabase...\n');
-  
-  const results = {
-    companies: { success: 0, failed: 0, errors: [] as string[] },
-    products: { success: 0, failed: 0, errors: [] as string[] }
-  };
-
-  // 导入基础公司数据
-  console.log('📦 导入基础公司数据 (12家)...');
-  for (const company of baseCompanies) {
-    try {
-      const { error } = await supabase
-        .from('companies')
-        .upsert(company, { onConflict: 'id' });
-      
-      if (error) {
-        results.companies.failed++;
-        results.companies.errors.push(`公司 ${company.name}: ${error.message}`);
-        console.log(`  ❌ ${company.name}: ${error.message}`);
-      } else {
-        results.companies.success++;
-        console.log(`  ✅ ${company.name}`);
-      }
-    } catch (err: any) {
-      results.companies.failed++;
-      results.companies.errors.push(`公司 ${company.name}: ${err.message}`);
-      console.log(`  ❌ ${company.name}: ${err.message}`);
-    }
-  }
-
-  // 导入扩展公司数据
-  console.log('\n📦 导入扩展公司数据 (50家)...');
-  for (const company of extendedCompanies) {
-    try {
-      const { error } = await supabase
-        .from('companies')
-        .upsert(company, { onConflict: 'id' });
-      
-      if (error) {
-        results.companies.failed++;
-        results.companies.errors.push(`公司 ${company.name}: ${error.message}`);
-        console.log(`  ❌ ${company.name}: ${error.message}`);
-      } else {
-        results.companies.success++;
-        console.log(`  ✅ ${company.name}`);
-      }
-    } catch (err: any) {
-      results.companies.failed++;
-      results.companies.errors.push(`公司 ${company.name}: ${err.message}`);
-      console.log(`  ❌ ${company.name}: ${err.message}`);
-    }
-  }
-
-  // 导入基础产品数据
-  console.log('\n📦 导入基础产品数据 (12个)...');
-  for (const product of baseProducts) {
-    try {
-      const { error } = await supabase
-        .from('products')
-        .upsert(product, { onConflict: 'id' });
-      
-      if (error) {
-        results.products.failed++;
-        results.products.errors.push(`产品 ${product.name}: ${error.message}`);
-        console.log(`  ❌ ${product.name}: ${error.message}`);
-      } else {
-        results.products.success++;
-        console.log(`  ✅ ${product.name}`);
-      }
-    } catch (err: any) {
-      results.products.failed++;
-      results.products.errors.push(`产品 ${product.name}: ${err.message}`);
-      console.log(`  ❌ ${product.name}: ${err.message}`);
-    }
-  }
-
-  // 导入扩展产品数据
-  console.log('\n📦 导入扩展产品数据 (80个)...');
-  for (const product of extendedProducts) {
-    try {
-      const { error } = await supabase
-        .from('products')
-        .upsert(product, { onConflict: 'id' });
-      
-      if (error) {
-        results.products.failed++;
-        results.products.errors.push(`产品 ${product.name}: ${error.message}`);
-        console.log(`  ❌ ${product.name}: ${error.message}`);
-      } else {
-        results.products.success++;
-        console.log(`  ✅ ${product.name}`);
-      }
-    } catch (err: any) {
-      results.products.failed++;
-      results.products.errors.push(`产品 ${product.name}: ${err.message}`);
-      console.log(`  ❌ ${product.name}: ${err.message}`);
-    }
-  }
-
-  // 打印结果
-  console.log('\n========================================');
-  console.log('📊 数据导入完成！');
-  console.log('========================================');
-  console.log(`🏢 公司数据: ${results.companies.success} 成功, ${results.companies.failed} 失败`);
-  console.log(`📦 产品数据: ${results.products.success} 成功, ${results.products.failed} 失败`);
-  console.log(`📈 总计: ${results.companies.success + results.products.success} 成功, ${results.companies.failed + results.products.failed} 失败`);
-
-  if (results.companies.errors.length > 0 || results.products.errors.length > 0) {
-    console.log('\n❌ 错误详情 (前10个):');
-    const allErrors = [...results.companies.errors, ...results.products.errors];
-    allErrors.slice(0, 10).forEach((error, index) => {
-      console.log(`  ${index + 1}. ${error}`);
-    });
-    if (allErrors.length > 10) {
-      console.log(`  ... 还有 ${allErrors.length - 10} 个错误`);
-    }
-    process.exit(1);
-  } else {
-    console.log('\n✅ 所有数据导入成功！');
-    process.exit(0);
-  }
+function escapeSql(value: string | null | undefined): string {
+  if (value === null || value === undefined) return 'NULL';
+  return "'" + value.replace(/'/g, "''").replace(/\\/g, '\\\\') + "'";
 }
 
-// 执行导入
-importData();
+function generateCompanySql(company: any): string {
+  return `INSERT INTO companies (id, name, name_zh, country, address, website, business_type, description, description_zh, created_at, updated_at)
+VALUES (
+  ${escapeSql(company.id)},
+  ${escapeSql(company.name)},
+  ${escapeSql(company.name_zh)},
+  ${escapeSql(company.country)},
+  ${escapeSql(company.address)},
+  ${escapeSql(company.website)},
+  ${escapeSql(company.business_type)},
+  ${escapeSql(company.description)},
+  ${escapeSql(company.description_zh)},
+  NOW(),
+  NOW()
+)
+ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  name_zh = EXCLUDED.name_zh,
+  country = EXCLUDED.country,
+  address = EXCLUDED.address,
+  website = EXCLUDED.website,
+  business_type = EXCLUDED.business_type,
+  description = EXCLUDED.description,
+  description_zh = EXCLUDED.description_zh,
+  updated_at = NOW();`;
+}
+
+function generateProductSql(product: any): string {
+  return `INSERT INTO products (id, company_id, name, name_zh, category, category_zh, description, description_zh, model_number, fda_number, ce_number, nmpa_number, status, created_at, updated_at)
+VALUES (
+  ${escapeSql(product.id)},
+  ${escapeSql(product.company_id)},
+  ${escapeSql(product.name)},
+  ${escapeSql(product.name_zh)},
+  ${escapeSql(product.category)},
+  ${escapeSql(product.category_zh)},
+  ${escapeSql(product.description)},
+  ${escapeSql(product.description_zh)},
+  ${escapeSql(product.model_number)},
+  ${escapeSql(product.fda_number)},
+  ${escapeSql(product.ce_number)},
+  ${escapeSql(product.nmpa_number)},
+  ${escapeSql(product.status)},
+  NOW(),
+  NOW()
+)
+ON CONFLICT (id) DO UPDATE SET
+  company_id = EXCLUDED.company_id,
+  name = EXCLUDED.name,
+  name_zh = EXCLUDED.name_zh,
+  category = EXCLUDED.category,
+  category_zh = EXCLUDED.category_zh,
+  description = EXCLUDED.description,
+  description_zh = EXCLUDED.description_zh,
+  model_number = EXCLUDED.model_number,
+  fda_number = EXCLUDED.fda_number,
+  ce_number = EXCLUDED.ce_number,
+  nmpa_number = EXCLUDED.nmpa_number,
+  status = EXCLUDED.status,
+  updated_at = NOW();`;
+}
+
+function generateSqlFile() {
+  const lines: string[] = [];
+  
+  lines.push('-- ============================================');
+  lines.push('-- MDLooker 种子数据导入 SQL');
+  lines.push('-- 生成时间: ' + new Date().toISOString());
+  lines.push('-- ============================================');
+  lines.push('');
+  lines.push('-- 开始事务');
+  lines.push('BEGIN;');
+  lines.push('');
+  
+  // 公司数据
+  lines.push('-- ============================================');
+  lines.push('-- 公司数据 (62家)');
+  lines.push('-- ============================================');
+  lines.push('');
+  
+  [...baseCompanies, ...extendedCompanies].forEach((company, index) => {
+    lines.push(`-- 公司 ${index + 1}: ${company.name}`);
+    lines.push(generateCompanySql(company));
+    lines.push('');
+  });
+  
+  // 产品数据
+  lines.push('-- ============================================');
+  lines.push('-- 产品数据 (92个)');
+  lines.push('-- ============================================');
+  lines.push('');
+  
+  [...baseProducts, ...extendedProducts].forEach((product, index) => {
+    lines.push(`-- 产品 ${index + 1}: ${product.name}`);
+    lines.push(generateProductSql(product));
+    lines.push('');
+  });
+  
+  lines.push('-- 提交事务');
+  lines.push('COMMIT;');
+  lines.push('');
+  lines.push('-- ============================================');
+  lines.push('-- 数据导入完成！');
+  lines.push('-- 公司: 62 家');
+  lines.push('-- 产品: 92 个');
+  lines.push('-- ============================================');
+  
+  return lines.join('\n');
+}
+
+// 生成 SQL 文件
+const sqlContent = generateSqlFile();
+const outputPath = path.join(__dirname, '..', 'database', 'seed_data.sql');
+
+// 确保目录存在
+const dir = path.dirname(outputPath);
+if (!fs.existsSync(dir)) {
+  fs.mkdirSync(dir, { recursive: true });
+}
+
+// 写入文件
+fs.writeFileSync(outputPath, sqlContent, 'utf-8');
+
+console.log('✅ SQL 文件生成成功！');
+console.log(`📁 文件路径: ${outputPath}`);
+console.log('');
+console.log('📖 使用方法:');
+console.log('1. 打开 Supabase Dashboard');
+console.log('2. 进入 SQL Editor');
+console.log('3. 点击 "New Query"');
+console.log('4. 复制 seed_data.sql 文件的内容');
+console.log('5. 粘贴到 SQL Editor');
+console.log('6. 点击 "Run" 执行');
+console.log('');
+console.log(`📊 数据概览:`);
+console.log(`   - 公司: ${baseCompanies.length + extendedCompanies.length} 家`);
+console.log(`   - 产品: ${baseProducts.length + extendedProducts.length} 个`);
