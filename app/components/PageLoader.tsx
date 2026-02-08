@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
 
 export default function PageLoader() {
   const [isLoading, setIsLoading] = useState(true);
@@ -44,14 +43,13 @@ export default function PageLoader() {
     <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white transition-opacity duration-500">
       {/* Logo动画 */}
       <div className="relative mb-8 w-20 h-20">
-        <div className="animate-pulse w-full h-full">
-          <Image 
+        <div className="animate-pulse w-full h-full flex items-center justify-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img 
             src="/logo.png" 
             alt="MDLooker" 
-            fill
-            className="animate-bounce object-contain"
+            className="w-16 h-16 animate-bounce object-contain"
             style={{ animationDuration: '2s' }}
-            priority
           />
         </div>
         {/* 旋转光环 */}

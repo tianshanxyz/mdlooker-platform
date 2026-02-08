@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { locales, type Locale } from '../i18n-config';
-import Image from 'next/image';
 import { useState } from 'react';
 import PageLoader from '../components/PageLoader';
 import Breadcrumb from '../components/Breadcrumb';
@@ -42,12 +41,11 @@ export default function LocaleLayout({
           <div className="flex items-center gap-8">
             <Link href={`/${locale}`} className="flex items-center gap-3 group">
               <div className="relative w-11 h-11">
-                <Image 
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img 
                   src="/logo.png" 
                   alt="MDLooker" 
-                  fill
-                  className="rounded-xl transition-transform group-hover:scale-105 object-contain"
-                  priority
+                  className="w-full h-full rounded-xl transition-transform group-hover:scale-105 object-contain"
                 />
                 {/* 发光效果 */}
                 <div className="absolute inset-0 rounded-xl bg-[#339999]/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>

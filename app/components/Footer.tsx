@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { Mail, MapPin, Phone, Github, Twitter, Linkedin, ExternalLink, Shield, Globe, FileText, BookOpen } from 'lucide-react';
 
 interface FooterProps {
@@ -67,14 +66,12 @@ export default function Footer({ locale }: FooterProps) {
           {/* 品牌区域 */}
           <div className="lg:col-span-2">
             <Link href={`/${locale}`} className="flex items-center gap-3 mb-4">
-              <div className="relative w-12 h-12">
-                <Image 
-                  src="/logo.png" 
-                  alt="MDLooker" 
-                  fill
-                  className="rounded-lg object-contain"
-                />
-              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img 
+                src="/logo.png" 
+                alt="MDLooker" 
+                className="w-12 h-12 rounded-lg object-contain"
+              />
               <span className="text-2xl font-bold">MDLooker</span>
             </Link>
             <p className="text-slate-400 text-sm leading-relaxed mb-6 max-w-sm">
