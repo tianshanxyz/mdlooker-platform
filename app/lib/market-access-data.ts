@@ -13,6 +13,46 @@ export interface AccessRequirement {
   timelineZh: string;
   cost: string;
   costZh: string;
+  // 新增：详细操作指南
+  detailedGuide?: {
+    description: string;
+    descriptionZh: string;
+    forms?: FormInfo[];
+    contacts?: ContactInfo[];
+    submissionMethods?: SubmissionMethod[];
+    tips?: string[];
+    tipsZh?: string[];
+  };
+}
+
+export interface FormInfo {
+  name: string;
+  nameZh: string;
+  downloadUrl?: string;
+  onlineUrl?: string;
+  description?: string;
+  descriptionZh?: string;
+}
+
+export interface ContactInfo {
+  name: string;
+  nameZh: string;
+  email?: string;
+  phone?: string;
+  website?: string;
+  address?: string;
+  description?: string;
+  descriptionZh?: string;
+}
+
+export interface SubmissionMethod {
+  method: string;
+  methodZh: string;
+  url?: string;
+  email?: string;
+  address?: string;
+  description?: string;
+  descriptionZh?: string;
 }
 
 export interface RegulationLink {
@@ -36,6 +76,9 @@ export interface MarketAccessPathway {
   notifiedBodies?: string[];
   localRepresentativeRequired: boolean;
   clinicalDataRequired: boolean;
+  // 新增：总体提示
+  generalTips?: string[];
+  generalTipsZh?: string[];
 }
 
 // 产品类别定义
@@ -129,6 +172,59 @@ function generateUSAPathway(
         timelineZh: '1-2周',
         cost: '$0',
         costZh: '免费',
+        detailedGuide: {
+          description: 'Use the FDA Product Classification Database to determine your device\'s classification. For novel devices, you may need to submit a 513(g) Request for Information.',
+          descriptionZh: '使用FDA产品分类数据库确定您的设备分类。对于新型设备，您可能需要提交513(g)信息请求。',
+          forms: [
+            {
+              name: '513(g) Request Form',
+              nameZh: '513(g)请求表格',
+              downloadUrl: 'https://www.fda.gov/media/71029/download',
+              onlineUrl: 'https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfPCD/classification.cfm',
+              description: 'Request for Information - Device Classification',
+              descriptionZh: '信息请求 - 设备分类'
+            }
+          ],
+          contacts: [
+            {
+              name: 'FDA Division of Industry and Consumer Education (DICE)',
+              nameZh: 'FDA行业与消费者教育司',
+              email: 'DICE@fda.hhs.gov',
+              phone: '+1-800-638-2041',
+              website: 'https://www.fda.gov/medical-devices/medical-device-safety/medical-device-reporting-mdr-how-report-medical-device-problems',
+              description: 'General questions about device classification',
+              descriptionZh: '设备分类的一般问题'
+            }
+          ],
+          submissionMethods: [
+            {
+              method: 'Online Database',
+              methodZh: '在线数据库',
+              url: 'https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfPCD/classification.cfm',
+              description: 'Search product classification database',
+              descriptionZh: '搜索产品分类数据库'
+            },
+            {
+              method: 'Email Submission',
+              methodZh: '邮件提交',
+              email: 'DICE@fda.hhs.gov',
+              description: 'For 513(g) requests and classification questions',
+              descriptionZh: '用于513(g)请求和分类问题'
+            }
+          ],
+          tips: [
+            'Search for similar devices already on the market to identify your predicate device',
+            'If no predicate exists, consider the De Novo pathway for novel devices',
+            'Document your classification rationale for future reference',
+            'Consult with FDA early if classification is unclear'
+          ],
+          tipsZh: [
+            '搜索市场上已有的类似设备以识别您的对比设备',
+            '如果不存在对比设备，请考虑De Novo途径用于新型设备',
+            '记录您的分类依据以供将来参考',
+            '如果分类不明确，请尽早咨询FDA'
+          ]
+        }
       },
       {
         step: 2,
@@ -150,6 +246,73 @@ function generateUSAPathway(
         timelineZh: isClassIII ? '180-360天' : '90-180天',
         cost: isClassIII ? '$300,000+' : '$15,000-50,000',
         costZh: isClassIII ? '30万美元以上' : '1.5-5万美元',
+        detailedGuide: {
+          description: isClassIII 
+            ? 'Submit your PMA application through the FDA eSubmitter system. Include all clinical data, manufacturing information, and labeling. FDA will conduct a thorough review including facility inspection.'
+            : 'Prepare your 510(k) submission demonstrating substantial equivalence to a predicate device. Use the FDA eSubmitter tool for electronic submission.',
+          descriptionZh: isClassIII 
+            ? '通过FDA eSubmitter系统提交您的PMA申请。包括所有临床数据、生产信息和标签。FDA将进行彻底审查，包括设施检查。'
+            : '准备您的510(k)提交，证明与对比设备的实质等效性。使用FDA eSubmitter工具进行电子提交。',
+          forms: [
+            {
+              name: '510(k) Submission Template',
+              nameZh: '510(k)提交模板',
+              downloadUrl: 'https://www.fda.gov/media/99946/download',
+              onlineUrl: 'https://www.fda.gov/medical-devices/premarket-submissions/premarket-notification-510k',
+              description: 'Standard format for 510(k) submissions',
+              descriptionZh: '510(k)提交的标准格式'
+            },
+            {
+              name: 'PMA Application Form',
+              nameZh: 'PMA申请表',
+              downloadUrl: 'https://www.fda.gov/media/71273/download',
+              onlineUrl: 'https://www.fda.gov/medical-devices/premarket-submissions/premarket-approval-pma',
+              description: 'Premarket Approval application',
+              descriptionZh: '上市前批准申请'
+            }
+          ],
+          contacts: [
+            {
+              name: 'FDA CDRH Premarket Review',
+              nameZh: 'FDA CDRH上市前审查',
+              email: 'CDRH-Submission-Support@fda.hhs.gov',
+              phone: '+1-301-796-5640',
+              website: 'https://www.fda.gov/medical-devices/premarket-submissions',
+              description: 'Questions about submission requirements and process',
+              descriptionZh: '关于提交要求和流程的问题'
+            }
+          ],
+          submissionMethods: [
+            {
+              method: 'FDA eSubmitter (Electronic)',
+              methodZh: 'FDA eSubmitter（电子）',
+              url: 'https://www.fda.gov/industry/electronic-submissions-gateway',
+              description: 'Preferred method for all submissions',
+              descriptionZh: '所有提交的首选方法'
+            },
+            {
+              method: 'CDRH Document Control Center',
+              methodZh: 'CDRH文件控制中心',
+              address: 'Food and Drug Administration, Center for Devices and Radiological Health, Document Control Center - WO66-G609, 10903 New Hampshire Avenue, Silver Spring, MD 20993-0002',
+              description: 'Mail submissions (not recommended)',
+              descriptionZh: '邮寄提交（不推荐）'
+            }
+          ],
+          tips: [
+            'Use the FDA eSubmitter tool for faster processing',
+            'Include a comprehensive cover letter summarizing your submission',
+            'Ensure all testing is conducted by accredited laboratories',
+            'Respond to FDA questions within the specified timeframe to avoid delays',
+            'Consider a pre-submission meeting with FDA for complex devices'
+          ],
+          tipsZh: [
+            '使用FDA eSubmitter工具以加快处理速度',
+            '包括一封全面的求职信，总结您的提交',
+            '确保所有测试均由认可实验室进行',
+            '在指定时间内回复FDA的问题以避免延误',
+            '对于复杂设备，考虑与FDA进行预提交会议'
+          ]
+        }
       },
       {
         step: 3,
@@ -163,6 +326,62 @@ function generateUSAPathway(
         timelineZh: '1-2周',
         cost: '$5,000+',
         costZh: '5000美元以上',
+        detailedGuide: {
+          description: 'All medical device establishments must register with FDA annually and list their devices. Foreign establishments must designate a US agent.',
+          descriptionZh: '所有医疗器械企业必须每年向FDA注册并列名其设备。外国企业必须指定美国代理人。',
+          forms: [
+            {
+              name: 'FDA Form 2891 - Establishment Registration',
+              nameZh: 'FDA表格2891 - 企业注册',
+              downloadUrl: 'https://www.fda.gov/media/71736/download',
+              onlineUrl: 'https://www.access.fda.gov/oaa/registration.htm',
+              description: 'Annual establishment registration',
+              descriptionZh: '年度企业注册'
+            },
+            {
+              name: 'FDA Form 2892 - Device Listing',
+              nameZh: 'FDA表格2892 - 设备列名',
+              downloadUrl: 'https://www.fda.gov/media/71737/download',
+              onlineUrl: 'https://www.access.fda.gov/oaa/registration.htm',
+              description: 'Device listing form',
+              descriptionZh: '设备列名表格'
+            }
+          ],
+          contacts: [
+            {
+              name: 'FDA Registration and Listing',
+              nameZh: 'FDA注册和列名',
+              email: 'registrationandlisting@fda.hhs.gov',
+              phone: '+1-301-796-7400',
+              website: 'https://www.fda.gov/medical-devices/registration-and-listing',
+              description: 'Questions about registration and listing',
+              descriptionZh: '关于注册和列名的问题'
+            }
+          ],
+          submissionMethods: [
+            {
+              method: 'FURLS Online System',
+              methodZh: 'FURLS在线系统',
+              url: 'https://www.access.fda.gov/oaa/registration.htm',
+              description: 'FDA Unified Registration and Listing System',
+              descriptionZh: 'FDA统一注册和列名系统'
+            }
+          ],
+          tips: [
+            'Registration must be renewed annually between October 1 and December 31',
+            'Foreign establishments must have a US agent with a US address',
+            'User fees must be paid before registration is complete',
+            'Keep your establishment information up to date',
+            'Device listing should be updated when products are added or modified'
+          ],
+          tipsZh: [
+            '注册必须在每年10月1日至12月31日之间续期',
+            '外国企业必须拥有具有美国地址的美国代理人',
+            '必须在注册完成前支付用户费用',
+            '保持您的企业信息最新',
+            '当产品添加或修改时，应更新设备列名'
+          ]
+        }
       },
       {
         step: 4,
@@ -176,6 +395,44 @@ function generateUSAPathway(
         timelineZh: '6-12个月',
         cost: '$50,000-200,000',
         costZh: '5-20万美元',
+        detailedGuide: {
+          description: 'Establish a quality system compliant with 21 CFR Part 820 (QSR). FDA may conduct inspections to verify compliance.',
+          descriptionZh: '建立符合21 CFR Part 820（QSR）的质量体系。FDA可以进行检查以验证合规性。',
+          forms: [
+            {
+              name: 'QSIT Inspection Guide',
+              nameZh: 'QSIT检查指南',
+              downloadUrl: 'https://www.fda.gov/media/11671/download',
+              description: 'Quality System Inspection Technique guide',
+              descriptionZh: '质量体系检查技术指南'
+            }
+          ],
+          contacts: [
+            {
+              name: 'FDA Office of Compliance',
+              nameZh: 'FDA合规办公室',
+              email: 'CDRH-Compliance@fda.hhs.gov',
+              phone: '+1-301-796-5500',
+              website: 'https://www.fda.gov/medical-devices/compliance',
+              description: 'Quality system compliance questions',
+              descriptionZh: '质量体系合规问题'
+            }
+          ],
+          tips: [
+            'Develop comprehensive SOPs covering all QSR requirements',
+            'Implement design controls early in product development',
+            'Maintain detailed records of all quality activities',
+            'Conduct internal audits regularly',
+            'Be prepared for FDA inspections at any time'
+          ],
+          tipsZh: [
+            '制定涵盖所有QSR要求的全面SOP',
+            '在产品开发早期实施设计控制',
+            '保持所有质量活动的详细记录',
+            '定期进行内部审核',
+            '随时准备FDA检查'
+          ]
+        }
       },
     ],
     keyRegulations: [
@@ -229,6 +486,20 @@ function generateUSAPathway(
     ],
     localRepresentativeRequired: true,
     clinicalDataRequired: isClassIII,
+    generalTips: [
+      'Start early - FDA review times can be lengthy',
+      'Maintain open communication with FDA throughout the process',
+      'Keep detailed records of all submissions and correspondence',
+      'Consider hiring a regulatory consultant for complex devices',
+      'Stay updated on FDA guidance documents and policy changes'
+    ],
+    generalTipsZh: [
+      '尽早开始 - FDA审查时间可能很长',
+      '在整个过程中与FDA保持开放沟通',
+      '保持所有提交和通信的详细记录',
+      '考虑为复杂设备聘请监管顾问',
+      '及时了解FDA指导文件和政策变化'
+    ]
   };
 }
 
@@ -260,6 +531,41 @@ function generateEUPathway(
         timelineZh: '1-2周',
         cost: '$0',
         costZh: '免费',
+        detailedGuide: {
+          description: 'Use the MDR classification rules in Annex VIII to determine your device class. Classes range from I (low risk) to III (high risk).',
+          descriptionZh: '使用MDR附件VIII中的分类规则确定您的设备类别。类别范围从I类（低风险）到III类（高风险）。',
+          forms: [
+            {
+              name: 'MDR Classification Guide',
+              nameZh: 'MDR分类指南',
+              downloadUrl: 'https://health.ec.europa.eu/system/files/2022-01/md_mdcg_2021_24_guidance_classification_en_0.pdf',
+              description: 'MDCG 2021-24 Classification guidance',
+              descriptionZh: 'MDCG 2021-24分类指南'
+            }
+          ],
+          contacts: [
+            {
+              name: 'European Commission DG SANTE',
+              nameZh: '欧盟委员会DG SANTE',
+              email: 'SANTE-MEDICAL-DEVICES@ec.europa.eu',
+              website: 'https://health.ec.europa.eu/medical-devices-sector_en',
+              description: 'General MDR questions',
+              descriptionZh: '一般MDR问题'
+            }
+          ],
+          tips: [
+            'Carefully review all 22 classification rules in Annex VIII',
+            'Consider borderline cases carefully - consult MDCG guidance',
+            'Document your classification rationale thoroughly',
+            'Classification determines the conformity assessment route'
+          ],
+          tipsZh: [
+            '仔细审查附件VIII中的所有22条分类规则',
+            '仔细考虑边界情况 - 咨询MDCG指南',
+            '彻底记录您的分类依据',
+            '分类决定了合格评定路线'
+          ]
+        }
       },
       {
         step: 2,
@@ -273,6 +579,31 @@ function generateEUPathway(
         timelineZh: '2-4周',
         cost: '$15,000-50,000',
         costZh: '1.5-5万欧元',
+        detailedGuide: {
+          description: 'Choose a Notified Body designated under MDR for your device class and type. Check NANDO database for available bodies.',
+          descriptionZh: '选择根据MDR为您的设备类别和类型指定的公告机构。检查NANDO数据库了解可用机构。',
+          contacts: [
+            {
+              name: 'NANDO Database',
+              nameZh: 'NANDO数据库',
+              website: 'https://ec.europa.eu/growth/tools-databases/nando/',
+              description: 'Search for Notified Bodies by country and scope',
+              descriptionZh: '按国家和范围搜索公告机构'
+            }
+          ],
+          tips: [
+            'Verify the Notified Body is designated for your device type',
+            'Compare costs and timelines between different bodies',
+            'Consider the body\'s experience with similar devices',
+            'Check the body\'s workload and availability'
+          ],
+          tipsZh: [
+            '验证公告机构是否为您的设备类型指定',
+            '比较不同机构之间的成本和时间表',
+            '考虑机构对类似设备的经验',
+            '检查机构的工作量和可用性'
+          ]
+        }
       },
       {
         step: 3,
@@ -286,6 +617,33 @@ function generateEUPathway(
         timelineZh: '3-6个月',
         cost: '$30,000-100,000',
         costZh: '3-10万欧元',
+        detailedGuide: {
+          description: 'Compile comprehensive technical documentation according to MDR Annexes II and III. This is the core of your conformity assessment.',
+          descriptionZh: '根据MDR附件II和III编制全面的技术文件。这是您合格评定的核心。',
+          forms: [
+            {
+              name: 'MDR Technical Documentation Template',
+              nameZh: 'MDR技术文件模板',
+              downloadUrl: 'https://health.ec.europa.eu/system/files/2022-01/md_mdcg_2021_25_tech_doc_en_0.pdf',
+              description: 'MDCG 2021-25 Technical Documentation guidance',
+              descriptionZh: 'MDCG 2021-25技术文件指南'
+            }
+          ],
+          tips: [
+            'Start with a detailed device description and specifications',
+            'Ensure risk management covers all identified risks',
+            'Clinical evaluation must be thorough and up-to-date',
+            'Include post-market surveillance procedures',
+            'Maintain a technical documentation file throughout device lifecycle'
+          ],
+          tipsZh: [
+            '从详细的设备描述和规格开始',
+            '确保风险管理涵盖所有已识别的风险',
+            '临床评估必须彻底且最新',
+            '包括上市后监督程序',
+            '在设备整个生命周期中保持技术文件档案'
+          ]
+        }
       },
       {
         step: 4,
@@ -299,6 +657,41 @@ function generateEUPathway(
         timelineZh: '2-4周',
         cost: '$0',
         costZh: '免费',
+        detailedGuide: {
+          description: 'Register as an economic operator in EUDAMED and obtain your Single Registration Number (SRN). This is mandatory for market access.',
+          descriptionZh: '在EUDAMED中注册为经济运营商并获取您的单一注册号（SRN）。这是市场准入的强制性要求。',
+          contacts: [
+            {
+              name: 'EUDAMED Helpdesk',
+              nameZh: 'EUDAMED帮助台',
+              email: 'SANTE-EUDAMED@ec.europa.eu',
+              website: 'https://ec.europa.eu/tools/eudamed',
+              description: 'EUDAMED technical support',
+              descriptionZh: 'EUDAMED技术支持'
+            }
+          ],
+          submissionMethods: [
+            {
+              method: 'EUDAMED Portal',
+              methodZh: 'EUDAMED门户',
+              url: 'https://ec.europa.eu/tools/eudamed',
+              description: 'European Database on Medical Devices',
+              descriptionZh: '欧洲医疗器械数据库'
+            }
+          ],
+          tips: [
+            'Ensure you have an EORI number before registering',
+            'All economic operators must register (manufacturers, importers, authorized representatives)',
+            'UDI assignment is required for most devices',
+            'Keep your EUDAMED information updated'
+          ],
+          tipsZh: [
+            '确保在注册前拥有EORI号码',
+            '所有经济运营商必须注册（制造商、进口商、授权代表）',
+            '大多数设备需要UDI分配',
+            '保持您的EUDAMED信息更新'
+          ]
+        }
       },
     ],
     keyRegulations: [
@@ -390,6 +783,31 @@ function generateChinaPathway(
         timelineZh: '2-4周',
         cost: '$0-5,000',
         costZh: '0-5000美元',
+        detailedGuide: {
+          description: 'Check the NMPA Medical Device Classification Catalog. For unclear cases, submit a classification inquiry to CMDE.',
+          descriptionZh: '查看NMPA医疗器械分类目录。对于不明确的情况，向CMDE提交分类界定申请。',
+          contacts: [
+            {
+              name: 'CMDE (Center for Medical Device Evaluation)',
+              nameZh: '医疗器械技术审评中心',
+              website: 'https://www.cmde.org.cn/',
+              description: 'Classification and technical review',
+              descriptionZh: '分类界定和技术审评'
+            }
+          ],
+          tips: [
+            'Reference the latest NMPA Classification Catalog',
+            'Classification determines the registration pathway',
+            'For novel devices, classification inquiry is recommended',
+            'Classification decisions can affect testing requirements'
+          ],
+          tipsZh: [
+            '参考最新的NMPA分类目录',
+            '分类决定了注册路径',
+            '对于新型设备，建议进行分类界定',
+            '分类决定可能影响测试要求'
+          ]
+        }
       },
       {
         step: 2,
@@ -403,6 +821,31 @@ function generateChinaPathway(
         timelineZh: '2-4个月',
         cost: '$10,000-30,000',
         costZh: '1-3万美元',
+        detailedGuide: {
+          description: 'Submit your device for testing at NMPA-accredited testing centers. Testing must comply with Chinese national standards (GB).',
+          descriptionZh: '将您的设备提交给NMPA认可的检测中心进行检测。检测必须符合中国国家标准（GB）。',
+          contacts: [
+            {
+              name: 'NMPA Testing Center Directory',
+              nameZh: 'NMPA检测中心目录',
+              website: 'https://www.nmpa.gov.cn/xxgk/ggtg/qtggtg/20210308160001253.html',
+              description: 'List of accredited testing institutions',
+              descriptionZh: '认可的检测机构名单'
+            }
+          ],
+          tips: [
+            'Select a testing center with experience in your device type',
+            'Ensure all GB standards are covered in testing',
+            'Plan for sample preparation and shipping time',
+            'Testing reports are valid for 1 year'
+          ],
+          tipsZh: [
+            '选择对您的设备类型有经验的检测中心',
+            '确保检测涵盖所有GB标准',
+            '计划样品准备和运输时间',
+            '检测报告有效期为1年'
+          ]
+        }
       },
       {
         step: 3,
@@ -424,6 +867,26 @@ function generateChinaPathway(
         timelineZh: isClassIII ? '12-24个月' : '2-3个月',
         cost: isClassIII ? '$200,000-500,000' : '$20,000-50,000',
         costZh: isClassIII ? '20-50万美元' : '2-5万美元',
+        detailedGuide: {
+          description: isClassIII 
+            ? 'Conduct clinical trials at approved sites in China with NMPA oversight. Requires ethics committee approval.'
+            : 'Prepare a clinical evaluation report based on literature review and/or equivalence to approved devices.',
+          descriptionZh: isClassIII 
+            ? '在NMPA监督下在中国批准的地点进行临床试验。需要伦理委员会批准。'
+            : '根据文献综述和/或与已批准设备的等同性准备临床评价报告。',
+          tips: [
+            'Clinical trials must be conducted at NMPA-approved sites',
+            'Ethics committee approval is mandatory',
+            'For Class II devices, clinical evaluation may be sufficient',
+            'Clinical trial data from overseas may be accepted with justification'
+          ],
+          tipsZh: [
+            '临床试验必须在NMPA批准的地点进行',
+            '伦理委员会批准是强制性的',
+            '对于II类设备，临床评价可能就足够了',
+            '海外临床试验数据可以在有理由的情况下被接受'
+          ]
+        }
       },
       {
         step: 4,
@@ -437,6 +900,40 @@ function generateChinaPathway(
         timelineZh: isClassIII ? '12-18个月' : '6-12个月',
         cost: '$15,000-30,000',
         costZh: '1.5-3万美元',
+        detailedGuide: {
+          description: 'Submit complete registration dossier through the NMPA eRPS system. CMDE will conduct technical review.',
+          descriptionZh: '通过NMPA eRPS系统提交完整的注册档案。CMDE将进行技术审评。',
+          contacts: [
+            {
+              name: 'NMPA Medical Device Registration',
+              nameZh: 'NMPA医疗器械注册',
+              website: 'https://www.nmpa.gov.cn/ylqx/ylqxjgdt/index.html',
+              description: 'Registration information and guidance',
+              descriptionZh: '注册信息和指南'
+            }
+          ],
+          submissionMethods: [
+            {
+              method: 'eRPS Electronic System',
+              methodZh: 'eRPS电子系统',
+              url: 'https://www.nmpa.gov.cn/ylqx/ylqxjgdt/index.html',
+              description: 'NMPA electronic registration system',
+              descriptionZh: 'NMPA电子注册系统'
+            }
+          ],
+          tips: [
+            'Ensure all documents are in Chinese or with Chinese translation',
+            'Technical requirements document is critical',
+            'Respond promptly to CMDE inquiries',
+            'Import devices require China agent appointment'
+          ],
+          tipsZh: [
+            '确保所有文件为中文或有中文翻译',
+            '技术要求文件至关重要',
+            '及时回复CMDE查询',
+            '进口设备需要指定中国代理人'
+          ]
+        }
       },
     ],
     keyRegulations: [
@@ -521,6 +1018,31 @@ function generateJapanPathway(
         timelineZh: '2-4周',
         cost: '$5,000-10,000',
         costZh: '5000-1万美元',
+        detailedGuide: {
+          description: 'Use the Nihonbashi portal to determine your device classification and select an appropriate RCB for your device class.',
+          descriptionZh: '使用日本桥门户确定您的设备分类，并为您的设备类别选择合适的RCB。',
+          contacts: [
+            {
+              name: 'Nihonbashi Portal',
+              nameZh: '日本桥门户',
+              website: 'https://www.nihonbashi-pmda.jp/english/',
+              description: 'Regulatory consultation portal',
+              descriptionZh: '监管咨询门户'
+            }
+          ],
+          tips: [
+            'Japan uses a 4-class system (Class I-IV)',
+            'Class I devices can be self-certified',
+            'Classes II-IV require RCB or PMDA review',
+            'Foreign manufacturers need a Marketing Authorization Holder (MAH)'
+          ],
+          tipsZh: [
+            '日本使用4类系统（I-IV类）',
+            'I类设备可以自我认证',
+            'II-IV类需要RCB或PMDA审查',
+            '外国制造商需要营销授权持有人（MAH）'
+          ]
+        }
       },
       {
         step: 2,
@@ -534,6 +1056,22 @@ function generateJapanPathway(
         timelineZh: '3-6个月',
         cost: '$20,000-40,000',
         costZh: '2-4万美元',
+        detailedGuide: {
+          description: 'Obtain ISO 13485 certification from a MHLW-accredited certification body. This is mandatory for medical device manufacturers.',
+          descriptionZh: '从MHLW认可的认证机构获得ISO 13485认证。这是医疗器械制造商的强制性要求。',
+          tips: [
+            'Certification must be from MHLW-recognized body',
+            'QMS must comply with Japanese Ministerial Ordinances',
+            'Annual surveillance audits are required',
+            'Foreign manufacturers may need on-site audits'
+          ],
+          tipsZh: [
+            '认证必须来自MHLW认可的机构',
+            'QMS必须符合日本省令',
+            '需要年度监督审核',
+            '外国制造商可能需要现场审核'
+          ]
+        }
       },
       {
         step: 3,
@@ -551,6 +1089,31 @@ function generateJapanPathway(
         timelineZh: isClassIV ? '12-18个月' : '6-12个月',
         cost: isClassIV ? '$50,000-100,000' : '$20,000-40,000',
         costZh: isClassIV ? '5-10万美元' : '2-4万美元',
+        detailedGuide: {
+          description: 'Submit your pre-market application through your MAH. Class IV devices require PMDA review; lower classes can use RCB certification.',
+          descriptionZh: '通过您的MAH提交上市前申请。IV类设备需要PMDA审查；较低类别可以使用RCB认证。',
+          contacts: [
+            {
+              name: 'PMDA Consultation',
+              nameZh: 'PMDA咨询',
+              website: 'https://www.pmda.go.jp/english/review-services/regulatory-info/0002.html',
+              description: 'Pre-submission consultation services',
+              descriptionZh: '预提交咨询服务'
+            }
+          ],
+          tips: [
+            'Foreign manufacturers cannot submit directly - must use MAH',
+            'STED format documentation is recommended',
+            'Japanese labeling is required',
+            'Consider pre-submission meetings for novel devices'
+          ],
+          tipsZh: [
+            '外国制造商不能直接提交 - 必须使用MAH',
+            '建议使用STED格式文件',
+            '需要日文标签',
+            '对于新型设备，考虑预提交会议'
+          ]
+        }
       },
     ],
     keyRegulations: [
@@ -635,6 +1198,31 @@ function generateCanadaPathway(
         timelineZh: '1-2周',
         cost: '$0',
         costZh: '免费',
+        detailedGuide: {
+          description: 'Use Health Canada\'s classification rules to determine your device class. Canada uses a 4-class system similar to the EU.',
+          descriptionZh: '使用Health Canada的分类规则确定您的设备类别。加拿大使用与欧盟类似的4类系统。',
+          contacts: [
+            {
+              name: 'Health Canada Medical Devices',
+              nameZh: 'Health Canada医疗器械',
+              website: 'https://www.canada.ca/en/health-canada/services/medical-devices.html',
+              description: 'Classification and general inquiries',
+              descriptionZh: '分类和一般查询'
+            }
+          ],
+          tips: [
+            'Classification rules are similar to EU MDR',
+            'Use the MDALL database to check similar devices',
+            'Class I devices are exempt from MDL but require registration',
+            'Consider special rules for combination devices'
+          ],
+          tipsZh: [
+            '分类规则与欧盟MDR相似',
+            '使用MDALL数据库检查类似设备',
+            'I类设备免于MDL但需要注册',
+            '考虑组合产品的特殊规则'
+          ]
+        }
       },
       {
         step: 2,
@@ -648,6 +1236,31 @@ function generateCanadaPathway(
         timelineZh: '3-6个月',
         cost: '$15,000-30,000',
         costZh: '1.5-3万加元',
+        detailedGuide: {
+          description: 'Obtain ISO 13485 certification from a registrar recognized by Health Canada\'s Canadian Medical Devices Conformity Assessment System (CMDCAS).',
+          descriptionZh: '从Health Canada加拿大医疗器械合格评定系统（CMDCAS）认可的注册机构获得ISO 13485认证。',
+          contacts: [
+            {
+              name: 'Health Canada CMDCAS',
+              nameZh: 'Health Canada CMDCAS',
+              website: 'https://www.canada.ca/en/health-canada/services/drugs-health-products/medical-devices/quality-management-system.html',
+              description: 'List of recognized registrars',
+              descriptionZh: '认可注册机构名单'
+            }
+          ],
+          tips: [
+            'CMDCAS recognition is required for Canadian market',
+            'Annual surveillance audits required',
+            'QMS must address Canadian Medical Devices Regulations',
+            'Certificate must be current for MDL application'
+          ],
+          tipsZh: [
+            '加拿大市场需要CMDCAS认可',
+            '需要年度监督审核',
+            'QMS必须解决加拿大医疗器械法规',
+            'MDL申请需要当前证书'
+          ]
+        }
       },
       {
         step: 3,
@@ -661,6 +1274,52 @@ function generateCanadaPathway(
         timelineZh: isClassIII ? '6-12个月' : '2-4个月',
         cost: '$5,000-15,000',
         costZh: '5000-1.5万加元',
+        detailedGuide: {
+          description: 'Submit your Medical Device License (MDL) application through Health Canada\'s Medical Devices Active Licence Listing (MDALL) system.',
+          descriptionZh: '通过Health Canada的医疗器械活跃许可证清单（MDALL）系统提交您的医疗器械许可证（MDL）申请。',
+          forms: [
+            {
+              name: 'MDL Application Form',
+              nameZh: 'MDL申请表',
+              downloadUrl: 'https://www.canada.ca/en/health-canada/services/drugs-health-products/medical-devices/application-information/forms/medical-device-license-application-form-instructions.html',
+              description: 'Medical Device Licence Application',
+              descriptionZh: '医疗器械许可证申请'
+            }
+          ],
+          contacts: [
+            {
+              name: 'Health Canada MDL Support',
+              nameZh: 'Health Canada MDL支持',
+              email: 'mdl@hc-sc.gc.ca',
+              website: 'https://www.canada.ca/en/health-canada/services/drugs-health-products/medical-devices.html',
+              description: 'MDL application questions',
+              descriptionZh: 'MDL申请问题'
+            }
+          ],
+          submissionMethods: [
+            {
+              method: 'Health Canada Online Portal',
+              methodZh: 'Health Canada在线门户',
+              url: 'https://www.canada.ca/en/health-canada/services/drugs-health-products/medical-devices.html',
+              description: 'Electronic submission preferred',
+              descriptionZh: '首选电子提交'
+            }
+          ],
+          tips: [
+            'Include comprehensive device description and intended use',
+            'Labeling must comply with Canadian requirements',
+            'Include risk management documentation',
+            'Respond promptly to information requests',
+            'Consider hiring a Canadian regulatory consultant'
+          ],
+          tipsZh: [
+            '包括全面的设备描述和预期用途',
+            '标签必须符合加拿大要求',
+            '包括风险管理文件',
+            '及时回复信息请求',
+            '考虑聘请加拿大监管顾问'
+          ]
+        }
       },
     ],
     keyRegulations: [

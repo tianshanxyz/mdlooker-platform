@@ -41,6 +41,60 @@ function FileTextIcon({ className }: { className?: string }) {
   );
 }
 
+// Chevron down icon component
+function ChevronDownIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+    </svg>
+  );
+}
+
+// Mail icon component
+function MailIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+    </svg>
+  );
+}
+
+// Phone icon component
+function PhoneIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+    </svg>
+  );
+}
+
+// Globe icon component
+function GlobeIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+    </svg>
+  );
+}
+
+// Lightbulb icon component
+function LightbulbIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+    </svg>
+  );
+}
+
+// Send icon component
+function SendIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+    </svg>
+  );
+}
+
 export default function MarketAccessPage() {
   const { data: session, status } = useSession();
   const [locale, setLocale] = useState<Locale>('en');
@@ -52,6 +106,13 @@ export default function MarketAccessPage() {
   const [showResults, setShowResults] = useState(false);
   const [canDownload, setCanDownload] = useState(false);
   const [isCheckingPermission, setIsCheckingPermission] = useState(true);
+  const [expandedSteps, setExpandedSteps] = useState<number[]>([]);
+
+  const toggleStep = (step: number) => {
+    setExpandedSteps(prev =>
+      prev.includes(step) ? prev.filter(s => s !== step) : [...prev, step]
+    );
+  };
 
   useEffect(() => {
     async function checkDownloadPermission() {
@@ -386,57 +447,262 @@ ${pathway.regulationLinks.map((link: { name: string; nameZh: string; url: string
               {locale === 'en' ? 'Access Pathway Steps' : '准入路径步骤'}
             </h3>
             <div className="space-y-6">
-              {pathway.requirements.map((req: { step: number; title: string; titleZh: string; description: string; descriptionZh: string; documents: string[]; documentsZh: string[]; timeline: string; timelineZh: string; cost: string; costZh: string }, index: number) => (
-                <div key={req.step} className="relative">
-                  {index !== pathway.requirements.length - 1 && (
-                    <div className="absolute left-6 top-14 w-0.5 h-full bg-[#339999]/20" />
-                  )}
-                  <div className="flex gap-4">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#339999] text-white flex items-center justify-center font-bold text-lg">
-                      {req.step}
-                    </div>
-                    <div className="flex-1 pb-6">
-                      <h4 className="text-lg font-semibold text-slate-900">
-                        {locale === 'zh' ? req.titleZh : req.title}
-                      </h4>
-                      <p className="text-slate-600 mt-1">
-                        {locale === 'zh' ? req.descriptionZh : req.description}
-                      </p>
+              {pathway.requirements.map((req: { step: number; title: string; titleZh: string; description: string; descriptionZh: string; documents: string[]; documentsZh: string[]; timeline: string; timelineZh: string; cost: string; costZh: string; detailedGuide?: any }, index: number) => {
+                const isExpanded = expandedSteps.includes(req.step);
+                const hasDetailedGuide = req.detailedGuide && (
+                  req.detailedGuide.forms?.length > 0 ||
+                  req.detailedGuide.contacts?.length > 0 ||
+                  req.detailedGuide.submissionMethods?.length > 0 ||
+                  req.detailedGuide.tips?.length > 0
+                );
 
-                      {/* Documents */}
-                      <div className="mt-3">
-                        <p className="text-sm font-medium text-slate-700">
-                          {locale === 'en' ? 'Required Documents:' : '所需文件：'}
-                        </p>
-                        <ul className="mt-1 space-y-1">
-                          {(locale === 'zh' ? req.documentsZh : req.documents).map((doc: string, i: number) => (
-                            <li key={i} className="text-sm text-slate-600 flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 bg-[#339999] rounded-full" />
-                              {doc}
-                            </li>
-                          ))}
-                        </ul>
+                return (
+                  <div key={req.step} className="relative">
+                    {index !== pathway.requirements.length - 1 && (
+                      <div className="absolute left-6 top-14 w-0.5 h-full bg-[#339999]/20" />
+                    )}
+                    <div className="flex gap-4">
+                      <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#339999] text-white flex items-center justify-center font-bold text-lg">
+                        {req.step}
                       </div>
+                      <div className="flex-1 pb-6">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1">
+                            <h4 className="text-lg font-semibold text-slate-900">
+                              {locale === 'zh' ? req.titleZh : req.title}
+                            </h4>
+                            <p className="text-slate-600 mt-1">
+                              {locale === 'zh' ? req.descriptionZh : req.description}
+                            </p>
+                          </div>
+                          {hasDetailedGuide && (
+                            <button
+                              onClick={() => toggleStep(req.step)}
+                              className="flex-shrink-0 inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-[#339999] hover:bg-[#339999]/10 rounded-lg transition-colors"
+                            >
+                              {locale === 'en' ? 'Details' : '详情'}
+                              <ChevronDownIcon className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                            </button>
+                          )}
+                        </div>
 
-                      {/* Timeline & Cost */}
-                      <div className="flex flex-wrap gap-4 mt-3">
-                        <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          {locale === 'zh' ? req.timelineZh : req.timeline}
-                        </span>
-                        <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          {locale === 'zh' ? req.costZh : req.cost}
-                        </span>
+                        {/* Documents */}
+                        <div className="mt-3">
+                          <p className="text-sm font-medium text-slate-700">
+                            {locale === 'en' ? 'Required Documents:' : '所需文件：'}
+                          </p>
+                          <ul className="mt-1 space-y-1">
+                            {(locale === 'zh' ? req.documentsZh : req.documents).map((doc: string, i: number) => (
+                              <li key={i} className="text-sm text-slate-600 flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 bg-[#339999] rounded-full" />
+                                {doc}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        {/* Timeline & Cost */}
+                        <div className="flex flex-wrap gap-4 mt-3">
+                          <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {locale === 'zh' ? req.timelineZh : req.timeline}
+                          </span>
+                          <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {locale === 'zh' ? req.costZh : req.cost}
+                          </span>
+                        </div>
+
+                        {/* Detailed Guide */}
+                        {isExpanded && req.detailedGuide && (
+                          <div className="mt-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            {/* Detailed Description */}
+                            {(locale === 'zh' ? req.detailedGuide.descriptionZh : req.detailedGuide.description) && (
+                              <div className="mb-4">
+                                <p className="text-sm text-slate-700 leading-relaxed">
+                                  {locale === 'zh' ? req.detailedGuide.descriptionZh : req.detailedGuide.description}
+                                </p>
+                              </div>
+                            )}
+
+                            {/* Forms */}
+                            {req.detailedGuide.forms && req.detailedGuide.forms.length > 0 && (
+                              <div className="mb-4">
+                                <h5 className="text-sm font-semibold text-slate-900 mb-2 flex items-center gap-2">
+                                  <FileTextIcon className="w-4 h-4 text-[#339999]" />
+                                  {locale === 'en' ? 'Required Forms' : '所需表格'}
+                                </h5>
+                                <div className="space-y-2">
+                                  {req.detailedGuide.forms.map((form: any, i: number) => (
+                                    <div key={i} className="p-3 bg-white rounded-lg border border-slate-200">
+                                      <p className="font-medium text-slate-900 text-sm">
+                                        {locale === 'zh' ? form.nameZh : form.name}
+                                      </p>
+                                      {(locale === 'zh' ? form.descriptionZh : form.description) && (
+                                        <p className="text-xs text-slate-500 mt-1">
+                                          {locale === 'zh' ? form.descriptionZh : form.description}
+                                        </p>
+                                      )}
+                                      <div className="flex flex-wrap gap-2 mt-2">
+                                        {form.downloadUrl && (
+                                          <a
+                                            href={form.downloadUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1 px-3 py-1 bg-[#339999] text-white text-xs rounded-lg hover:bg-[#2a7a7a] transition-colors"
+                                          >
+                                            <DownloadIcon className="w-3 h-3" />
+                                            {locale === 'en' ? 'Download' : '下载'}
+                                          </a>
+                                        )}
+                                        {form.onlineUrl && (
+                                          <a
+                                            href={form.onlineUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 text-xs rounded-lg hover:bg-blue-100 transition-colors"
+                                          >
+                                            <ExternalLinkIcon className="w-3 h-3" />
+                                            {locale === 'en' ? 'Online Form' : '在线填写'}
+                                          </a>
+                                        )}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Contacts */}
+                            {req.detailedGuide.contacts && req.detailedGuide.contacts.length > 0 && (
+                              <div className="mb-4">
+                                <h5 className="text-sm font-semibold text-slate-900 mb-2 flex items-center gap-2">
+                                  <PhoneIcon className="w-4 h-4 text-[#339999]" />
+                                  {locale === 'en' ? 'Contact Information' : '联系方式'}
+                                </h5>
+                                <div className="space-y-2">
+                                  {req.detailedGuide.contacts.map((contact: any, i: number) => (
+                                    <div key={i} className="p-3 bg-white rounded-lg border border-slate-200">
+                                      <p className="font-medium text-slate-900 text-sm">
+                                        {locale === 'zh' ? contact.nameZh : contact.name}
+                                      </p>
+                                      {(locale === 'zh' ? contact.descriptionZh : contact.description) && (
+                                        <p className="text-xs text-slate-500 mt-0.5">
+                                          {locale === 'zh' ? contact.descriptionZh : contact.description}
+                                        </p>
+                                      )}
+                                      <div className="flex flex-wrap gap-3 mt-2">
+                                        {contact.email && (
+                                          <a
+                                            href={`mailto:${contact.email}`}
+                                            className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800"
+                                          >
+                                            <MailIcon className="w-3 h-3" />
+                                            {contact.email}
+                                          </a>
+                                        )}
+                                        {contact.phone && (
+                                          <span className="inline-flex items-center gap-1 text-xs text-slate-600">
+                                            <PhoneIcon className="w-3 h-3" />
+                                            {contact.phone}
+                                          </span>
+                                        )}
+                                        {contact.website && (
+                                          <a
+                                            href={contact.website}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800"
+                                          >
+                                            <GlobeIcon className="w-3 h-3" />
+                                            {locale === 'en' ? 'Website' : '官网'}
+                                          </a>
+                                        )}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Submission Methods */}
+                            {req.detailedGuide.submissionMethods && req.detailedGuide.submissionMethods.length > 0 && (
+                              <div className="mb-4">
+                                <h5 className="text-sm font-semibold text-slate-900 mb-2 flex items-center gap-2">
+                                  <SendIcon className="w-4 h-4 text-[#339999]" />
+                                  {locale === 'en' ? 'How to Submit' : '提交方式'}
+                                </h5>
+                                <div className="space-y-2">
+                                  {req.detailedGuide.submissionMethods.map((method: any, i: number) => (
+                                    <div key={i} className="p-3 bg-white rounded-lg border border-slate-200">
+                                      <p className="font-medium text-slate-900 text-sm">
+                                        {locale === 'zh' ? method.methodZh : method.method}
+                                      </p>
+                                      {(locale === 'zh' ? method.descriptionZh : method.description) && (
+                                        <p className="text-xs text-slate-500 mt-0.5">
+                                          {locale === 'zh' ? method.descriptionZh : method.description}
+                                        </p>
+                                      )}
+                                      {method.url && (
+                                        <a
+                                          href={method.url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="inline-flex items-center gap-1 mt-2 text-xs text-blue-600 hover:text-blue-800"
+                                        >
+                                          <ExternalLinkIcon className="w-3 h-3" />
+                                          {method.url}
+                                        </a>
+                                      )}
+                                      {method.email && (
+                                        <a
+                                          href={`mailto:${method.email}`}
+                                          className="inline-flex items-center gap-1 mt-2 text-xs text-blue-600 hover:text-blue-800"
+                                        >
+                                          <MailIcon className="w-3 h-3" />
+                                          {method.email}
+                                        </a>
+                                      )}
+                                      {method.address && (
+                                        <p className="text-xs text-slate-600 mt-2 flex items-start gap-1">
+                                          <span className="font-medium">{locale === 'en' ? 'Address: ' : '地址: '}</span>
+                                          {method.address}
+                                        </p>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Tips */}
+                            {req.detailedGuide.tips && req.detailedGuide.tips.length > 0 && (
+                              <div>
+                                <h5 className="text-sm font-semibold text-slate-900 mb-2 flex items-center gap-2">
+                                  <LightbulbIcon className="w-4 h-4 text-amber-500" />
+                                  {locale === 'en' ? 'Tips & Best Practices' : '提示与最佳实践'}
+                                </h5>
+                                <ul className="space-y-1.5">
+                                  {(locale === 'zh' ? req.detailedGuide.tipsZh : req.detailedGuide.tips).map((tip: string, i: number) => (
+                                    <li key={i} className="text-sm text-slate-700 flex items-start gap-2">
+                                      <span className="text-amber-500 mt-0.5">•</span>
+                                      {tip}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 

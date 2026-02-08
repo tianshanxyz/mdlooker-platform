@@ -2,13 +2,176 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 自定义CSS变量 */
+/* 自定义CSS变量 - 医疗科技风格 */
 :root {
   --background: #ffffff;
   --foreground: #0f172a;
+  --primary: #339999;
+  --primary-dark: #2a7a7a;
+  --primary-light: #e6f4f4;
+  --secondary: #f1f5f9;
+  --accent: #0ea5e9;
 }
 
+/* 全局样式 */
 body {
   background-color: var(--background);
   color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 医疗科技风格 - 卡片 */
+.medical-card {
+  @apply bg-white rounded-2xl border border-slate-200/60 shadow-sm;
+  @apply hover:shadow-lg hover:border-[#339999]/30;
+  @apply transition-all duration-300;
+}
+
+/* 医疗科技风格 - 按钮 */
+.medical-btn-primary {
+  @apply px-6 py-3 bg-gradient-to-r from-[#339999] to-[#2a7a7a];
+  @apply text-white font-medium rounded-xl;
+  @apply shadow-lg shadow-[#339999]/25;
+  @apply hover:shadow-xl hover:shadow-[#339999]/30 hover:-translate-y-0.5;
+  @apply active:translate-y-0;
+  @apply transition-all duration-200;
+}
+
+.medical-btn-secondary {
+  @apply px-6 py-3 bg-white border-2 border-[#339999]/20;
+  @apply text-[#339999] font-medium rounded-xl;
+  @apply hover:bg-[#339999]/5 hover:border-[#339999]/40;
+  @apply transition-all duration-200;
+}
+
+/* 医疗科技风格 - 输入框 */
+.medical-input {
+  @apply w-full px-4 py-3 bg-white border-2 border-slate-200 rounded-xl;
+  @apply text-slate-700 placeholder:text-slate-400;
+  @apply focus:border-[#339999] focus:ring-4 focus:ring-[#339999]/10;
+  @apply transition-all duration-200;
+}
+
+/* 医疗科技风格 - 标签 */
+.medical-tag {
+  @apply inline-flex items-center gap-1.5 px-3 py-1.5;
+  @apply bg-[#339999]/10 text-[#339999] text-sm font-medium;
+  @apply rounded-full;
+}
+
+/* 医疗科技风格 - 徽章 */
+.medical-badge {
+  @apply inline-flex items-center gap-1 px-2.5 py-1;
+  @apply bg-gradient-to-r from-[#339999] to-[#2a7a7a];
+  @apply text-white text-xs font-semibold;
+  @apply rounded-lg;
+}
+
+/* 渐变文字 */
+.gradient-text {
+  @apply bg-gradient-to-r from-[#339999] to-[#2a7a7a] bg-clip-text text-transparent;
+}
+
+/* 玻璃态效果 */
+.glass-effect {
+  @apply bg-white/80 backdrop-blur-md border border-white/20;
+}
+
+/* 发光效果 */
+.glow-effect {
+  box-shadow: 0 0 20px rgba(51, 153, 153, 0.3);
+}
+
+/* 悬浮动画 */
+.hover-lift {
+  @apply transition-transform duration-300;
+}
+.hover-lift:hover {
+  @apply -translate-y-1;
+}
+
+/* 页面过渡动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+/* 脉冲动画 */
+.pulse-soft {
+  animation: pulseSoft 2s ease-in-out infinite;
+}
+
+@keyframes pulseSoft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* 选择文本样式 */
+::selection {
+  background: rgba(51, 153, 153, 0.2);
+  color: #0f172a;
+}
+
+/* 焦点样式 */
+*:focus-visible {
+  outline: 2px solid #339999;
+  outline-offset: 2px;
+}
+
+/* 链接样式 */
+a {
+  @apply transition-colors duration-200;
+}
+
+/* 表格样式 */
+.medical-table {
+  @apply w-full border-collapse;
+}
+
+.medical-table th {
+  @apply px-4 py-3 text-left text-sm font-semibold text-slate-700 bg-slate-50 border-b border-slate-200;
+}
+
+.medical-table td {
+  @apply px-4 py-3 text-sm text-slate-600 border-b border-slate-100;
+}
+
+.medical-table tr:hover td {
+  @apply bg-slate-50/50;
 }
