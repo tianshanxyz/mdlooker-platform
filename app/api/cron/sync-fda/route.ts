@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Force dynamic rendering for cron jobs
+export const dynamic = 'force-dynamic';
+
 /**
  * Cron Job: Daily FDA Data Sync
  * Runs at 2:00 AM UTC every day

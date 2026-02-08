@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseClient } from '../../../lib/supabase';
 
+// Force dynamic rendering for cron jobs
+export const dynamic = 'force-dynamic';
+
 /**
  * Cron Job: Update Search Index
  * Runs at 4:00 AM UTC every day
