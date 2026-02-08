@@ -1,0 +1,16 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/sync-fda",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/sync-eudamed",
+      "schedule": "0 3 * * 0"
+    },
+    {
+      "path": "/api/cron/update-search-index",
+      "schedule": "0 4 * * *"
+    }
+  ]
+}
