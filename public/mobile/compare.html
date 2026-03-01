@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#339999">
+    <title>企业对比 - MDLooker</title>
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #339999 0%, #2a7a7a 100%);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .header-title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .add-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .content {
+            padding: 16px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .empty-icon {
+            width: 100px;
+            height: 100px;
+            background: #e0e0e0;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+        
+        .empty-title {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .empty-desc {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 24px;
+        }
+        
+        .empty-btn {
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #339999, #2a7a7a);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .compare-table {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .compare-header {
+            display: grid;
+            grid-template-columns: 100px repeat(2, 1fr);
+            background: linear-gradient(135deg, #339999, #2a7a7a);
+            color: white;
+        }
+        
+        .compare-cell {
+            padding: 16px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .compare-cell:first-child {
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .company-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .company-logo {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .company-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .compare-row {
+            display: grid;
+            grid-template-columns: 100px repeat(2, 1fr);
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .compare-row:last-child {
+            border-bottom: none;
+        }
+        
+        .compare-row:nth-child(even) {
+            background: #fafafa;
+        }
+        
+        .row-label {
+            padding: 16px;
+            font-size: 13px;
+            color: #666;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        
+        .row-value {
+            padding: 16px;
+            text-align: center;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .score-high {
+            color: #4caf50;
+            font-weight: 600;
+        }
+        
+        .score-medium {
+            color: #ff9800;
+            font-weight: 600;
+        }
+        
+        .score-low {
+            color: #f44336;
+            font-weight: 600;
+        }
+        
+        .winner-badge {
+            display: inline-block;
+            background: #4caf50;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            margin-left: 4px;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.85);
+            color: white;
+            padding: 16px 28px;
+            border-radius: 12px;
+            font-size: 14px;
+            z-index: 1000;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -40%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="back-btn" onclick="goBack()">←</button>
+        <div class="header-title">企业对比</div>
+        <button class="add-btn" onclick="addCompany()">+ 添加</button>
+    </div>
+    
+    <div class="content" id="content">
+        <!-- Content will be inserted here -->
+    </div>
+    
+    <script>
+        // Mock comparison data
+        const compareData = {
+            companies: [
+                { name: '迈瑞医疗', icon: '🏢', country: '🇨🇳 中国' },
+                { name: '西门子医疗', icon: '🏥', country: '🇩🇪 德国' }
+            ],
+            data: [
+                { label: '合规评分', values: [96, 98], unit: '分', higher: true },
+                { label: 'FDA认证', values: [156, 234], unit: '个', higher: true },
+                { label: 'NMPA认证', values: [287, 198], unit: '个', higher: true },
+                { label: 'CE认证', values: [89, 312], unit: '个', higher: true },
+                { label: '成立时间', values: ['1991年', '1847年'], unit: '', higher: false },
+                { label: '员工人数', values: ['10,000+', '50,000+'], unit: '', higher: true },
+                { label: '年营收', values: ['$3.5B', '$18B'], unit: '', higher: true }
+            ]
+        };
+        
+        function loadComparison() {
+            const content = document.getElementById('content');
+            
+            if (compareData.companies.length === 0) {
+                content.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">⚖️</div>
+                        <div class="empty-title">暂无对比企业</div>
+                        <div class="empty-desc">添加企业开始对比分析</div>
+                        <button class="empty-btn" onclick="addCompany()">添加企业</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '<div class="compare-table">';
+            
+            // Header
+            html += '<div class="compare-header">';
+            html += '<div class="compare-cell">对比项</div>';
+            compareData.companies.forEach(company => {
+                html += `
+                    <div class="compare-cell">
+                        <div class="company-header">
+                            <div class="company-logo">${company.icon}</div>
+                            <div class="company-name">${company.name}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            // Data rows
+            compareData.data.forEach(row => {
+                const maxValue = Math.max(...row.values.map(v => parseFloat(v) || 0));
+                
+                html += '<div class="compare-row">';
+                html += `<div class="row-label">${row.label}</div>`;
+                
+                row.values.forEach((value, index) => {
+                    const numValue = parseFloat(value);
+                    let scoreClass = '';
+                    let badge = '';
+                    
+                    if (!isNaN(numValue) && row.higher) {
+                        if (numValue === maxValue) {
+                            scoreClass = 'score-high';
+                            badge = '<span class="winner-badge">优</span>';
+                        } else if (numValue >= maxValue * 0.8) {
+                            scoreClass = 'score-medium';
+                        } else {
+                            scoreClass = 'score-low';
+                        }
+                    }
+                    
+                    html += `<div class="row-value ${scoreClass}">${value}${row.unit}${badge}</div>`;
+                });
+                
+                html += '</div>';
+            });
+            
+            html += '</div>';
+            content.innerHTML = html;
+        }
+        
+        function goBack() {
+            window.history.back();
+        }
+        
+        function addCompany() {
+            showToast('添加企业功能开发中');
+        }
+        
+        function showToast(message) {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.remove(), 2000);
+        }
+        
+        // Load on page load
+        loadComparison();
+    </script>
+</body>
+</html>

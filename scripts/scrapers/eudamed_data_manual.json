@@ -1,0 +1,402 @@
+[
+  {
+    "name": "AD-MF-000001354",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.474668",
+    "srn": "SOADCO, S.L. [ES]",
+    "type": "SOADCO, S.L. [ES]"
+  },
+  {
+    "name": "AE-MF-000004542",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.487002",
+    "srn": "United Medical Industries Limited Co. L.L.C [EN]",
+    "type": "UNIMED [EN]"
+  },
+  {
+    "name": "AE-MF-000011696",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.515120",
+    "srn": "London Healthcare MF [EN]",
+    "type": ""
+  },
+  {
+    "name": "AE-MF-000017384",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.537362",
+    "srn": "Gulf Pharmaceutical Industries (Julphar) [EN]",
+    "type": ""
+  },
+  {
+    "name": "AE-MF-000018791",
+    "details": "2\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.547647",
+    "srn": "Steripharm Ltd Fzc [EN]",
+    "type": ""
+  },
+  {
+    "name": "AE-MF-000019360",
+    "details": "2\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.574131",
+    "srn": "Vasmed Technologies Ltd Fzc [EN]",
+    "type": ""
+  },
+  {
+    "name": "AE-MF-000019505",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.585350",
+    "srn": "Protect 7 Healthcare Sole Proprietorship LLC - MF [EN]",
+    "type": "Protect7 [EN]"
+  },
+  {
+    "name": "AE-MF-000021274",
+    "details": "2\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.597836",
+    "srn": "Nihon Kohden Middle East (Branch) [EN]",
+    "type": "NKME [EN]"
+  },
+  {
+    "name": "AE-MF-000026668",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.607252",
+    "srn": "Avicenna [EN]",
+    "type": "AVCN [EN]"
+  },
+  {
+    "name": "AE-MF-000028318",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.615840",
+    "srn": "ABU DHABI MEDICAL DEVICES CO. LLC. [EN]",
+    "type": "ADMD [EN]"
+  },
+  {
+    "name": "AE-MF-000029409",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.625997",
+    "srn": "Medysinal FZCO [EN]",
+    "type": "MEDYSINAL [EN]"
+  },
+  {
+    "name": "AE-MF-000033002",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.637752",
+    "srn": "Khalifa University Enterprises Company LLC [EN]",
+    "type": ""
+  },
+  {
+    "name": "AE-MF-000039363",
+    "details": "2\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.657149",
+    "srn": "AirMed Dwc LLC [EN]",
+    "type": ""
+  },
+  {
+    "name": "AE-MF-000041976",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.677820",
+    "srn": "Axiscure Medical Equipments Trading Co. L.L.C",
+    "type": ""
+  },
+  {
+    "name": "AE-MF-000042654",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.687299",
+    "srn": "PRIMACISION MEDICAL & SURGICAL DEVICES MANUFACTURING L.L.C [EN]",
+    "type": ""
+  },
+  {
+    "name": "AE-MF-000043885",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.694871",
+    "srn": "HILBRO GOODS WHOLESALERS L.L.C [EN]",
+    "type": ""
+  },
+  {
+    "name": "AE-MF-000045895",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.703351",
+    "srn": "Tokai Optical MEA (FZC) [EN]",
+    "type": ""
+  },
+  {
+    "name": "AE-MF-000046241",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.713779",
+    "srn": "SURGICRAFTS MEDICAL EQUIPMENTS TRADING DWC-LLC [EN]",
+    "type": ""
+  },
+  {
+    "name": "AE-MF-000050475",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.722703",
+    "srn": "ZOE MEDSOLUTIONS L.L.C-FZ [EN]",
+    "type": ""
+  },
+  {
+    "name": "AE-MF-000050792",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.742367",
+    "srn": "OXYGEN HEALTH CARE TECHNOLOGY L.L.C",
+    "type": ""
+  },
+  {
+    "name": "AE-MF-000050909",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.750028",
+    "srn": "Quantis Medical F.Z.C",
+    "type": ""
+  },
+  {
+    "name": "AE-MF-000051038",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.759318",
+    "srn": "The Nkaye Pearl F.Z.E [DE]",
+    "type": "Tge Nkaye Pearl F.Z.E [DE]"
+  },
+  {
+    "name": "AE-MF-000051572",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.766305",
+    "srn": "AZURE INDUSTRIES FZCO [EN]",
+    "type": ""
+  },
+  {
+    "name": "AL-MF-000031133",
+    "details": "2\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.775721",
+    "srn": "Albset EU [EN]",
+    "type": ""
+  },
+  {
+    "name": "AM-MF-000048355",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.783454",
+    "srn": "Arides LLC [EN]",
+    "type": ""
+  },
+  {
+    "name": "AO-MF-000037597",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.791977",
+    "srn": "Medvida Lda [PT]",
+    "type": ""
+  },
+  {
+    "name": "AR-MF-000001878",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.799329",
+    "srn": "OXAVITA SRL [ES]",
+    "type": "OXAVITA [ES]"
+  },
+  {
+    "name": "AR-MF-000002381",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.807277",
+    "srn": "Odontotecnoemprendimientos del Plata S.A. [ES], Odontotecnoemprendimientos del Plata S.A. [EN]",
+    "type": "Odontotecno"
+  },
+  {
+    "name": "AR-MF-000003564",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.814430",
+    "srn": "Ecleris S.R.L. [ES]",
+    "type": ""
+  },
+  {
+    "name": "AR-MF-000005456",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.821769",
+    "srn": "Suavepie SAIC [ES]",
+    "type": "Suavepie [ES]"
+  },
+  {
+    "name": "AR-MF-000016435",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.830281",
+    "srn": "Assistance srl [EN]",
+    "type": "Assy [EN]"
+  },
+  {
+    "name": "AR-MF-000017203",
+    "details": "2\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.837227",
+    "srn": "STEELDEC SA [ES]",
+    "type": ""
+  },
+  {
+    "name": "AR-MF-000019201",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.845267",
+    "srn": "PAMPAMED S.R.L. [ES]",
+    "type": "PAMPAMED [ES]"
+  },
+  {
+    "name": "AR-MF-000020030",
+    "details": "2\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.852201",
+    "srn": "MEDIX MEDICAL DEVICES SRL [ES]",
+    "type": ""
+  },
+  {
+    "name": "AR-MF-000021548",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.860219",
+    "srn": "ViewMind S.A. [ES]",
+    "type": ""
+  },
+  {
+    "name": "AR-MF-000023153",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.867071",
+    "srn": "Laboratorios SL S.A. [EN]",
+    "type": ""
+  },
+  {
+    "name": "AR-MF-000023348",
+    "details": "4\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.874746",
+    "srn": "PROMEDON S.A. [ES]",
+    "type": "PROMEDON [ES]"
+  },
+  {
+    "name": "AR-MF-000023604",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.881619",
+    "srn": "UV-Vis Metrolab S.A. [ES]",
+    "type": "Metrolab [ES]"
+  },
+  {
+    "name": "AR-MF-000023605",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.888108",
+    "srn": "Wiener Laboratorios SAIC [ES]",
+    "type": "Wiener lab [ES]"
+  },
+  {
+    "name": "AR-MF-000024519",
+    "details": "3\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.895047",
+    "srn": "JS Medicina Electrónica SRL",
+    "type": ""
+  },
+  {
+    "name": "AR-MF-000025937",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.901796",
+    "srn": "Orlight Laser [ES]",
+    "type": ""
+  },
+  {
+    "name": "AR-MF-000029448",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.910518",
+    "srn": "NUXEN SRL [ES]",
+    "type": "NUXEN [ES]"
+  },
+  {
+    "name": "AR-MF-000030306",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.919459",
+    "srn": "TECME S.A. [ES]",
+    "type": ""
+  },
+  {
+    "name": "AR-MF-000031451",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.926265",
+    "srn": "Flexafil SACI [ES]",
+    "type": ""
+  },
+  {
+    "name": "AR-MF-000034989",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.932879",
+    "srn": "Oxigenoterapia Norte SACIFIA [ES]",
+    "type": "Oxigenoterapia Norte [ES]"
+  },
+  {
+    "name": "AR-MF-000036125",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.939764",
+    "srn": "Lexel srl [ES]",
+    "type": "Lexel srl [ES]"
+  },
+  {
+    "name": "AR-MF-000037702",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.954732",
+    "srn": "Ingenplast S.A. [ES]",
+    "type": ""
+  },
+  {
+    "name": "AR-MF-000037798",
+    "details": "2\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.961806",
+    "srn": "Marzzan Lucas Jorge [ES]",
+    "type": "Marzzan [ES]"
+  },
+  {
+    "name": "AR-MF-000042606",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.968952",
+    "srn": "Body Health S.A.",
+    "type": ""
+  },
+  {
+    "name": "AR-MF-000047833",
+    "details": "1\n(Current)",
+    "country": "Manufacturer",
+    "scraped_at": "2026-02-21T21:25:22.975486",
+    "srn": "Terragene S.A. [ES]",
+    "type": ""
+  }
+]

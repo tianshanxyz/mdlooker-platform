@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#339999">
+    <title>个人中心 - MDLooker</title>
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #339999 0%, #2a7a7a 100%);
+            color: white;
+            padding: 20px;
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .settings-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .user-card {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+        }
+        
+        .user-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .user-avatar {
+            width: 70px;
+            height: 70px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: #339999;
+        }
+        
+        .user-info h2 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+        
+        .user-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .level-section {
+            border-top: 1px solid rgba(255,255,255,0.2);
+            padding-top: 16px;
+        }
+        
+        .level-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .level-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .level-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            border-radius: 4px;
+            width: 65%;
+        }
+        
+        .content {
+            padding: 16px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px 8px;
+            text-align: center;
+        }
+        
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            background: #e3f2fd;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-size: 20px;
+        }
+        
+        .stat-number {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+        
+        .menu-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+        }
+        
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .menu-icon {
+            width: 40px;
+            height: 40px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .menu-text {
+            flex: 1;
+            font-size: 15px;
+            color: #333;
+        }
+        
+        .menu-arrow {
+            color: #ccc;
+            font-size: 18px;
+        }
+        
+        .vip-banner {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .vip-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .vip-info {
+            flex: 1;
+        }
+        
+        .vip-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 4px;
+        }
+        
+        .vip-desc {
+            font-size: 12px;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .vip-btn {
+            padding: 10px 20px;
+            background: white;
+            border: none;
+            border-radius: 20px;
+            color: #ff9800;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .logout-btn {
+            width: 100%;
+            padding: 16px;
+            background: white;
+            border: none;
+            border-radius: 20px;
+            color: #f44336;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.85);
+            color: white;
+            padding: 16px 28px;
+            border-radius: 12px;
+            font-size: 14px;
+            z-index: 1000;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -40%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-top">
+            <h1>个人中心</h1>
+            <button class="settings-btn" onclick="showSettings()">⚙️</button>
+        </div>
+        
+        <div class="user-card">
+            <div class="user-header">
+                <div class="user-avatar">G</div>
+                <div class="user-info">
+                    <h2>游客用户</h2>
+                    <span class="user-badge">⭐ Lv.1 新手</span>
+                </div>
+            </div>
+            <div class="level-section">
+                <div class="level-header">
+                    <span>当前等级</span>
+                    <span>65/100 XP</span>
+                </div>
+                <div class="level-bar">
+                    <div class="level-fill"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="content">
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">❤️</div>
+                <div class="stat-number">3</div>
+                <div class="stat-label">收藏</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🔍</div>
+                <div class="stat-number">12</div>
+                <div class="stat-label">搜索</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⬇️</div>
+                <div class="stat-number">0</div>
+                <div class="stat-label">下载</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👁️</div>
+                <div class="stat-number">8</div>
+                <div class="stat-label">浏览</div>
+            </div>
+        </div>
+        
+        <!-- Menu -->
+        <div class="menu-card">
+            <div class="menu-item" onclick="goToPage('favorites')">
+                <div class="menu-icon">❤️</div>
+                <div class="menu-text">我的收藏</div>
+                <div class="menu-arrow">›</div>
+            </div>
+            <div class="menu-item" onclick="goToPage('history')">
+                <div class="menu-icon">⏰</div>
+                <div class="menu-text">搜索历史</div>
+                <div class="menu-arrow">›</div>
+            </div>
+            <div class="menu-item" onclick="goToPage('achievements')">
+                <div class="menu-icon">🏆</div>
+                <div class="menu-text">我的成就</div>
+                <div class="menu-arrow">›</div>
+            </div>
+            <div class="menu-item" onclick="goToPage('compare')">
+                <div class="menu-icon">⚖️</div>
+                <div class="menu-text">企业对比</div>
+                <div class="menu-arrow">›</div>
+            </div>
+            <div class="menu-item" onclick="goToPage('downloads')">
+                <div class="menu-icon">⬇️</div>
+                <div class="menu-text">下载记录</div>
+                <div class="menu-arrow">›</div>
+            </div>
+            <div class="menu-item" onclick="goToPage('notifications')">
+                <div class="menu-icon">🔔</div>
+                <div class="menu-text">消息通知</div>
+                <div class="menu-arrow">›</div>
+            </div>
+        </div>
+        
+        <!-- Settings -->
+        <div class="menu-card">
+            <div class="menu-item" onclick="showLanguage()">
+                <div class="menu-icon">🌐</div>
+                <div class="menu-text">语言设置</div>
+                <div class="menu-text" style="color: #999;">简体中文</div>
+            </div>
+            <div class="menu-item" onclick="showPrivacy()">
+                <div class="menu-icon">🔒</div>
+                <div class="menu-text">隐私设置</div>
+                <div class="menu-arrow">›</div>
+            </div>
+            <div class="menu-item" onclick="showHelp()">
+                <div class="menu-icon">❓</div>
+                <div class="menu-text">帮助与反馈</div>
+                <div class="menu-arrow">›</div>
+            </div>
+        </div>
+        
+        <!-- VIP Banner -->
+        <div class="vip-banner">
+            <div class="vip-icon">👑</div>
+            <div class="vip-info">
+                <div class="vip-title">升级 VIP 会员</div>
+                <div class="vip-desc">解锁无限搜索、下载报告、API访问</div>
+            </div>
+            <button class="vip-btn" onclick="upgradeVIP()">升级</button>
+        </div>
+        
+        <!-- Logout -->
+        <button class="logout-btn" onclick="logout()">退出登录</button>
+    </div>
+    
+    <script>
+        function showSettings() {
+            window.location.href = 'settings.html';
+        }
+        
+        function goToPage(page) {
+            const pages = {
+                'favorites': 'favorites.html',
+                'history': 'history.html',
+                'achievements': 'achievements.html',
+                'notifications': 'notifications.html',
+                'compare': 'compare.html'
+            };
+            if (pages[page]) {
+                window.location.href = pages[page];
+            } else {
+                showToast('功能开发中');
+            }
+        }
+        
+        function showLanguage() {
+            showToast('语言切换功能开发中');
+        }
+        
+        function showPrivacy() {
+            showToast('隐私设置功能开发中');
+        }
+        
+        function showHelp() {
+            showToast('帮助中心功能开发中');
+        }
+        
+        function upgradeVIP() {
+            showToast('VIP升级功能开发中');
+        }
+        
+        function logout() {
+            showToast('已退出登录');
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 1500);
+        }
+        
+        function showToast(message) {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.remove(), 2000);
+        }
+    </script>
+</body>
+</html>

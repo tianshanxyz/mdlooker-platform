@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#339999">
+    <title>企业详情 - MDLooker</title>
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #339999 0%, #2a7a7a 100%);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .header-title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .header-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        
+        /* Company Card */
+        .company-card {
+            background: linear-gradient(135deg, #339999 0%, #2a7a7a 100%);
+            color: white;
+            padding: 24px 20px;
+            text-align: center;
+        }
+        
+        .company-logo {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 20px;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+        
+        .company-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .company-name-en {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 12px;
+        }
+        
+        .company-tags {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .company-tag {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        
+        /* Compliance Score */
+        .score-card {
+            background: white;
+            margin: -20px 16px 16px;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .score-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .score-title {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .score-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #4caf50;
+        }
+        
+        .score-bar {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .score-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .score-label {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #999;
+        }
+        
+        /* Certifications */
+        .section {
+            background: white;
+            margin: 0 16px 16px;
+            padding: 20px;
+            border-radius: 16px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .cert-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        
+        .cert-item {
+            text-align: center;
+            padding: 16px 8px;
+            background: #f5f5f5;
+            border-radius: 12px;
+        }
+        
+        .cert-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .cert-name {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .cert-count {
+            font-size: 11px;
+            color: #666;
+        }
+        
+        /* Info List */
+        .info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        
+        .info-icon {
+            width: 40px;
+            height: 40px;
+            background: #e3f2fd;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        
+        .info-content {
+            flex: 1;
+        }
+        
+        .info-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 4px;
+        }
+        
+        .info-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        /* Products */
+        .product-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .product-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+        
+        .product-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #339999, #2a7a7a);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .product-info {
+            flex: 1;
+        }
+        
+        .product-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .product-cert {
+            font-size: 12px;
+            color: #4caf50;
+        }
+        
+        /* Bottom Actions */
+        .bottom-actions {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 12px 16px;
+            display: flex;
+            gap: 12px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #339999, #2a7a7a);
+            color: white;
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.85);
+            color: white;
+            padding: 16px 28px;
+            border-radius: 12px;
+            font-size: 14px;
+            z-index: 1000;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -40%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <button class="back-btn" onclick="goBack()">←</button>
+        <div class="header-title">企业详情</div>
+        <div class="header-actions">
+            <button class="header-btn" onclick="toggleFavorite()" id="favBtn">♡</button>
+            <button class="header-btn" onclick="shareCompany()"></button>
+        </div>
+    </div>
+    
+    <!-- Company Card -->
+    <div class="company-card">
+        <div class="company-logo">🏢</div>
+        <div class="company-name" id="companyName">迈瑞医疗</div>
+        <div class="company-name-en" id="companyNameEn">Mindray Medical</div>
+        <div class="company-tags">
+            <span class="company-tag">🇨🇳 中国</span>
+            <span class="company-tag">医疗器械</span>
+            <span class="company-tag">上市公司</span>
+        </div>
+    </div>
+    
+    <!-- Compliance Score -->
+    <div class="score-card">
+        <div class="score-header">
+            <span class="score-title">合规评分</span>
+            <span class="score-value" id="scoreValue">96</span>
+        </div>
+        <div class="score-bar">
+            <div class="score-fill" id="scoreFill" style="width: 96%"></div>
+        </div>
+        <div class="score-label">
+            <span>基于注册完整性、认证数量、历史记录</span>
+            <span>优秀</span>
+        </div>
+    </div>
+    
+    <!-- Certifications -->
+    <div class="section">
+        <div class="section-title">🏆 认证情况</div>
+        <div class="cert-grid">
+            <div class="cert-item">
+                <div class="cert-icon">🇺🇸</div>
+                <div class="cert-name">FDA</div>
+                <div class="cert-count">156 产品</div>
+            </div>
+            <div class="cert-item">
+                <div class="cert-icon">🇨🇳</div>
+                <div class="cert-name">NMPA</div>
+                <div class="cert-count">287 产品</div>
+            </div>
+            <div class="cert-item">
+                <div class="cert-icon">🇪🇺</div>
+                <div class="cert-name">CE-MDR</div>
+                <div class="cert-count">89 产品</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Company Info -->
+    <div class="section">
+        <div class="section-title">📋 企业信息</div>
+        <div class="info-list">
+            <div class="info-item">
+                <div class="info-icon">📍</div>
+                <div class="info-content">
+                    <div class="info-label">地址</div>
+                    <div class="info-value">广东省深圳市南山区高新技术产业园区</div>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon">🌐</div>
+                <div class="info-content">
+                    <div class="info-label">官网</div>
+                    <div class="info-value">www.mindray.com</div>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon">📞</div>
+                <div class="info-content">
+                    <div class="info-label">电话</div>
+                    <div class="info-value">+86-755-81888998</div>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon">📧</div>
+                <div class="info-content">
+                    <div class="info-label">邮箱</div>
+                    <div class="info-value">contact@mindray.com</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Products -->
+    <div class="section">
+        <div class="section-title">📦 主要产品</div>
+        <div class="product-list">
+            <div class="product-item" onclick="viewProduct('监护仪')">
+                <div class="product-icon">🏥</div>
+                <div class="product-info">
+                    <div class="product-name">病人监护仪 BeneVision N1</div>
+                    <div class="product-cert">✓ FDA / NMPA / CE</div>
+                </div>
+            </div>
+            <div class="product-item" onclick="viewProduct('除颤仪')">
+                <div class="product-icon">⚡</div>
+                <div class="product-info">
+                    <div class="product-name">除颤监护仪 BeneHeart D6</div>
+                    <div class="product-cert">✓ FDA / NMPA / CE</div>
+                </div>
+            </div>
+            <div class="product-item" onclick="viewProduct('超声')">
+                <div class="product-icon">🔊</div>
+                <div class="product-info">
+                    <div class="product-name">超声诊断系统 Resona R9</div>
+                    <div class="product-cert">✓ FDA / NMPA / CE</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bottom Actions -->
+    <div class="bottom-actions">
+        <button class="action-btn btn-secondary" onclick="downloadReport()">
+            📥 下载报告
+        </button>
+        <button class="action-btn btn-primary" onclick="contactCompany()">
+            📞 联系企业
+        </button>
+    </div>
+    
+    <script>
+        // Get company from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const companyId = urlParams.get('id') || 'mindray';
+        
+        // Company data
+        const companies = {
+            mindray: {
+                name: '迈瑞医疗',
+                nameEn: 'Mindray Medical',
+                country: '🇨🇳 中国',
+                score: 96,
+                fda: 156,
+                nmpa: 287,
+                ce: 89
+            },
+            siemens: {
+                name: '西门子医疗',
+                nameEn: 'Siemens Healthineers',
+                country: '🇩🇪 德国',
+                score: 98,
+                fda: 234,
+                nmpa: 198,
+                ce: 312
+            },
+            medtronic: {
+                name: '美敦力',
+                nameEn: 'Medtronic',
+                country: '🇺🇸 美国',
+                score: 95,
+                fda: 445,
+                nmpa: 156,
+                ce: 278
+            }
+        };
+        
+        // Load company data
+        function loadCompany() {
+            const company = companies[companyId] || companies.mindray;
+            document.getElementById('companyName').textContent = company.name;
+            document.getElementById('companyNameEn').textContent = company.nameEn;
+            document.getElementById('scoreValue').textContent = company.score;
+            document.getElementById('scoreFill').style.width = company.score + '%';
+        }
+        
+        // Go back
+        function goBack() {
+            window.history.back();
+        }
+        
+        // Toggle favorite
+        let isFavorite = false;
+        function toggleFavorite() {
+            isFavorite = !isFavorite;
+            document.getElementById('favBtn').textContent = isFavorite ? '♥' : '♡';
+            showToast(isFavorite ? '已添加到收藏' : '已取消收藏');
+        }
+        
+        // Share company
+        function shareCompany() {
+            if (navigator.share) {
+                navigator.share({
+                    title: '迈瑞医疗 - MDLooker',
+                    text: '查看迈瑞医疗的合规档案',
+                    url: window.location.href
+                });
+            } else {
+                showToast('链接已复制');
+            }
+        }
+        
+        // View product
+        function viewProduct(name) {
+            showToast('查看产品: ' + name);
+        }
+        
+        // Download report
+        function downloadReport() {
+            showToast('报告下载中...');
+            setTimeout(() => showToast('报告已下载'), 1500);
+        }
+        
+        // Contact company
+        function contactCompany() {
+            showToast('拨打: +86-755-81888998');
+        }
+        
+        // Toast
+        function showToast(message) {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.remove(), 2000);
+        }
+        
+        // Init
+        loadCompany();
+    </script>
+</body>
+</html>

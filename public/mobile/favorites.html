@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#339999">
+    <title>我的收藏 - MDLooker</title>
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #339999 0%, #2a7a7a 100%);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .header-title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .header-count {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+        }
+        
+        .content {
+            padding: 16px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .empty-icon {
+            width: 100px;
+            height: 100px;
+            background: #e0e0e0;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+        
+        .empty-title {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .empty-desc {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 24px;
+        }
+        
+        .empty-btn {
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #339999, #2a7a7a);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .favorites-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .favorite-item {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .company-logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #339999, #2a7a7a);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+        
+        .company-info {
+            flex: 1;
+        }
+        
+        .company-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .company-desc {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .company-tags {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .company-tag {
+            background: #e3f2fd;
+            color: #339999;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        
+        .favorite-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .action-icon {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: #f5f5f5;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .score-badge {
+            background: linear-gradient(135deg, #4caf50, #8bc34a);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.85);
+            color: white;
+            padding: 16px 28px;
+            border-radius: 12px;
+            font-size: 14px;
+            z-index: 1000;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -40%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="back-btn" onclick="goBack()">←</button>
+        <div class="header-title">我的收藏</div>
+        <div class="header-count" id="favCount">3</div>
+    </div>
+    
+    <div class="content">
+        <div class="favorites-list" id="favoritesList">
+            <!-- Favorite items will be inserted here -->
+        </div>
+    </div>
+    
+    <script>
+        // Mock favorites data
+        const favorites = [
+            {
+                id: 'mindray',
+                name: '迈瑞医疗',
+                nameEn: 'Mindray',
+                desc: '中国 · 医疗器械龙头',
+                tags: ['FDA', 'NMPA', 'CE'],
+                score: 96,
+                icon: '🏢'
+            },
+            {
+                id: 'siemens',
+                name: '西门子医疗',
+                nameEn: 'Siemens',
+                desc: '德国 · 影像设备',
+                tags: ['FDA', 'CE'],
+                score: 98,
+                icon: '🏥'
+            },
+            {
+                id: 'medtronic',
+                name: '美敦力',
+                nameEn: 'Medtronic',
+                desc: '美国 · 全球领导者',
+                tags: ['FDA', 'NMPA', 'CE'],
+                score: 95,
+                icon: '⚕️'
+            }
+        ];
+        
+        function loadFavorites() {
+            const list = document.getElementById('favoritesList');
+            const count = document.getElementById('favCount');
+            
+            if (favorites.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">❤️</div>
+                        <div class="empty-title">暂无收藏</div>
+                        <div class="empty-desc">收藏您关注的企业，随时查看最新动态</div>
+                        <button class="empty-btn" onclick="goSearch()">去搜索</button>
+                    </div>
+                `;
+            } else {
+                count.textContent = favorites.length;
+                list.innerHTML = favorites.map(company => `
+                    <div class="favorite-item" onclick="viewCompany('${company.id}')">
+                        <div class="company-logo">${company.icon}</div>
+                        <div class="company-info">
+                            <div class="company-name">${company.name}</div>
+                            <div class="company-desc">${company.desc}</div>
+                            <div class="company-tags">
+                                ${company.tags.map(tag => `<span class="company-tag">${tag}</span>`).join('')}
+                            </div>
+                        </div>
+                        <div class="favorite-actions">
+                            <span class="score-badge">${company.score}</span>
+                            <button class="action-icon" onclick="event.stopPropagation(); removeFavorite('${company.id}')">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        function goBack() {
+            window.history.back();
+        }
+        
+        function goSearch() {
+            window.location.href = 'index.html';
+        }
+        
+        function viewCompany(id) {
+            window.location.href = 'company.html?id=' + id;
+        }
+        
+        function removeFavorite(id) {
+            showToast('已取消收藏');
+            // Remove from array and reload
+            const index = favorites.findIndex(f => f.id === id);
+            if (index > -1) {
+                favorites.splice(index, 1);
+                loadFavorites();
+            }
+        }
+        
+        function showToast(message) {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.remove(), 2000);
+        }
+        
+        // Load on page load
+        loadFavorites();
+    </script>
+</body>
+</html>

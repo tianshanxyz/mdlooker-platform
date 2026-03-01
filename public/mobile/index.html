@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#339999">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>MDLooker - 全球医疗器械合规信息平台</title>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+    <link rel="stylesheet" href="styles/common.css">
+    <script src="js/loading.js"></script>
+    <script src="js/transitions.js"></script>
+    <script src="js/api-client.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #339999 0%, #2a7a7a 100%);
+            min-height: 100vh;
+            color: white;
+            padding-bottom: 80px;
+        }
+        
+        .container {
+            max-width: 100%;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+        
+        .header-right {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .header-btn {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .logo-main {
+            width: 100px;
+            height: 100px;
+            border-radius: 24px;
+            margin: 0 auto 20px;
+            object-fit: cover;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        
+        /* Search Box */
+        .search-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .search-box {
+            background: white;
+            border-radius: 16px;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        
+        .search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            color: #333;
+            padding: 14px 16px;
+            background: transparent;
+        }
+        
+        .search-input::placeholder {
+            color: #999;
+        }
+        
+        .search-btn {
+            width: 44px;
+            height: 44px;
+            background: #339999;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-right: 4px;
+        }
+        
+        .search-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        /* Search Suggestions */
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 16px;
+            margin-top: 8px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            display: none;
+            overflow: hidden;
+            z-index: 100;
+        }
+        
+        .search-suggestions.active {
+            display: block;
+        }
+        
+        .suggestion-item {
+            padding: 14px 16px;
+            color: #333;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+        
+        .suggestion-item:active {
+            background: #f5f5f5;
+        }
+        
+        .suggestion-icon {
+            width: 32px;
+            height: 32px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 8px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            text-decoration: none;
+            color: white;
+            transition: transform 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .action-text {
+            font-size: 12px;
+        }
+        
+        /* User Stats Card */
+        .user-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .user-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #339999, #2a7a7a);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .user-info h3 {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+        
+        .user-level {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .level-progress {
+            margin-top: 12px;
+        }
+        
+        .level-bar {
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .level-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #339999, #2a7a7a);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        .level-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 6px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        /* Daily Tasks */
+        .tasks-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .card-badge {
+            background: #fff3e0;
+            color: #ff9800;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        
+        .task-icon {
+            width: 40px;
+            height: 40px;
+            background: #e3f2fd;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .task-info {
+            flex: 1;
+        }
+        
+        .task-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+        
+        .task-reward {
+            font-size: 12px;
+            color: #ff9800;
+        }
+        
+        .task-status {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .task-status.completed {
+            background: #4caf50;
+            border-color: #4caf50;
+            color: white;
+        }
+        
+        /* Features Section */
+        .features-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .feature-item:active {
+            background: #e3f2fd;
+            transform: scale(0.98);
+        }
+        
+        .feature-icon-box {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #339999, #2a7a7a);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .feature-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 20px;
+            color: #999;
+            text-decoration: none;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .nav-item.active {
+            color: #339999;
+        }
+        
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.85);
+            color: white;
+            padding: 16px 28px;
+            border-radius: 12px;
+            font-size: 14px;
+            z-index: 1000;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -40%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+        
+        /* Search Results */
+        .search-results {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+            color: #333;
+        }
+        
+        .search-results.active {
+            display: block;
+        }
+        
+        .result-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-icon {
+            width: 48px;
+            height: 48px;
+            background: #e3f2fd;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .result-info h4 {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+        
+        .result-info p {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .compliance-score {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #e8f5e9;
+            color: #4caf50;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <img src="/icons/mdlooker.png" alt="MDLooker" class="logo-img" onerror="this.style.display='none'">
+            </div>
+            <div class="header-right">
+                <button class="header-btn" onclick="toggleLanguage()">🌐 <span id="langText">EN</span></button>
+                <button class="header-btn" onclick="window.location.href='login.html'">👤 登录</button>
+            </div>
+        </div>
+        
+        <!-- Hero Section -->
+        <div class="hero" id="heroSection">
+            <img src="/icons/icon-192x192.png" alt="MDLooker" class="logo-main" onerror="this.style.display='none'">
+            <h1>MDLooker</h1>
+            <p class="subtitle" id="subtitleText">全球医疗器械合规信息平台</p>
+        </div>
+        
+        <!-- Search Box -->
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="搜索公司、产品或 UDI..." id="searchInput">
+                <button class="search-btn" onclick="performSearch()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.3-4.3"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Search Suggestions -->
+            <div class="search-suggestions" id="searchSuggestions">
+                <div class="suggestion-item" onclick="quickSearch('迈瑞医疗')">
+                    <div class="suggestion-icon">🏢</div>
+                    <div>迈瑞医疗</div>
+                </div>
+                <div class="suggestion-item" onclick="quickSearch('Medtronic')">
+                    <div class="suggestion-icon">🏢</div>
+                    <div>Medtronic</div>
+                </div>
+                <div class="suggestion-item" onclick="quickSearch('西门子')">
+                    <div class="suggestion-icon">🏢</div>
+                    <div>西门子医疗</div>
+                </div>
+                <div class="suggestion-item" onclick="quickSearch('监护仪')">
+                    <div class="suggestion-icon">📦</div>
+                    <div>监护仪产品</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <button class="action-btn" onclick="voiceSearch()">
+                <div class="action-icon">🎤</div>
+                <span class="action-text" id="voiceText">语音</span>
+            </button>
+            <button class="action-btn" onclick="scanCode()">
+                <div class="action-icon">📷</div>
+                <span class="action-text" id="scanText">扫码</span>
+            </button>
+            <button class="action-btn" onclick="showHistory()">
+                <div class="action-icon">⏰</div>
+                <span class="action-text" id="historyText">历史</span>
+            </button>
+            <button class="action-btn" onclick="showFavorites()">
+                <div class="action-icon">❤️</div>
+                <span class="action-text" id="favText">收藏</span>
+            </button>
+        </div>
+        
+        <!-- Search Results -->
+        <div class="search-results" id="searchResults">
+            <div class="card-header">
+                <span class="card-title" id="resultsTitle">搜索结果</span>
+                <span class="card-badge" id="resultsCount">3 条</span>
+            </div>
+            <div id="resultsList">
+                <!-- Results will be inserted here -->
+            </div>
+        </div>
+        
+        <!-- User Stats Card -->
+        <div class="user-card">
+            <div class="user-header">
+                <div class="user-avatar">G</div>
+                <div class="user-info">
+                    <h3 id="userName">游客用户</h3>
+                    <span class="user-level">⭐ <span id="levelText">Lv.1 新手</span></span>
+                </div>
+            </div>
+            <div class="level-progress">
+                <div class="level-bar">
+                    <div class="level-fill" style="width: 35%"></div>
+                </div>
+                <div class="level-text">
+                    <span id="expText">经验值: 35/100</span>
+                    <span id="nextLevel">距离升级还需 65</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Daily Tasks -->
+        <div class="tasks-card">
+            <div class="card-header">
+                <span class="card-title" id="tasksTitle">每日任务</span>
+                <span class="card-badge" id="tasksBadge">+75 XP</span>
+            </div>
+            <div class="task-list">
+                <div class="task-item" onclick="completeTask(this, 'search')">
+                    <div class="task-icon">🔍</div>
+                    <div class="task-info">
+                        <div class="task-name" id="task1">完成1次搜索</div>
+                        <div class="task-reward">+10 XP</div>
+                    </div>
+                    <div class="task-status" id="task1-status"></div>
+                </div>
+                <div class="task-item" onclick="completeTask(this, 'favorite')">
+                    <div class="task-icon">❤️</div>
+                    <div class="task-info">
+                        <div class="task-name" id="task2">收藏1家企业</div>
+                        <div class="task-reward">+20 XP</div>
+                    </div>
+                    <div class="task-status" id="task2-status"></div>
+                </div>
+                <div class="task-item" onclick="completeTask(this, 'share')">
+                    <div class="task-icon">📤</div>
+                    <div class="task-info">
+                        <div class="task-name" id="task3">分享1份报告</div>
+                        <div class="task-reward">+30 XP</div>
+                    </div>
+                    <div class="task-status" id="task3-status"></div>
+                </div>
+                <div class="task-item" onclick="completeTask(this, 'view')">
+                    <div class="task-icon">👁️</div>
+                    <div class="task-info">
+                        <div class="task-name" id="task4">浏览3家企业</div>
+                        <div class="task-reward">+15 XP</div>
+                    </div>
+                    <div class="task-status" id="task4-status"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Features -->
+        <div class="features-card">
+            <div class="card-header">
+                <span class="card-title" id="featuresTitle">功能服务</span>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-item" onclick="openFeature('search')">
+                    <div class="feature-icon-box">🔍</div>
+                    <span class="feature-name" id="feat1">智能搜索</span>
+                </div>
+                <div class="feature-item" onclick="openFeature('company')">
+                    <div class="feature-icon-box">🏢</div>
+                    <span class="feature-name" id="feat2">企业档案</span>
+                </div>
+                <div class="feature-item" onclick="openFeature('compliance')">
+                    <div class="feature-icon-box">📋</div>
+                    <span class="feature-name" id="feat3">合规查询</span>
+                </div>
+                <div class="feature-item" onclick="openFeature('market')">
+                    <div class="feature-icon-box">🌍</div>
+                    <span class="feature-name" id="feat4">市场准入</span>
+                </div>
+                <div class="feature-item" onclick="openFeature('comparison')">
+                    <div class="feature-icon-box">📊</div>
+                    <span class="feature-name" id="feat5">企业对比</span>
+                </div>
+                <div class="feature-item" onclick="openFeature('reports')">
+                    <div class="feature-icon-box">📑</div>
+                    <span class="feature-name" id="feat6">报告下载</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab('home')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            <span id="navHome">首页</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('search')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.3-4.3"/>
+            </svg>
+            <span id="navSearch">搜索</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='favorites.html'">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+            </svg>
+            <span id="navFav">收藏</span>
+        </button>
+        <button class="nav-item" onclick="window.location.href='profile.html'">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <span id="navProfile">我的</span>
+        </button>
+    </nav>
+    
+    <script>
+        // Language configuration
+        const i18n = {
+            zh: {
+                subtitle: '全球医疗器械合规信息平台',
+                searchPlaceholder: '搜索公司、产品或 UDI...',
+                voice: '语音',
+                scan: '扫码',
+                history: '历史',
+                favorite: '收藏',
+                resultsTitle: '搜索结果',
+                userName: '游客用户',
+                level: 'Lv.1 新手',
+                exp: '经验值: 35/100',
+                nextLevel: '距离升级还需 65',
+                tasksTitle: '每日任务',
+                tasksBadge: '+75 XP',
+                task1: '完成1次搜索',
+                task2: '收藏1家企业',
+                task3: '分享1份报告',
+                task4: '浏览3家企业',
+                featuresTitle: '功能服务',
+                feat1: '智能搜索',
+                feat2: '企业档案',
+                feat3: '合规查询',
+                feat4: '市场准入',
+                feat5: '企业对比',
+                feat6: '报告下载',
+                navHome: '首页',
+                navSearch: '搜索',
+                navFav: '收藏',
+                navProfile: '我的',
+                login: '登录',
+                lang: 'EN'
+            },
+            en: {
+                subtitle: 'Global Medical Device Compliance Info Platform',
+                searchPlaceholder: 'Search companies, products or UDI...',
+                voice: 'Voice',
+                scan: 'Scan',
+                history: 'History',
+                favorite: 'Favorite',
+                resultsTitle: 'Search Results',
+                userName: 'Guest',
+                level: 'Lv.1 Beginner',
+                exp: 'XP: 35/100',
+                nextLevel: '65 to next level',
+                tasksTitle: 'Daily Tasks',
+                tasksBadge: '+75 XP',
+                task1: 'Search once',
+                task2: 'Save 1 company',
+                task3: 'Share 1 report',
+                task4: 'View 3 companies',
+                featuresTitle: 'Services',
+                feat1: 'Smart Search',
+                feat2: 'Company Profile',
+                feat3: 'Compliance',
+                feat4: 'Market Access',
+                feat5: 'Comparison',
+                feat6: 'Reports',
+                navHome: 'Home',
+                navSearch: 'Search',
+                navFav: 'Favorites',
+                navProfile: 'Profile',
+                login: 'Login',
+                lang: '中文'
+            }
+        };
+        
+        let currentLang = 'zh';
+        
+        // Toggle language
+        function toggleLanguage() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            updateLanguage();
+            showToast(currentLang === 'zh' ? '已切换为中文' : 'Switched to English');
+        }
+        
+        function updateLanguage() {
+            const texts = i18n[currentLang];
+            document.getElementById('subtitleText').textContent = texts.subtitle;
+            document.getElementById('searchInput').placeholder = texts.searchPlaceholder;
+            document.getElementById('voiceText').textContent = texts.voice;
+            document.getElementById('scanText').textContent = texts.scan;
+            document.getElementById('historyText').textContent = texts.history;
+            document.getElementById('favText').textContent = texts.favorite;
+            document.getElementById('resultsTitle').textContent = texts.resultsTitle;
+            document.getElementById('userName').textContent = texts.userName;
+            document.getElementById('levelText').textContent = texts.level;
+            document.getElementById('expText').textContent = texts.exp;
+            document.getElementById('nextLevel').textContent = texts.nextLevel;
+            document.getElementById('tasksTitle').textContent = texts.tasksTitle;
+            document.getElementById('tasksBadge').textContent = texts.tasksBadge;
+            document.getElementById('task1').textContent = texts.task1;
+            document.getElementById('task2').textContent = texts.task2;
+            document.getElementById('task3').textContent = texts.task3;
+            document.getElementById('task4').textContent = texts.task4;
+            document.getElementById('featuresTitle').textContent = texts.featuresTitle;
+            document.getElementById('feat1').textContent = texts.feat1;
+            document.getElementById('feat2').textContent = texts.feat2;
+            document.getElementById('feat3').textContent = texts.feat3;
+            document.getElementById('feat4').textContent = texts.feat4;
+            document.getElementById('feat5').textContent = texts.feat5;
+            document.getElementById('feat6').textContent = texts.feat6;
+            document.getElementById('navHome').textContent = texts.navHome;
+            document.getElementById('navSearch').textContent = texts.navSearch;
+            document.getElementById('navFav').textContent = texts.navFav;
+            document.getElementById('navProfile').textContent = texts.navProfile;
+            document.getElementById('langText').textContent = texts.lang;
+            document.querySelector('.header-btn:last-child').innerHTML = '👤 ' + texts.login;
+        }
+        
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const searchSuggestions = document.getElementById('searchSuggestions');
+        
+        searchInput.addEventListener('input', function() {
+            if (this.value.length > 0) {
+                searchSuggestions.classList.add('active');
+            } else {
+                searchSuggestions.classList.remove('active');
+            }
+        });
+        
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+        
+        function performSearch() {
+            const query = searchInput.value.trim();
+            if (!query) {
+                showToast(currentLang === 'zh' ? '请输入搜索内容' : 'Please enter search term');
+                return;
+            }
+            
+            searchSuggestions.classList.remove('active');
+            showSearchResults(query);
+            completeTaskByType('search');
+        }
+        
+        function quickSearch(term) {
+            searchInput.value = term;
+            searchSuggestions.classList.remove('active');
+            showSearchResults(term);
+            completeTaskByType('search');
+        }
+        
+        function showSearchResults(query) {
+            const resultsDiv = document.getElementById('searchResults');
+            const resultsList = document.getElementById('resultsList');
+            const resultsCount = document.getElementById('resultsCount');
+            
+            // Mock search results
+            const mockResults = [
+                { name: '迈瑞医疗', nameEn: 'Mindray', type: '🏢', desc: '中国 · 医疗器械龙头', score: 96 },
+                { name: '西门子医疗', nameEn: 'Siemens Healthineers', type: '🏢', desc: '德国 · 影像设备', score: 98 },
+                { name: '美敦力', nameEn: 'Medtronic', type: '🏢', desc: '美国 · 全球医疗器械领导者', score: 95 }
+            ];
+            
+            resultsCount.textContent = mockResults.length + (currentLang === 'zh' ? ' 条' : ' results');
+            
+            resultsList.innerHTML = mockResults.map(company => `
+                <div class="result-item" onclick="viewCompany('${company.name}')">
+                    <div class="result-icon">${company.type}</div>
+                    <div class="result-info">
+                        <h4>${currentLang === 'zh' ? company.name : company.nameEn}</h4>
+                        <p>${company.desc}</p>
+                    </div>
+                    <span class="compliance-score">${company.score}</span>
+                </div>
+            `).join('');
+            
+            resultsDiv.classList.add('active');
+            document.getElementById('heroSection').style.display = 'none';
+        }
+        
+        function viewCompany(name) {
+            const companyMap = { '迈瑞医疗': 'mindray', '西门子医疗': 'siemens', '美敦力': 'medtronic' };
+            const companyId = companyMap[name] || 'mindray';
+            window.location.href = 'company.html?id=' + companyId;
+        }
+        
+        // Voice search
+        function voiceSearch() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const recognition = new SpeechRecognition();
+                recognition.lang = currentLang === 'zh' ? 'zh-CN' : 'en-US';
+                recognition.start();
+                
+                showToast(currentLang === 'zh' ? '请说话...' : 'Listening...');
+                
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    searchInput.value = transcript;
+                    performSearch();
+                };
+            } else {
+                showToast(currentLang === 'zh' ? '您的设备不支持语音搜索' : 'Voice search not supported');
+            }
+        }
+        
+        // Scan code
+        function scanCode() {
+            showToast(currentLang === 'zh' ? '扫码功能需要原生APP支持' : 'Scan requires native APP');
+        }
+        
+        // Show history
+        function showHistory() {
+            const history = JSON.parse(localStorage.getItem('search_history') || '[]');
+            if (history.length === 0) {
+                showToast(currentLang === 'zh' ? '暂无搜索历史' : 'No search history');
+            } else {
+                showToast(currentLang === 'zh' ? '最近搜索: ' + history[0] : 'Recent: ' + history[0]);
+            }
+        }
+        
+        // Show favorites
+        function showFavorites() {
+            showToast(currentLang === 'zh' ? '请先登录查看收藏' : 'Please login to view favorites');
+        }
+        
+        // Complete task
+        function completeTask(element, type) {
+            const status = element.querySelector('.task-status');
+            if (!status.classList.contains('completed')) {
+                status.classList.add('completed');
+                status.innerHTML = '✓';
+                showToast(currentLang === 'zh' ? '任务完成! +XP' : 'Task completed! +XP');
+                
+                // Save to localStorage
+                const completed = JSON.parse(localStorage.getItem('completed_tasks') || '[]');
+                completed.push(type);
+                localStorage.setItem('completed_tasks', JSON.stringify(completed));
+            }
+        }
+        
+        function completeTaskByType(type) {
+            const taskMap = { search: 'task1-status', favorite: 'task2-status', share: 'task3-status', view: 'task4-status' };
+            const statusId = taskMap[type];
+            if (statusId) {
+                const status = document.getElementById(statusId);
+                if (status && !status.classList.contains('completed')) {
+                    status.classList.add('completed');
+                    status.innerHTML = '✓';
+                }
+            }
+        }
+        
+        // Open feature
+        function openFeature(feature) {
+            const featureNames = {
+                search: currentLang === 'zh' ? '智能搜索' : 'Smart Search',
+                company: currentLang === 'zh' ? '企业档案' : 'Company Profile',
+                compliance: currentLang === 'zh' ? '合规查询' : 'Compliance',
+                market: currentLang === 'zh' ? '市场准入' : 'Market Access',
+                comparison: currentLang === 'zh' ? '企业对比' : 'Comparison',
+                reports: currentLang === 'zh' ? '报告下载' : 'Reports'
+            };
+            showToast(featureNames[feature] + (currentLang === 'zh' ? ' 功能开发中' : ' coming soon'));
+        }
+        
+        // Show login
+        function showLogin() {
+            showToast(currentLang === 'zh' ? '登录功能开发中' : 'Login coming soon');
+        }
+        
+        // Switch tab
+        function switchTab(tab) {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            if (tab === 'home') {
+                document.getElementById('searchResults').classList.remove('active');
+                document.getElementById('heroSection').style.display = 'block';
+            } else if (tab === 'search') {
+                document.getElementById('searchInput').focus();
+            } else if (tab === 'favorites') {
+                showFavorites();
+            } else if (tab === 'profile') {
+                showLogin();
+            }
+        }
+        
+        // Toast notification
+        function showToast(message) {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.remove(), 2000);
+        }
+        
+        // Close suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.search-container')) {
+                searchSuggestions.classList.remove('active');
+            }
+        });
+        
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(() => console.log('Service Worker registered'))
+                .catch(err => console.log('SW registration failed'));
+        }
+        
+        // Load completed tasks
+        window.addEventListener('load', function() {
+            const completed = JSON.parse(localStorage.getItem('completed_tasks') || '[]');
+            completed.forEach(type => completeTaskByType(type));
+        });
+    </script>
+</body>
+</html>

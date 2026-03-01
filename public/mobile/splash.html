@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#339999">
+    <title>MDLooker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #339999 0%, #2a7a7a 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            overflow: hidden;
+        }
+        
+        .splash-container {
+            text-align: center;
+            animation: fadeInUp 0.8s ease;
+        }
+        
+        .logo-container {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 30px;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+        }
+        
+        .app-name {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: 2px;
+        }
+        
+        .app-tagline {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 40px;
+            letter-spacing: 1px;
+        }
+        
+        .loading-bar {
+            width: 200px;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        
+        .loading-progress {
+            height: 100%;
+            background: white;
+            border-radius: 2px;
+            width: 0%;
+            animation: loading 2s ease-in-out infinite;
+        }
+        
+        .loading-text {
+            margin-top: 16px;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .version {
+            position: absolute;
+            bottom: 40px;
+            font-size: 12px;
+            opacity: 0.6;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+        
+        @keyframes loading {
+            0% {
+                width: 0%;
+                left: 0;
+            }
+            50% {
+                width: 100%;
+                left: 0;
+            }
+            100% {
+                width: 100%;
+                left: 100%;
+            }
+        }
+        
+        /* 适配不同屏幕尺寸 */
+        @media (min-height: 800px) {
+            .logo-container {
+                width: 140px;
+                height: 140px;
+                margin-bottom: 40px;
+            }
+            
+            .logo {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .app-name {
+                font-size: 42px;
+            }
+            
+            .app-tagline {
+                font-size: 16px;
+            }
+        }
+        
+        /* 刘海屏适配 */
+        @supports (padding-top: env(safe-area-inset-top)) {
+            body {
+                padding-top: env(safe-area-inset-top);
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="splash-container">
+        <div class="logo-container">
+            <img src="/icons/mdlooker.png" alt="MDLooker" class="logo" onerror="this.style.display='none'; this.parentElement.innerHTML='MD';">
+        </div>
+        <h1 class="app-name">MDLooker</h1>
+        <p class="app-tagline">全球医疗器械合规信息平台</p>
+        
+        <div class="loading-bar">
+            <div class="loading-progress"></div>
+        </div>
+        <p class="loading-text">正在加载...</p>
+    </div>
+    
+    <div class="version">v1.0.0</div>
+    
+    <script>
+        // 自动跳转到首页
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 2500);
+    </script>
+</body>
+</html>
