@@ -181,21 +181,8 @@ export default function MobileSearchBox({
   // 扫码搜索
   const startScan = async () => {
     try {
-      // 检查是否在Capacitor环境中
-      if (typeof window !== 'undefined' && (window as any).Capacitor) {
-        const { BarcodeScanner } = await import('@capacitor/barcode-scanner');
-        const result = await BarcodeScanner.scan({
-          hint: 17, // QR_CODE and Barcode
-        });
-        if (result.content) {
-          setQuery(result.content);
-          saveSearchHistory(result.content);
-          onSearch(result.content);
-        }
-      } else {
-        // Web环境：使用HTML5二维码扫描
-        alert(isZh ? '请使用APP扫码功能，或在搜索框中手动输入' : 'Please use APP scan feature or type manually');
-      }
+      // Web环境暂不支持扫码
+      alert(isZh ? '请使用APP扫码功能，或在搜索框中手动输入' : 'Please use APP scan feature or type manually');
     } catch (error) {
       console.error('Scan error:', error);
       alert(isZh ? '扫码功能需要在APP中使用' : 'Scan feature requires APP');
