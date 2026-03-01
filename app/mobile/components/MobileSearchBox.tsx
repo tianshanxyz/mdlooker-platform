@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Search, X, Mic, ScanLine, Sparkles, Loader2, History, TrendingUp } from 'lucide-react';
+import { Search, X, Mic, Sparkles, Loader2, History, TrendingUp } from 'lucide-react';
 
 interface SearchSuggestion {
   text: string;
@@ -33,13 +33,11 @@ export default function MobileSearchBox({
 
   const isZh = locale === 'zh';
 
-  // 加载搜索历史和热门搜索
   useEffect(() => {
     loadSearchHistory();
     fetchHotTerms();
   }, [locale]);
 
-  // 点击外部关闭建议
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -50,7 +48,6 @@ export default function MobileSearchBox({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // 搜索建议防抖
   useEffect(() => {
     const timer = setTimeout(() => {
       if (query.length >= 2) {
@@ -145,7 +142,6 @@ export default function MobileSearchBox({
     setSearchHistory([]);
   };
 
-  // 语音搜索
   const startVoiceSearch = () => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       setIsListening(true);
@@ -178,17 +174,6 @@ export default function MobileSearchBox({
     }
   };
 
-  // 扫码搜索
-  const startScan = async () => {
-    try {
-      // Web环境暂不支持扫码
-      alert(isZh ? '请使用APP扫码功能，或在搜索框中手动输入' : 'Please use APP scan feature or type manually');
-    } catch (error) {
-      console.error('Scan error:', error);
-      alert(isZh ? '扫码功能需要在APP中使用' : 'Scan feature requires APP');
-    }
-  };
-
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'company': return '🏢';
@@ -201,7 +186,6 @@ export default function MobileSearchBox({
   return (
     <div ref={containerRef} className="w-full">
       <form onSubmit={handleSubmit} className="relative">
-        {/* 搜索框容器 */}
         <div
           className={`
             relative flex items-center gap-2
@@ -214,7 +198,6 @@ export default function MobileSearchBox({
             }
           `}
         >
-          {/* 搜索图标 */}
           <div className="pl-4">
             {isLoading ? (
               <Loader2 className="w-5 h-5 text-[#339999] animate-spin" />
@@ -223,7 +206,6 @@ export default function MobileSearchBox({
             )}
           </div>
 
-          {/* 输入框 */}
           <input
             ref={inputRef}
             type="text"
@@ -239,7 +221,6 @@ export default function MobileSearchBox({
             "
           />
 
-          {/* 清除按钮 */}
           {query && (
             <button
               type="button"
@@ -250,7 +231,6 @@ export default function MobileSearchBox({
             </button>
           )}
 
-          {/* 语音搜索按钮 */}
           <button
             type="button"
             onClick={startVoiceSearch}
@@ -264,21 +244,10 @@ export default function MobileSearchBox({
           >
             <Mic className={`w-5 h-5 ${isListening ? 'animate-bounce' : ''}`} />
           </button>
-
-          {/* 扫码按钮 */}
-          <button
-            type="button"
-            onClick={startScan}
-            className="p-2 mr-1 rounded-xl hover:bg-slate-100 text-slate-400 transition-colors"
-          >
-            <ScanLine className="w-5 h-5" />
-          </button>
         </div>
 
-        {/* 搜索建议和历史下拉框 */}
         {isFocused && (
           <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden z-50 max-h-[70vh] overflow-y-auto">
-            {/* 搜索建议 */}
             {query.length >= 2 && suggestions.length > 0 && (
               <div className="p-3">
                 <div className="px-2 py-1.5 text-xs font-medium text-slate-400 uppercase tracking-wide">
@@ -298,7 +267,6 @@ export default function MobileSearchBox({
               </div>
             )}
 
-            {/* 搜索历史 */}
             {!query && searchHistory.length > 0 && (
               <div className="p-3 border-b border-slate-100">
                 <div className="flex items-center justify-between px-2 py-1.5">
@@ -327,7 +295,6 @@ export default function MobileSearchBox({
               </div>
             )}
 
-            {/* 热门搜索 */}
             {!query && hotTerms.length > 0 && (
               <div className="p-3">
                 <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-medium text-slate-400 uppercase tracking-wide">
@@ -352,7 +319,6 @@ export default function MobileSearchBox({
         )}
       </form>
 
-      {/* 快捷操作栏 */}
       <div className="flex items-center justify-center gap-6 mt-4">
         <button
           onClick={startVoiceSearch}
@@ -362,16 +328,6 @@ export default function MobileSearchBox({
             <Mic className={`w-5 h-5 ${isListening ? 'animate-bounce' : ''}`} />
           </div>
           <span className="text-xs">{isZh ? '语音' : 'Voice'}</span>
-        </button>
-
-        <button
-          onClick={startScan}
-          className="flex flex-col items-center gap-1 text-slate-500"
-        >
-          <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
-            <ScanLine className="w-5 h-5" />
-          </div>
-          <span className="text-xs">{isZh ? '扫码' : 'Scan'}</span>
         </button>
 
         <button
