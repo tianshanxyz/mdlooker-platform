@@ -20,8 +20,18 @@ interface SearchParams {
   pageSize?: number;
 }
 
+interface SearchResult {
+  data: any[];
+  count: number;
+  byAuthority?: {
+    HSA: number;
+    PMDA: number;
+    SFDA: number;
+  };
+}
+
 // 搜索HSA数据
-async function searchHSA(params: SearchParams) {
+async function searchHSA(params: SearchParams): Promise<SearchResult> {
   let query = supabase
     .from('hsa_registrations')
     .select('*', { count: 'exact' })
@@ -60,11 +70,16 @@ async function searchHSA(params: SearchParams) {
       status: item.registration_status,
     })) || [],
     count: count || 0,
+    byAuthority: {
+      HSA: count || 0,
+      PMDA: 0,
+      SFDA: 0,
+    },
   };
 }
 
 // 搜索PMDA数据
-async function searchPMDA(params: SearchParams) {
+async function searchPMDA(params: SearchParams): Promise<SearchResult> {
   let query = supabase
     .from('pmda_approvals')
     .select('*', { count: 'exact' })
@@ -103,11 +118,16 @@ async function searchPMDA(params: SearchParams) {
       status: item.approval_status,
     })) || [],
     count: count || 0,
+    byAuthority: {
+      HSA: 0,
+      PMDA: count || 0,
+      SFDA: 0,
+    },
   };
 }
 
 // 搜索SFDA数据
-async function searchSFDA(params: SearchParams) {
+async function searchSFDA(params: SearchParams): Promise<SearchResult> {
   let query = supabase
     .from('sfda_mdma')
     .select('*', { count: 'exact' })
@@ -146,11 +166,16 @@ async function searchSFDA(params: SearchParams) {
       status: item.approval_status,
     })) || [],
     count: count || 0,
+    byAuthority: {
+      HSA: 0,
+      PMDA: 0,
+      SFDA: count || 0,
+    },
   };
 }
 
 // 统一搜索所有机构
-async function searchAll(params: SearchParams) {
+async function searchAll(params: SearchParams): Promise<SearchResult> {
   const [hsaResult, pmdaResult, sfdaResult] = await Promise.all([
     searchHSA(params),
     searchPMDA(params),
