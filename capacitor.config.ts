@@ -1,6 +1,7 @@
-import { CapacitorConfig } from '@capacitor/cli';
+// Capacitor配置 - 仅在构建移动APP时使用
+// 注意: 需要安装 @capacitor/cli 才能使用此配置
 
-const config: CapacitorConfig = {
+const config = {
   appId: 'com.mdlooker.app',
   appName: 'MDLooker',
   webDir: 'dist',
