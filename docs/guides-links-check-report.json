@@ -1,0 +1,81 @@
+{
+  "timestamp": "2026-03-01T15:22:33.458Z",
+  "total": 18,
+  "valid": 8,
+  "invalid": 2,
+  "redirects": 8,
+  "invalidLinks": [
+    {
+      "url": "https://www.nmpa.gov.cn/",
+      "name": "NMPA官网",
+      "status": 412,
+      "valid": false,
+      "redirect": false
+    },
+    {
+      "url": "https://www.tga.gov.au/medical-devices",
+      "name": "Australia TGA",
+      "status": "TIMEOUT",
+      "valid": false,
+      "error": "Request timeout"
+    }
+  ],
+  "redirectLinks": [
+    {
+      "url": "https://www.fda.gov/medical-devices",
+      "name": "FDA Medical Devices",
+      "status": 302,
+      "valid": true,
+      "redirect": true
+    },
+    {
+      "url": "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpmn/pmn.cfm",
+      "name": "FDA 510(k) Database",
+      "status": 302,
+      "valid": true,
+      "redirect": true
+    },
+    {
+      "url": "https://www.fda.gov/medical-devices/classify-your-medical-device",
+      "name": "FDA Device Classification",
+      "status": 302,
+      "valid": true,
+      "redirect": true
+    },
+    {
+      "url": "https://www.fda.gov/medical-devices/premarket-submissions/premarket-notification-510k",
+      "name": "FDA 510(k) Guidance",
+      "status": 302,
+      "valid": true,
+      "redirect": true
+    },
+    {
+      "url": "https://ec.europa.eu/growth/sectors/medical-devices_en",
+      "name": "EU Medical Devices",
+      "status": 301,
+      "valid": true,
+      "redirect": true
+    },
+    {
+      "url": "https://ec.europa.eu/tools/eudamed",
+      "name": "EUDAMED",
+      "status": 302,
+      "valid": true,
+      "redirect": true
+    },
+    {
+      "url": "https://ec.europa.eu/growth/tools-databases/nando/",
+      "name": "NANDO Database",
+      "status": 307,
+      "valid": true,
+      "redirect": true
+    },
+    {
+      "url": "https://www.healthcanada.gc.ca/medical-devices",
+      "name": "Health Canada",
+      "status": 302,
+      "valid": true,
+      "redirect": true
+    }
+  ]
+}
