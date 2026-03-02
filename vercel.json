@@ -2,10 +2,5 @@
   "buildCommand": "next build",
   "devCommand": "next dev",
   "installCommand": "npm install",
-  "framework": "nextjs",
-  "outputDirectory": ".next",
-  "regions": ["pdx1"],
-  "env": {
-    "NEXT_TELEMETRY_DISABLED": "1"
-  }
+  "framework": "nextjs"
 }
