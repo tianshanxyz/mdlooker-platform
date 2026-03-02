@@ -76,7 +76,7 @@ class NMPAAutoSearcher:
         delay = random.uniform(min_seconds, max_seconds)
         time.sleep(delay)
         
-    def navigate_to_medical_device_search(self) -> bool:
+http://192.168.3.42:8080/mobile    def navigate_to_medical_device_search(self) -> bool:
         """导航到医疗器械搜索页面"""
         try:
             print("\n🌐 访问 NMPA 数据查询页面...")

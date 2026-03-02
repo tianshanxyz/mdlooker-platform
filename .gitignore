@@ -70,3 +70,5 @@ ENV/
 # Mobile
 android/
 ios/
+.vercel
+.env*.local

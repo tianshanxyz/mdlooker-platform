@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // 使用 SSR 模式（不要静态导出）
-  output: 'standalone',
-  
   // 允许的外部图片域名
   images: {
     unoptimized: true,
