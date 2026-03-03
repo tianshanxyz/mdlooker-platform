@@ -337,7 +337,8 @@ export async function GET(request: NextRequest) {
         if (searchTerms.length > 0) {
           const orConditions = searchTerms.map(term => {
             const cleanTerm = term.replace(/[%_]/g, '\\$&');
-            return `product_name.ilike.%${cleanTerm}%,company_name.ilike.%${cleanTerm}%,registration_number.ilike.%${cleanTerm}%`;
+            // NMPA表使用 manufacturer/registration_holder 而不是 company_name
+            return `product_name.ilike.%${cleanTerm}%,product_name_zh.ilike.%${cleanTerm}%,manufacturer.ilike.%${cleanTerm}%,manufacturer_zh.ilike.%${cleanTerm}%,registration_holder.ilike.%${cleanTerm}%,registration_holder_zh.ilike.%${cleanTerm}%,registration_number.ilike.%${cleanTerm}%`;
           }).join(',');
           nmpaQuery = nmpaQuery.or(orConditions);
         }
@@ -360,9 +361,12 @@ export async function GET(request: NextRequest) {
               if (!companyMap.has(n.company.id)) {
                 companyMap.set(n.company.id, n.company);
               }
-            } else if (n.company_name) {
-              // 如果没有关联公司，尝试通过名称查找公司
-              companiesToFetch.push(n.company_name);
+            } else if (n.manufacturer || n.manufacturer_zh || n.registration_holder || n.registration_holder_zh) {
+              // 如果没有关联公司，尝试通过制造商或注册持有人名称查找公司
+              const companyName = n.manufacturer_zh || n.manufacturer || n.registration_holder_zh || n.registration_holder;
+              if (companyName && !companiesToFetch.includes(companyName)) {
+                companiesToFetch.push(companyName);
+              }
             }
           });
 

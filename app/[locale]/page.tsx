@@ -118,7 +118,7 @@ export default function HomePage() {
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#339999]/10 rounded-full mb-6">
               <Sparkles className="w-4 h-4 text-[#339999]" />
               <span className="text-sm font-medium text-[#339999]">
-                {isZh ? '全球医疗器械合规信息平台' : 'Global Medical Device Compliance Intelligence Platform'}
+                {isZh ? 'AI驱动的合规数据平台' : 'AI-Powered Compliance Intelligence'}
               </span>
             </div>
             
