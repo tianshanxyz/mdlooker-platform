@@ -326,49 +326,84 @@ export async function GET(request: NextRequest) {
 
     // 3. 搜索NMPA注册 (中国) - 通过产品/公司名称反查公司
     if ((hasChinese || detectedType === 'general' || detectedType === 'company' || source === 'nmpa') && (source === 'all' || source === 'nmpa')) {
-      let nmpaQuery = supabase
-        .from('nmpa_registrations')
-        .select(`
-          *,
-          company:companies(*)
-        `, { count: 'exact' });
+      try {
+        let nmpaQuery = supabase
+          .from('nmpa_registrations')
+          .select(`
+            *,
+            company:companies(*)
+          `, { count: 'exact' });
 
-      if (searchTerms.length > 0) {
-        const orConditions = searchTerms.map(term => {
-          const cleanTerm = term.replace(/[%_]/g, '\\$&');
-          return `product_name.ilike.%${cleanTerm}%,company_name.ilike.%${cleanTerm}%,registration_number.ilike.%${cleanTerm}%`;
-        }).join(',');
-        nmpaQuery = nmpaQuery.or(orConditions);
-      }
+        if (searchTerms.length > 0) {
+          const orConditions = searchTerms.map(term => {
+            const cleanTerm = term.replace(/[%_]/g, '\\$&');
+            return `product_name.ilike.%${cleanTerm}%,company_name.ilike.%${cleanTerm}%,registration_number.ilike.%${cleanTerm}%`;
+          }).join(',');
+          nmpaQuery = nmpaQuery.or(orConditions);
+        }
 
-      const { data: nmpaData, error, count } = await nmpaQuery
-        .range(0, pageSize - 1)
-        .order('approval_date', { ascending: false });
+        const { data: nmpaData, error, count } = await nmpaQuery
+          .range(0, pageSize - 1)
+          .order('approval_date', { ascending: false });
 
-      if (!error && nmpaData) {
-        // 提取唯一的公司
-        const companyMap = new Map();
-        nmpaData.forEach((n: any) => {
-          if (n.company && !companyMap.has(n.company.id)) {
-            companyMap.set(n.company.id, n.company);
+        if (error) {
+          console.error('NMPA search error:', error);
+        } else if (nmpaData && nmpaData.length > 0) {
+          console.log(`NMPA found ${nmpaData.length} records`);
+          
+          // 提取唯一的公司（包括通过company_name查找的）
+          const companyMap = new Map();
+          const companiesToFetch: string[] = [];
+          
+          nmpaData.forEach((n: any) => {
+            if (n.company && n.company.id) {
+              if (!companyMap.has(n.company.id)) {
+                companyMap.set(n.company.id, n.company);
+              }
+            } else if (n.company_name) {
+              // 如果没有关联公司，尝试通过名称查找公司
+              companiesToFetch.push(n.company_name);
+            }
+          });
+
+          // 尝试通过名称查找未关联的公司
+          if (companiesToFetch.length > 0) {
+            for (const companyName of companiesToFetch) {
+              const { data: foundCompanies } = await supabase
+                .from('companies')
+                .select('*')
+                .or(`name.ilike.%${companyName}%,name_zh.ilike.%${companyName}%`)
+                .limit(1);
+              
+              if (foundCompanies && foundCompanies.length > 0) {
+                const foundCompany = foundCompanies[0];
+                if (!companyMap.has(foundCompany.id)) {
+                  companyMap.set(foundCompany.id, foundCompany);
+                }
+              }
+            }
           }
-        });
 
-        // 为每个公司获取完整信息
-        const companyResults = await Promise.all(
-          Array.from(companyMap.values()).map(async (company: any) => {
-            const fullInfo = await getCompanyFullInfo(supabase, company.id);
-            return {
-              ...company,
-              resultType: 'company',
-              ...fullInfo,
-              matched_via: 'nmpa_registration'
-            };
-          })
-        );
+          // 为每个公司获取完整信息
+          const companyResults = await Promise.all(
+            Array.from(companyMap.values()).map(async (company: any) => {
+              const fullInfo = await getCompanyFullInfo(supabase, company.id);
+              return {
+                ...company,
+                resultType: 'company',
+                ...fullInfo,
+                matched_via: 'nmpa_registration'
+              };
+            })
+          );
 
-        allResults = [...allResults, ...companyResults];
-        totalCount += (count || 0);
+          allResults = [...allResults, ...companyResults];
+          totalCount += (count || 0);
+        } else {
+          console.log('NMPA: no data found');
+        }
+      } catch (err) {
+        console.error('NMPA search exception:', err);
       }
     }
 
