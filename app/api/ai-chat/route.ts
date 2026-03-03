@@ -285,4 +285,4 @@ export async function POST(request: NextRequest) {
 
 // 限制请求频率
 export const runtime = 'edge';
-export const preferredRegion = 'iad';
+export const preferredRegion = 'iad1';
