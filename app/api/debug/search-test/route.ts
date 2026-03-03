@@ -5,69 +5,47 @@ export async function GET(request: Request) {
   try {
     const supabase = getSupabaseClient();
     const { searchParams } = new URL(request.url);
-    const query = searchParams.get('q') || '晶硕';
+    const query = searchParams.get('q') || '测试';
+    const hasChinese = /[\u4e00-\u9fa5]/.test(query);
     
-    console.log('Testing search for:', query);
+    console.log('Testing search for:', query, 'hasChinese:', hasChinese);
     
-    // 测试1: 直接查询NMPA表
-    const { data: nmpaData, error: nmpaError, count: nmpaCount } = await supabase
+    // 测试1: NMPA表 - 使用正确的字段名
+    let nmpaQuery = supabase
       .from('nmpa_registrations')
-      .select('*', { count: 'exact' })
-      .or(`product_name.ilike.%${query}%,company_name.ilike.%${query}%`)
-      .limit(5);
+      .select('id, product_name, product_name_zh, manufacturer, manufacturer_zh, registration_number, company_id', { count: 'exact' });
+
+    if (hasChinese) {
+      nmpaQuery = nmpaQuery.or(`product_name_zh.ilike.%${query}%,manufacturer_zh.ilike.%${query}%`);
+    } else {
+      nmpaQuery = nmpaQuery.or(`product_name.ilike.%${query}%,manufacturer.ilike.%${query}%`);
+    }
+
+    const { data: nmpaData, error: nmpaError, count: nmpaCount } = await nmpaQuery.limit(5);
     
-    // 测试2: 直接查询EUDAMED表
-    const { data: eudamedData, error: eudamedError, count: eudamedCount } = await supabase
-      .from('eudamed_registrations')
-      .select('*', { count: 'exact' })
-      .or(`device_name.ilike.%${query}%,actor_name.ilike.%${query}%`)
-      .limit(5);
-    
-    // 测试3: 查询NMPA总数量
-    const { count: totalNmpa, error: totalNmpaError } = await supabase
+    // 测试2: 获取NMPA样本
+    const { data: nmpaSample } = await supabase
       .from('nmpa_registrations')
-      .select('*', { count: 'exact', head: true });
-    
-    // 测试4: 查询EUDAMED总数量
-    const { count: totalEudamed, error: totalEudamedError } = await supabase
-      .from('eudamed_registrations')
-      .select('*', { count: 'exact', head: true });
-    
-    // 测试5: 获取NMPA样本
-    const { data: nmpaSample, error: nmpaSampleError } = await supabase
-      .from('nmpa_registrations')
-      .select('id, product_name, company_name, company_id, registration_number')
+      .select('id, product_name, product_name_zh, manufacturer, manufacturer_zh, company_id')
       .limit(3);
     
-    // 测试6: 获取EUDAMED样本
-    const { data: eudamedSample, error: eudamedSampleError } = await supabase
-      .from('eudamed_registrations')
-      .select('id, device_name, actor_name, actor_id, company_id')
-      .limit(3);
+    // 测试3: 获取companies表样本
+    const { data: companiesSample } = await supabase
+      .from('companies')
+      .select('id, name, name_zh')
+      .limit(5);
     
     return NextResponse.json({
       query,
+      hasChinese,
       nmpa: {
-        totalCount: totalNmpa,
         searchCount: nmpaCount,
         searchResults: nmpaData,
         sample: nmpaSample,
-        errors: {
-          total: totalNmpaError?.message,
-          search: nmpaError?.message,
-          sample: nmpaSampleError?.message
-        }
+        error: nmpaError?.message
       },
-      eudamed: {
-        totalCount: totalEudamed,
-        searchCount: eudamedCount,
-        searchResults: eudamedData,
-        sample: eudamedSample,
-        errors: {
-          total: totalEudamedError?.message,
-          search: eudamedError?.message,
-          sample: eudamedSampleError?.message
-        }
+      companies: {
+        sample: companiesSample
       }
     });
   } catch (error) {
