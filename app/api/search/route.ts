@@ -421,15 +421,19 @@ export async function GET(request: NextRequest) {
         `)
         .or(searchTerms.map(term => {
           const cleanTerm = term.replace(/[%_]/g, '\\$&');
-          return `device_name.ilike.%${cleanTerm}%,company_name.ilike.%${cleanTerm}%`;
+          // FDA表没有company_name字段，使用关联查询
+          return `device_name.ilike.%${cleanTerm}%,device_description.ilike.%${cleanTerm}%`;
         }).join(','))
         .limit(pageSize);
 
       if (!error && fdaData) {
         const companyMap = new Map();
         fdaData.forEach((f: any) => {
-          if (f.company && !companyMap.has(f.company.id)) {
-            companyMap.set(f.company.id, f.company);
+          // FDA通过company_id关联到companies表
+          if (f.company && f.company.id) {
+            if (!companyMap.has(f.company.id)) {
+              companyMap.set(f.company.id, f.company);
+            }
           }
         });
 
