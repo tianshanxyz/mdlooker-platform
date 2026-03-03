@@ -219,6 +219,48 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // 搜索NMPA注册（如果类型是general或company且结果较少，或用户搜索中文）
+    const hasChinese = /[\u4e00-\u9fa5]/.test(query);
+    if (hasChinese || detectedType === 'general' || detectedType === 'company') {
+      let nmpaQuery = supabase
+        .from('nmpa_registrations')
+        .select(`
+          *,
+          company:companies(id, name, name_zh, country)
+        `, { count: 'exact' });
+
+      const searchTerms = query.split(/\s+/).filter(term => term.length > 0);
+      if (searchTerms.length > 0) {
+        const orConditions = searchTerms.map(term => {
+          const cleanTerm = term.replace(/[%_]/g, '\\$&');
+          return `product_name.ilike.%${cleanTerm}%,company_name.ilike.%${cleanTerm}%,registration_number.ilike.%${cleanTerm}%`;
+        }).join(',');
+        nmpaQuery = nmpaQuery.or(orConditions);
+      }
+
+      const { data: nmpaData, error, count } = await nmpaQuery
+        .range(0, pageSize - 1)
+        .order('approval_date', { ascending: false });
+
+      if (!error && nmpaData) {
+        // 将NMPA结果转换为统一格式
+        const nmpaResults = nmpaData.map(n => ({
+          ...n,
+          resultType: 'nmpa_registration',
+          name: n.product_name,
+          name_zh: n.product_name_zh,
+          company_name: n.company?.name || n.company_name,
+          company_name_zh: n.company?.name_zh,
+          company_country: n.company?.country || 'China',
+          registration_summary: {
+            nmpa_count: 1
+          }
+        }));
+        allResults = [...allResults, ...nmpaResults];
+        totalCount += (count || 0);
+      }
+    }
+
     // 计算匹配分数并排序
     if (query && allResults.length > 0) {
       const queryLower = query.toLowerCase();
