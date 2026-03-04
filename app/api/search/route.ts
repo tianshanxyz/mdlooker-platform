@@ -327,6 +327,8 @@ export async function GET(request: NextRequest) {
     // 3. 搜索NMPA注册 (中国) - 通过产品/公司名称反查公司
     if ((hasChinese || detectedType === 'general' || detectedType === 'company' || source === 'nmpa') && (source === 'all' || source === 'nmpa')) {
       try {
+        console.log('[NMPA Search] Query:', query, 'hasChinese:', hasChinese, 'searchTerms:', searchTerms);
+        
         let nmpaQuery = supabase
           .from('nmpa_registrations')
           .select(`
@@ -350,6 +352,7 @@ export async function GET(request: NextRequest) {
         if (error) {
           console.error('NMPA search error:', error);
         } else if (nmpaData && nmpaData.length > 0) {
+          console.log('[NMPA Search] Found:', nmpaData.length, 'records, sample:', nmpaData.slice(0, 2));
           console.log(`NMPA found ${nmpaData.length} records`);
           
           // 提取唯一的公司（包括通过company_name查找的）
@@ -404,7 +407,7 @@ export async function GET(request: NextRequest) {
           allResults = [...allResults, ...companyResults];
           totalCount += (count || 0);
         } else {
-          console.log('NMPA: no data found');
+          console.log('[NMPA Search] No data found');
         }
       } catch (err) {
         console.error('NMPA search exception:', err);
