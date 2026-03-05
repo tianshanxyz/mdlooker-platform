@@ -329,12 +329,10 @@ export async function GET(request: NextRequest) {
       try {
         console.log('[NMPA Search] Query:', query, 'hasChinese:', hasChinese, 'searchTerms:', searchTerms);
         
+        // NMPA 表的 company_id 都是 NULL，所以不关联 companies 表
         let nmpaQuery = supabase
           .from('nmpa_registrations')
-          .select(`
-            *,
-            company:companies(*)
-          `, { count: 'exact' });
+          .select('*', { count: 'exact' });
 
         if (searchTerms.length > 0) {
           const orConditions = searchTerms.map(term => {
@@ -352,59 +350,62 @@ export async function GET(request: NextRequest) {
         if (error) {
           console.error('NMPA search error:', error);
         } else if (nmpaData && nmpaData.length > 0) {
-          console.log('[NMPA Search] Found:', nmpaData.length, 'records, sample:', nmpaData.slice(0, 2));
-          console.log(`NMPA found ${nmpaData.length} records`);
+          console.log('[NMPA Search] Found', nmpaData.length, 'records');
           
-          // 提取唯一的公司（包括通过company_name查找的）
-          const companyMap = new Map();
-          const companiesToFetch: string[] = [];
-          
+          // 提取唯一的制造商名称
+          const manufacturerNames = new Set<string>();
           nmpaData.forEach((n: any) => {
-            if (n.company && n.company.id) {
-              if (!companyMap.has(n.company.id)) {
-                companyMap.set(n.company.id, n.company);
-              }
-            } else if (n.manufacturer || n.manufacturer_zh || n.registration_holder || n.registration_holder_zh) {
-              // 如果没有关联公司，尝试通过制造商或注册持有人名称查找公司
-              const companyName = n.manufacturer_zh || n.manufacturer || n.registration_holder_zh || n.registration_holder;
-              if (companyName && !companiesToFetch.includes(companyName)) {
-                companiesToFetch.push(companyName);
-              }
-            }
+            const name = n.manufacturer_zh || n.manufacturer;
+            if (name) manufacturerNames.add(name);
           });
-
-          // 尝试通过名称查找未关联的公司
-          if (companiesToFetch.length > 0) {
-            for (const companyName of companiesToFetch) {
-              const { data: foundCompanies } = await supabase
-                .from('companies')
-                .select('*')
-                .or(`name.ilike.%${companyName}%,name_zh.ilike.%${companyName}%`)
-                .limit(1);
-              
-              if (foundCompanies && foundCompanies.length > 0) {
-                const foundCompany = foundCompanies[0];
-                if (!companyMap.has(foundCompany.id)) {
-                  companyMap.set(foundCompany.id, foundCompany);
-                }
-              }
-            }
-          }
-
-          // 为每个公司获取完整信息
-          const companyResults = await Promise.all(
-            Array.from(companyMap.values()).map(async (company: any) => {
+          
+          console.log('[NMPA Search] Manufacturers:', Array.from(manufacturerNames));
+          
+          // 为每个制造商创建公司记录
+          for (const manufacturer of Array.from(manufacturerNames)) {
+            // 先在 companies 表中查找
+            const { data: foundCompanies } = await supabase
+              .from('companies')
+              .select('*')
+              .or(`name_zh.ilike.%${manufacturer}%,name.ilike.%${manufacturer}%`)
+              .limit(1);
+            
+            if (foundCompanies && foundCompanies.length > 0) {
+              // 找到匹配的公司
+              const company = foundCompanies[0];
               const fullInfo = await getCompanyFullInfo(supabase, company.id);
-              return {
+              allResults.push({
                 ...company,
                 resultType: 'company',
                 ...fullInfo,
                 matched_via: 'nmpa_registration'
-              };
-            })
-          );
-
-          allResults = [...allResults, ...companyResults];
+              });
+            } else {
+              // 创建虚拟公司记录
+              const nmpaCount = nmpaData.filter(n => 
+                (n.manufacturer_zh || n.manufacturer) === manufacturer
+              ).length;
+              
+              allResults.push({
+                id: `nmpa_${manufacturer}`,
+                name: manufacturer,
+                name_zh: manufacturer,
+                country: 'China',
+                resultType: 'company',
+                registration_count: nmpaCount,
+                compliance_score: 50 + Math.min(nmpaCount * 2, 30),
+                markets: ['China'],
+                device_classes: ['Class II', 'Class III'],
+                regulatory_history: [],
+                registration_summary: {
+                  fda: 0, nmpa: nmpaCount, eudamed: 0, pmda: 0, hsa: 0, tga: 0,
+                  health_canada: 0, mhra: 0, ema: 0, swissmedic: 0, mfds: 0, anvisa: 0
+                },
+                matched_via: 'nmpa_registration'
+              });
+            }
+          }
+          
           totalCount += (count || 0);
         } else {
           console.log('[NMPA Search] No data found');
