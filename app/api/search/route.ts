@@ -381,28 +381,28 @@ export async function GET(request: NextRequest) {
                 matched_via: 'nmpa_registration'
               });
             } else {
-              // 创建虚拟公司记录
-              const nmpaCount = nmpaData.filter(n => 
-                (n.manufacturer_zh || n.manufacturer) === manufacturer
-              ).length;
-              
-              allResults.push({
-                id: `nmpa_${manufacturer}`,
-                name: manufacturer,
-                name_zh: manufacturer,
-                country: 'China',
-                resultType: 'company',
-                registration_count: nmpaCount,
-                compliance_score: 50 + Math.min(nmpaCount * 2, 30),
-                markets: ['China'],
-                device_classes: ['Class II', 'Class III'],
-                regulatory_history: [],
-                registration_summary: {
-                  fda: 0, nmpa: nmpaCount, eudamed: 0, pmda: 0, hsa: 0, tga: 0,
-                  health_canada: 0, mhra: 0, ema: 0, swissmedic: 0, mfds: 0, anvisa: 0
-                },
-                matched_via: 'nmpa_registration'
+              // 创建公司记录（写入数据库）
+              const createResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://www.mdlooker.com'}/api/companies/create-from-nmpa`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ manufacturer, manufacturer_zh: manufacturer })
               });
+              
+              const created = await createResponse.json();
+              
+              if (created.id) {
+                const fullInfo = await getCompanyFullInfo(supabase, created.id);
+                allResults.push({
+                  id: created.id,
+                  name: manufacturer,
+                  name_zh: manufacturer,
+                  country: 'China',
+                  resultType: 'company',
+                  ...fullInfo,
+                  matched_via: 'nmpa_registration',
+                  newly_created: created.created
+                });
+              }
             }
           }
           
