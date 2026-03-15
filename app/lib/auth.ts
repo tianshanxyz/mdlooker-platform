@@ -8,12 +8,20 @@ export interface Permission {
   allowed: boolean;
 }
 
+// 调试模式开关 - 设置为 true 时，所有用户都有 VIP 权限
+const DEBUG_MODE = process.env.NEXT_PUBLIC_DEBUG_MODE === 'true';
+
 // Check if user has permission
 export async function checkPermission(
   userId: string | undefined,
   resource: string,
   action: string
 ): Promise<boolean> {
+  // 调试模式：允许所有权限
+  if (DEBUG_MODE) {
+    return true;
+  }
+
   if (!userId) {
     // Guest users - check guest permissions
     return checkGuestPermission(resource, action);
@@ -59,6 +67,9 @@ async function checkGuestPermission(resource: string, action: string): Promise<b
 
 // Get user role
 export async function getUserRole(userId: string | undefined): Promise<UserRole> {
+  // 调试模式：所有人都是 VIP
+  if (DEBUG_MODE) return 'vip';
+  
   if (!userId) return 'guest';
 
   const supabase = createClient();
