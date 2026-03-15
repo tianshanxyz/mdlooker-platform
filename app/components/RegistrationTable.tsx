@@ -36,7 +36,8 @@ export function RegistrationTable({ registrations, title, isZh, emptyMessage }: 
   }
 
   const getExpiryDate = (reg: RegistrationItem) => {
-    return reg.expiry_date || reg.valid_until || reg.certificate_expiry_date;
+    // NMPA 使用 expiration_date，其他可能使用 expiry_date 或 valid_until
+    return reg.expiration_date || reg.expiry_date || reg.valid_until || reg.certificate_expiry_date;
   };
 
   const getStatus = (reg: RegistrationItem) => {

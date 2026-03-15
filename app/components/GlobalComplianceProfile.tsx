@@ -256,6 +256,39 @@ export default function GlobalComplianceProfile({ companyId, locale, complianceD
                         {reg.approval_date && (
                           <p>Approval Date: {new Date(reg.approval_date).toLocaleDateString()}</p>
                         )}
+                        {/* Expiration Date with Status */}
+                        {(() => {
+                          const expiryDate = reg.expiration_date || reg.expiry_date || reg.valid_until || reg.certificate_expiry_date;
+                          if (!expiryDate) return null;
+                          
+                          const now = new Date();
+                          const expiry = new Date(expiryDate);
+                          const diffMs = expiry.getTime() - now.getTime();
+                          const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+                          
+                          let statusColor = 'text-green-600';
+                          let statusText = isZh ? '有效' : 'Active';
+                          let statusIcon = '✓';
+                          
+                          if (diffDays < 0) {
+                            statusColor = 'text-red-600 font-semibold';
+                            statusText = isZh ? '已过期' : 'Expired';
+                            statusIcon = '✗';
+                          } else if (diffDays < 180) {
+                            statusColor = 'text-orange-600 font-semibold';
+                            statusText = isZh ? `即将到期 (${diffDays}天)` : `Expiring (${diffDays}d)`;
+                            statusIcon = '⚠';
+                          }
+                          
+                          return (
+                            <div className="flex items-center gap-2">
+                              <p>Expiration Date: <span className={statusColor}>{new Date(expiryDate).toLocaleDateString()}</span></p>
+                              <span className={`text-xs ${statusColor}`}>
+                                {statusIcon} {statusText}
+                              </span>
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
                     
