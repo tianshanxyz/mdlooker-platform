@@ -62,16 +62,16 @@
   - [x] 显示已收藏公司列表
   - [x] 显示通知数量统计
 
-### Task 6: 基础数据统计
-- [ ] **Task 6.1**: 各国注册数量统计 API
-  - [ ] 实现 `/api/stats/country-summary`
-  - [ ] 按月/年聚合数据
-  - [ ] 添加缓存（5 分钟）
+### Task 6: 基础数据统计 ✅
+- [x] **Task 6.1**: 各国注册数量统计 API
+  - [x] 实现 `/api/stats`（支持 country-summary, monthly-trend, company-stats）
+  - [x] 按月/年聚合数据
+  - [ ] 添加缓存（5 分钟）- 可选优化
   
-- [ ] **Task 6.2**: 简单图表展示
-  - [ ] 安装 Chart.js 或 Recharts
-  - [ ] 创建统计图表组件
-  - [ ] 在首页或独立页面展示
+- [x] **Task 6.2**: 简单图表展示
+  - [x] 安装 Chart.js 和 react-chartjs-2
+  - [x] 创建统计图表组件（CountrySummaryChart, MonthlyTrendChart）
+  - [x] 创建独立统计页面 `/stats`
 
 ## 第三阶段：智能化与可视化（3-4 周）
 
