@@ -224,6 +224,8 @@ export async function GET(request: NextRequest) {
   const page = parseInt(searchParams.get('page') || '1', 10);
   const pageSize = parseInt(searchParams.get('pageSize') || '10', 10);
   const country = searchParams.get('country');
+  const certificateStatus = searchParams.get('certificateStatus');
+  const companyType = searchParams.get('companyType');
   const hasFDA = searchParams.get('hasFDA') === 'true';
   const hasNMPA = searchParams.get('hasNMPA') === 'true';
   const hasEUDAMED = searchParams.get('hasEUDAMED') === 'true';
