@@ -5,7 +5,8 @@ import { useSearchParams, useRouter, useParams } from 'next/navigation';
 import { translations, locales, type Locale } from '../../i18n-config';
 import { SearchFiltersComponent } from '../components/SearchFilters';
 import { Pagination } from '../components/Pagination';
-import { Building2, Package, ScanBarcode, AlertCircle, ChevronRight } from 'lucide-react';
+import { ExportButton } from '../components/ExportButton';
+import { Building2, Package, ScanBarcode, AlertCircle, ChevronRight, Download } from 'lucide-react';
 
 interface SearchResult {
   id: string;
@@ -168,16 +169,29 @@ export default function SearchPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* 页面标题 */}
+        {/* 页面标题和导出 */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {isZh ? '搜索结果' : 'Search Results'}
-          </h1>
-          {results && (
-            <p className="text-gray-600">
-              {isZh ? `找到 ${results.total} 条与 "${results.query}" 相关的结果` : `Found ${results.total} results for "${results.query}"`}
-            </p>
-          )}
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                {isZh ? '搜索结果' : 'Search Results'}
+              </h1>
+              {results && (
+                <p className="text-gray-600">
+                  {isZh ? `找到 ${results.total} 条与 "${results.query}" 相关的结果` : `Found ${results.total} results for "${results.query}"`}
+                </p>
+              )}
+            </div>
+            
+            {/* 导出按钮 */}
+            {results && results.results.length > 0 && (
+              <ExportButton
+                type="search"
+                query={results.query}
+                className="flex-shrink-0"
+              />
+            )}
+          </div>
         </div>
 
         {/* 筛选器 */}
