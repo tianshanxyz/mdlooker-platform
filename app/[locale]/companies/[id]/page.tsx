@@ -84,21 +84,14 @@ interface CompanyDetail {
 
 export default function CompanyDetailPage() {
   const params = useParams();
-  const [locale, setLocale] = useState<Locale>('en');
-  const [companyId, setCompanyId] = useState<string>('');
+  const locale = (params?.locale as Locale) || 'en';
+  const companyId = (params?.id as string) || '';
   const [company, setCompany] = useState<CompanyDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'registrations' | 'ip' | 'risk' | 'branches'>('overview');
 
-  // Get companyId from URL params
-  useEffect(() => {
-    const id = params?.id as string;
-    if (id) {
-      setCompanyId(id);
-    }
-  }, [params]);
-
+  // Fetch company data
   useEffect(() => {
     if (!companyId) return;
 
@@ -122,24 +115,34 @@ export default function CompanyDetailPage() {
 
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto px-6 py-20 text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#339999] mx-auto"></div>
-        <p className="mt-4 text-slate-600">
-          {locale === 'en' ? 'Loading...' : '加载中...'}
-        </p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50 to-slate-100">
+        <div className="max-w-6xl mx-auto px-6 py-20 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#339999] mx-auto"></div>
+          <p className="mt-4 text-slate-600">
+            {locale === 'en' ? 'Loading...' : '加载中...'}
+          </p>
+        </div>
       </div>
     );
   }
 
   if (error || !company) {
     return (
-      <div className="max-w-6xl mx-auto px-6 py-20 text-center">
-        <p className="text-red-600">
-          {locale === 'en' ? 'Company not found' : '未找到企业'}
-        </p>
-        <Link href={`/${locale}`} className="text-[#339999] hover:underline mt-4 inline-block">
-          {locale === 'en' ? '← Back to Home' : '← 返回首页'}
-        </Link>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50 to-slate-100">
+        <div className="max-w-6xl mx-auto px-6 py-20 text-center">
+          <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p className="text-xl text-gray-500 mb-4">
+            {locale === 'en' ? 'Company not found' : '未找到企业'}
+          </p>
+          <Link href={`/${locale}/search`} className="text-[#339999] hover:underline inline-flex items-center gap-2">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            {locale === 'en' ? 'Back to Search' : '返回搜索'}
+          </Link>
+        </div>
       </div>
     );
   }
@@ -169,35 +172,43 @@ export default function CompanyDetailPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12">
-      <Link href={`/${locale}`} className="text-[#339999] hover:underline mb-6 inline-block">
-        {locale === 'en' ? '← Back to Search' : '← 返回搜索'}
-      </Link>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50 to-slate-100">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-[#339999] to-[#2a7a7a] text-white py-12">
+        <div className="max-w-6xl mx-auto px-6">
+          <Link href={`/${locale}/search`} className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-4 transition-colors">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            {locale === 'en' ? 'Back to Search' : '返回搜索'}
+          </Link>
 
-      {/* Company Header */}
-      <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 border border-slate-100">
-        <div className="flex justify-between items-start mb-6">
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold text-slate-900">{company.name}</h1>
-            {company.name_zh && (
-              <p className="text-xl text-slate-600 mt-1">{company.name_zh}</p>
-            )}
+          <h1 className="text-4xl font-bold mb-2">{company.name}</h1>
+          {company.name_zh && (
+            <p className="text-xl text-white/90">{company.name_zh}</p>
+          )}
+          
+          <div className="flex flex-wrap gap-3 mt-4">
             {company.business_status && (
-              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mt-3 ${
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
                 company.business_status === 'Active' 
-                  ? 'bg-green-100 text-green-800' 
-                  : 'bg-slate-100 text-slate-800'
+                  ? 'bg-green-500/30 text-white' 
+                  : 'bg-white/20 text-white'
               }`}>
                 {company.business_status}
               </span>
             )}
+            {company.country && (
+              <span className="bg-white/20 text-white px-4 py-1 rounded-full text-sm font-medium">
+                {company.country}
+              </span>
+            )}
           </div>
-          {company.country && (
-            <span className="bg-[#339999]/10 text-[#339999] px-4 py-2 rounded-full text-sm font-medium">
-              {company.country}
-            </span>
-          )}
         </div>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-6xl mx-auto px-6 py-8">
 
         {/* Quick Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
