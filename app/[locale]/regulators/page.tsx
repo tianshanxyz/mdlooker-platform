@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useLocale } from 'next-intl';
 import ExportButton from '../../components/ExportButton';
 
 // 监管机构数据类型
@@ -182,7 +181,7 @@ const mockAgencies: RegulatoryAgency[] = [
 
 export default function RegulatorsPage() {
   const params = useParams();
-  const locale = useLocale();
+  const locale = (params?.locale as string) || 'zh';
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCountry, setSelectedCountry] = useState<string>('all');
   const [selectedType, setSelectedType] = useState<string>('all');

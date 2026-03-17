@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useLocale } from 'next-intl';
 
 // 筛选器配置类型
 export interface FilterOption {
@@ -28,6 +27,7 @@ interface AdvancedFiltersProps {
   onReset?: () => void;
   totalResults?: number;
   compact?: boolean;
+  locale?: string;
 }
 
 export default function AdvancedFilters({
@@ -37,8 +37,8 @@ export default function AdvancedFilters({
   onReset,
   totalResults,
   compact = false,
+  locale = 'zh',
 }: AdvancedFiltersProps) {
-  const locale = useLocale();
   const [isExpanded, setIsExpanded] = useState(!compact);
 
   const t = {

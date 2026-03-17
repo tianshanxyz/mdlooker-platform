@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
-import { useLocale } from 'next-intl';
 import Link from 'next/link';
 import AdvancedFilters, { type FilterConfig } from '../../components/AdvancedFilters';
 import ExportButton from '../../components/ExportButton';
@@ -22,7 +21,7 @@ interface SearchResult {
 export default function SearchPage() {
   const params = useParams();
   const searchParams = useSearchParams();
-  const locale = useLocale();
+  const locale = (params?.locale as string) || 'zh';
   
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [resultType, setResultType] = useState<'all' | 'company' | 'product' | 'regulator'>('all');

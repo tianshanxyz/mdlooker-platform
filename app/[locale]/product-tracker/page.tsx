@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useLocale } from 'next-intl';
 
 // 产品类型
 interface Product {
@@ -112,7 +111,7 @@ const countryFlags: Record<string, string> = {
 
 export default function ProductTrackerPage() {
   const params = useParams();
-  const locale = useLocale();
+  const locale = (params?.locale as string) || 'zh';
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');

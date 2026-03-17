@@ -1,7 +1,6 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useLocale } from 'next-intl';
 import Link from 'next/link';
 
 // 模拟产品详情数据
@@ -150,7 +149,7 @@ const mockTimeline = [
 
 export default function ProductDetailPage() {
   const params = useParams();
-  const locale = useLocale();
+  const locale = (params?.locale as string) || 'zh';
 
   const t = {
     backToList: locale === 'zh' ? '返回列表' : 'Back to List',
