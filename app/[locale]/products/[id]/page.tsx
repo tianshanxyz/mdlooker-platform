@@ -182,9 +182,9 @@ export default function ProductDetailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50 to-slate-100">
+      {/* Header - 统一使用网站主色调 #339999 */}
+      <div className="bg-gradient-to-r from-[#339999] to-[#2a7a7a] text-white py-12">
         <div className="max-w-6xl mx-auto px-6">
           <Link
             href={`/${params.locale}/product-tracker`}
@@ -225,7 +225,7 @@ export default function ProductDetailPage() {
             {/* Product Overview */}
             <div className="bg-white rounded-2xl shadow-lg p-6">
               <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 text-[#339999]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 {t.overview}
@@ -251,7 +251,7 @@ export default function ProductDetailPage() {
             {/* Global Registrations */}
             <div className="bg-white rounded-2xl shadow-lg p-6">
               <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 text-[#339999]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
                 </svg>
                 {t.globalRegistrations}
@@ -303,7 +303,7 @@ export default function ProductDetailPage() {
             {/* Timeline */}
             <div className="bg-white rounded-2xl shadow-lg p-6">
               <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 text-[#339999]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 {t.registrationTimeline}
@@ -312,13 +312,13 @@ export default function ProductDetailPage() {
               <div className="relative">
                 <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
                 <div className="space-y-4">
-                  {mockTimeline.map((event, idx) => (
+                  {mockTimeline.map((event) => (
                     <div key={event.id} className="relative flex gap-4">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center z-10 ${
                         event.event_type === 'approval' 
-                          ? 'bg-green-500 text-white'
+                          ? 'bg-[#339999] text-white'
                           : event.event_type === 'renewal'
-                          ? 'bg-blue-500 text-white'
+                          ? 'bg-[#2a7a7a] text-white'
                           : 'bg-gray-500 text-white'
                       }`}>
                         {event.event_type === 'approval' && (
@@ -376,7 +376,7 @@ export default function ProductDetailPage() {
               <div className="space-y-4">
                 <div>
                   <p className="text-sm text-gray-500 mb-1">{t.totalCountries}</p>
-                  <p className="text-3xl font-bold text-blue-600">{mockRegistrations.length}</p>
+                  <p className="text-3xl font-bold text-[#339999]">{mockRegistrations.length}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500 mb-1">{t.firstApproval}</p>
@@ -394,16 +394,20 @@ export default function ProductDetailPage() {
               <h3 className="text-lg font-bold text-gray-900 mb-4">{t.manufacturer}</h3>
               <div className="space-y-3">
                 <div>
-                  <p className="text-sm text-gray-500 mb-1">公司名称</p>
+                  <p className="text-sm text-gray-500 mb-1">
+                    {locale === 'zh' ? '公司名称' : 'Company Name'}
+                  </p>
                   <p className="text-gray-900 font-medium">{mockProduct.manufacturer_name}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 mb-1">国家</p>
+                  <p className="text-sm text-gray-500 mb-1">
+                    {locale === 'zh' ? '国家' : 'Country'}
+                  </p>
                   <p className="text-gray-900">{mockProduct.manufacturer_country}</p>
                 </div>
                 <Link
                   href={`/${params.locale}/companies/${mockProduct.company_id}`}
-                  className="block w-full text-center py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:shadow-lg hover:shadow-blue-600/30 transition-all font-medium"
+                  className="block w-full text-center py-2.5 bg-gradient-to-r from-[#339999] to-[#2a7a7a] text-white rounded-xl hover:shadow-lg hover:shadow-[#339999]/30 transition-all font-medium"
                 >
                   {t.viewCompany}
                 </Link>
