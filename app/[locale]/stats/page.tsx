@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { translations, locales, type Locale } from '../../i18n-config';
-import { CountrySummaryChart, MonthlyTrendChart } from '../components/StatsCharts';
+import { CountrySummaryChart, MonthlyTrendChart } from '../../components/StatsCharts';
 import { BarChart3, TrendingUp, Building2, Globe } from 'lucide-react';
 
 interface CountrySummary {

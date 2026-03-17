@@ -36,8 +36,8 @@ async function fixNMPAData() {
     }
     
     // 去重
-    const manufacturerSet = new Set();
-    const manufacturers = [];
+    const manufacturerSet = new Set<string>();
+    const manufacturers: { manufacturer_zh: string | null; manufacturer: string | null }[] = [];
     
     uniqueManufacturers.forEach(item => {
       const name = item.manufacturer_zh || item.manufacturer;

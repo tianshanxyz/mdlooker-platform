@@ -208,7 +208,7 @@ async function getAllCompaniesStats(supabase: any) {
     `)
     .limit(20);
   
-  const stats = (companies || []).map(c => ({
+  const stats = (companies || []).map((c: any) => ({
     id: c.id,
     name: c.name,
     name_zh: c.name_zh,
@@ -219,7 +219,7 @@ async function getAllCompaniesStats(supabase: any) {
     total: ((c.nmpa_registrations as any[])?.[0]?.count || 0) +
            ((c.fda_registrations as any[])?.[0]?.count || 0) +
            ((c.eudamed_registrations as any[])?.[0]?.count || 0)
-  })).sort((a, b) => b.total - a.total);
+  })).sort((a: any, b: any) => b.total - a.total);
   
   return {
     companies: stats,

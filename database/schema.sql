@@ -181,7 +181,8 @@ CREATE INDEX IF NOT EXISTS idx_nmpa_product_name ON nmpa_registrations USING gin
 CREATE INDEX IF NOT EXISTS idx_pmda_product_name ON pmda_registrations USING gin(to_tsvector('simple', COALESCE(product_name_jp, '')::text));
 CREATE INDEX IF NOT EXISTS idx_health_canada_device_name ON health_canada_registrations USING gin(to_tsvector('english', COALESCE(device_name, '')::text));
 
--- 更新时间触发器
+-- 更新时间触发器函数
+-- 使用 CREATE OR REPLACE 避免函数已存在的错误
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -190,6 +191,16 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
+-- 删除已存在的触发器（避免重复创建错误）
+DROP TRIGGER IF EXISTS update_companies_updated_at ON companies;
+DROP TRIGGER IF EXISTS update_fda_registrations_updated_at ON fda_registrations;
+DROP TRIGGER IF EXISTS update_nmpa_registrations_updated_at ON nmpa_registrations;
+DROP TRIGGER IF EXISTS update_eudamed_registrations_updated_at ON eudamed_registrations;
+DROP TRIGGER IF EXISTS update_pmda_registrations_updated_at ON pmda_registrations;
+DROP TRIGGER IF EXISTS update_health_canada_registrations_updated_at ON health_canada_registrations;
+DROP TRIGGER IF EXISTS update_products_updated_at ON products;
+
+-- 创建触发器
 CREATE TRIGGER update_companies_updated_at BEFORE UPDATE ON companies
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 

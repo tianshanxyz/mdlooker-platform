@@ -1,17 +1,29 @@
-# EUDAMED & NMPA 爬虫依赖
+# MDLooker 数据采集脚本依赖
+# 使用方法：pip install -r requirements.txt
 
-# 浏览器自动化
-playwright>=1.40.0
-
-# 数据库
-supabase>=2.0.0
-
-# 工具
-python-dotenv>=1.0.0
+# HTTP 请求库
 requests>=2.31.0
+
+# HTML 解析（用于 NMPA 等网页爬虫）
 beautifulsoup4>=4.12.0
 lxml>=4.9.0
 
-# 数据处理
-pandas>=2.0.0
-openpyxl>=3.1.0
+# 数据库连接（可选，用于数据入库）
+# psycopg2-binary>=2.9.0  # PostgreSQL
+# sqlalchemy>=2.0.0       # ORM
+
+# 日志增强（可选）
+# colorlog>=6.7.0
+
+# 配置文件管理（可选）
+# python-dotenv>=1.0.0
+
+# 数据处理（可选）
+# pandas>=2.0.0
+
+# 报告生成（任务 20）
+jinja2>=3.1.0
+
+# 测试
+# pytest>=7.4.0
+# pytest-cov>=4.1.0

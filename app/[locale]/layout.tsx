@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { locales, type Locale } from '../i18n-config';
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
 import PageLoader from '../components/PageLoader';
 import Breadcrumb from '../components/Breadcrumb';
 import Footer from '../components/Footer';
@@ -18,6 +19,7 @@ export default function LocaleLayout({
 }) {
   const pathname = usePathname();
   const locale = params.locale as Locale;
+  const { data: session } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   if (!(locales as readonly string[]).includes(locale)) {
@@ -27,9 +29,11 @@ export default function LocaleLayout({
   const navItems = [
     { href: `/${locale}`, labelEn: 'Home', labelZh: '首页' },
     { href: `/${locale}/compliance-profile`, labelEn: 'Compliance Profile', labelZh: '合规档案' },
+    { href: `/${locale}/product-tracker`, labelEn: 'Product Tracker', labelZh: '产品追踪' },
     { href: `/${locale}/market-access`, labelEn: 'Market Access', labelZh: '准入导航' },
+    { href: `/${locale}/regulators`, labelEn: 'Regulators', labelZh: '监管数据库' },
     { href: `/${locale}/guides`, labelEn: 'Guides', labelZh: '指南' },
-    { href: `/${locale}/compare`, labelEn: 'Compare', labelZh: '企业对比' },
+    { href: `/${locale}/toolkit`, labelEn: 'Toolkit', labelZh: '工具箱' },
   ];
 
   // 用户工具菜单（监控、统计）
@@ -110,7 +114,7 @@ export default function LocaleLayout({
             </div>
           </div>
           
-          {/* Right side: Language switcher + Mobile menu button */}
+          {/* Right side: Language switcher + User menu + Mobile menu button */}
           <div className="flex items-center gap-2">
             {/* Language switcher - always visible */}
             <div className="hidden sm:flex gap-1 p-1 bg-slate-100 rounded-xl">
@@ -128,6 +132,43 @@ export default function LocaleLayout({
                 </Link>
               ))}
             </div>
+            
+            {/* User menu - show when logged in */}
+            {session && (
+              <div className="relative group hidden sm:block">
+                <button className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-[#339999]/10 transition-colors">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#339999] to-[#2a7a7a] flex items-center justify-center text-white text-sm font-bold">
+                    {session.user?.name?.charAt(0) || session.user?.email?.charAt(0) || 'U'}
+                  </div>
+                  <svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right z-50">
+                  <div className="py-2">
+                    <Link
+                      href={`/${locale}/profile/dashboard`}
+                      className="px-4 py-2 text-sm text-gray-700 hover:bg-[#339999]/10 hover:text-[#339999] flex items-center gap-2 transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      <span>{locale === 'zh' ? '个人中心' : 'Dashboard'}</span>
+                    </Link>
+                    <Link
+                      href={`/${locale}/profile`}
+                      className="px-4 py-2 text-sm text-gray-700 hover:bg-[#339999]/10 hover:text-[#339999] flex items-center gap-2 transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      <span>{locale === 'zh' ? '个人设置' : 'Settings'}</span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
             
             {/* Mobile menu button */}
             <button 
