@@ -209,6 +209,20 @@ export function getPageSEO(page: string, locale: string = 'zh', params?: Record<
         canonical,
       };
 
+    case 'toolkit':
+      return {
+        title: locale === 'zh'
+          ? '工具箱 - MDLooker'
+          : 'Toolkit - MDLooker',
+        description: locale === 'zh'
+          ? 'MDLooker工具箱提供各种医疗器械合规数据查询工具，包括合规档案、产品追踪、监管机构查询等。'
+          : 'MDLooker toolkit provides various medical device compliance data query tools.',
+        keywords: locale === 'zh'
+          ? '工具箱,合规查询,产品追踪,监管机构,市场准入,法规指南'
+          : 'toolkit,compliance search,product tracker,regulators,market access,guides',
+        canonical,
+      };
+
     default:
       return {
         ...defaultSEO,
