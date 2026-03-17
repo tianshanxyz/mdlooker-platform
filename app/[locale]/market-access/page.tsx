@@ -13,6 +13,8 @@ import {
   type MarketAccessPathway,
 } from '@/app/lib/market-access-data';
 import { checkPermission, trackDownload } from '@/app/lib/auth';
+import { MarketAccessPDF, generateAndDownloadPDF } from '@/app/components/PDFTemplates';
+import { generateReportId, trackReportDownload } from '@/app/lib/report-tracking';
 
 // Download icon component
 function DownloadIcon({ className }: { className?: string }) {
@@ -153,7 +155,7 @@ export default function MarketAccessPage() {
     return locale === 'zh' ? market?.nameZh : market?.name;
   };
 
-  // Generate and download pathway report
+  // Generate and download pathway report as PDF
   const downloadPathwayReport = async () => {
     if (!pathway) return;
 
@@ -171,82 +173,43 @@ export default function MarketAccessPage() {
       return;
     }
 
-    // Track download
-    if (session?.user?.id) {
-      await trackDownload(
-        session.user.id,
-        'market_access_report',
-        targetMarket,
-        `market-access-pathway-${targetMarket}.md`
-      );
-    }
+    // Generate report ID
+    const reportId = generateReportId('MAP');
 
+    // Track download in database
+    await trackReportDownload(
+      reportId,
+      session?.user?.id || null,
+      'MAP',
+      targetMarket,
+      {
+        productCategory,
+        sourceCountry,
+        deviceClass,
+        pathway: pathway.targetMarket,
+      }
+    );
+
+    // Get display names
     const categoryName = productCategories.find((c: { id: string; name: string; nameZh: string }) => c.id === productCategory);
     const countryName = sourceCountries.find((c: { id: string; name: string; nameZh: string }) => c.id === sourceCountry);
     const marketName = targetMarkets.find((m: { id: string; name: string; nameZh: string }) => m.id === targetMarket);
     const className = deviceClasses.find((c: { id: string; name: string; nameZh: string }) => c.id === deviceClass);
 
-    const reportContent = `
-# ${locale === 'en' ? 'Market Access Pathway Report' : '市场准入路径报告'}
-## ${pathway.targetMarket} - ${locale === 'zh' ? pathway.targetMarketZh : pathway.targetMarket}
+    // Generate PDF
+    const pdfComponent = (
+      <MarketAccessPDF
+        pathway={pathway}
+        productCategory={(locale === 'zh' ? categoryName?.nameZh : categoryName?.name) || productCategory}
+        sourceCountry={(locale === 'zh' ? countryName?.nameZh : countryName?.name) || sourceCountry}
+        targetMarket={(locale === 'zh' ? marketName?.nameZh : marketName?.name) || targetMarket}
+        deviceClass={(locale === 'zh' ? className?.nameZh : className?.name) || deviceClass}
+        locale={locale}
+      />
+    );
 
----
-
-### ${locale === 'en' ? 'Product Information' : '产品信息'}
-- **${locale === 'en' ? 'Category' : '类别'}:** ${locale === 'zh' ? categoryName?.nameZh : categoryName?.name}
-- **${locale === 'en' ? 'Source Country' : '来源国'}:** ${locale === 'zh' ? countryName?.nameZh : countryName?.name}
-- **${locale === 'en' ? 'Target Market' : '目标市场'}:** ${locale === 'zh' ? marketName?.nameZh : marketName?.name}
-- **${locale === 'en' ? 'Device Class' : '设备分类'}:** ${locale === 'zh' ? className?.nameZh : className?.name}
-
----
-
-### ${locale === 'en' ? 'Requirements Summary' : '要求概要'}
-- **${locale === 'en' ? 'Total Steps' : '总步骤'}:** ${pathway.requirements.length}
-- **${locale === 'en' ? 'Local Representative Required' : '需要本地代表'}:** ${pathway.localRepresentativeRequired ? (locale === 'en' ? 'Yes' : '是') : (locale === 'en' ? 'No' : '否')}
-- **${locale === 'en' ? 'Clinical Data Required' : '需要临床数据'}:** ${pathway.clinicalDataRequired ? (locale === 'en' ? 'Yes' : '是') : (locale === 'en' ? 'No' : '否')}
-
----
-
-### ${locale === 'en' ? 'Access Pathway Steps' : '准入路径步骤'}
-${pathway.requirements.map((req: { step: number; title: string; titleZh: string; description: string; descriptionZh: string; documents: string[]; documentsZh: string[]; timeline: string; timelineZh: string; cost: string; costZh: string }) => `
-#### ${locale === 'zh' ? req.titleZh : req.title}
-**${locale === 'en' ? 'Step' : '步骤'} ${req.step}**
-
-${locale === 'zh' ? req.descriptionZh : req.description}
-
-**${locale === 'en' ? 'Required Documents' : '所需文件'}:**
-${(locale === 'zh' ? req.documentsZh : req.documents).map((doc: string) => `- ${doc}`).join('\n')}
-
-- **${locale === 'en' ? 'Timeline' : '时间'}:** ${locale === 'zh' ? req.timelineZh : req.timeline}
-- **${locale === 'en' ? 'Estimated Cost' : '预估成本'}:** ${locale === 'zh' ? req.costZh : req.cost}
-`).join('\n---\n')}
-
----
-
-### ${locale === 'en' ? 'Key Regulations' : '核心法规'}
-${(locale === 'zh' ? pathway.keyRegulationsZh : pathway.keyRegulations).map((reg: string, idx: number) => `${idx + 1}. ${reg}`).join('\n')}
-
----
-
-### ${locale === 'en' ? 'Regulation Links' : '法规链接'}
-${pathway.regulationLinks.map((link: { name: string; nameZh: string; url: string; description?: string; descriptionZh?: string }) => `- **${locale === 'zh' ? link.nameZh : link.name}**: ${link.url}
-  ${locale === 'zh' ? (link.descriptionZh || '') : (link.description || '')}`).join('\n')}
-
----
-
-*${locale === 'en' ? 'Report generated by MDLooker Market Access Navigator' : '报告由MDLooker市场准入导航生成'}*
-*${new Date().toLocaleString()}*
-`;
-
-    const blob = new Blob([reportContent], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `market-access-pathway-${targetMarket}-${new Date().toISOString().split('T')[0]}.md`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    const filename = `mdlooker-map-${targetMarket.toLowerCase()}-${new Date().toISOString().split('T')[0]}-${reportId.split('-').pop()}.pdf`;
+    await generateAndDownloadPDF(pdfComponent, filename);
   };
 
   return (
