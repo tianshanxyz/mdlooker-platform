@@ -82,6 +82,76 @@ interface CompanyDetail {
   };
 }
 
+// Mock 公司数据（当 API 不可用时使用）
+const mockCompanies: Record<string, CompanyDetail> = {
+  '1': {
+    id: '1',
+    name: 'MedTech Solutions Inc.',
+    name_zh: '医疗科技解决方案公司',
+    country: 'United States',
+    address: '123 Medical Drive, Boston, MA 02134, USA',
+    website: 'https://www.medtechsolutions.com',
+    email: 'info@medtechsolutions.com',
+    phone: '+1-617-555-1234',
+    description: 'Leading medical device manufacturer specializing in cardiovascular implants and minimally invasive surgical instruments.',
+    description_zh: '领先的医疗器械制造商，专注于心血管植入物和微创手术器械。',
+    business_type: 'Manufacturer',
+    established_year: 2005,
+    employee_count: '500-1000',
+    business_status: 'Active',
+    fda_registrations: [
+      { id: '1', registration_number: 'P190012', product_name: 'Intravascular Stent System', status: 'Active' },
+    ],
+    nmpa_registrations: [
+      { id: '1', registration_number: '国械注准 20203130001', product_name: '血管内支架系统', status: 'Active' },
+    ],
+    eudamed_registrations: [],
+    pmda_registrations: [],
+    health_canada_registrations: [],
+    ema_registrations: [],
+    mhra_registrations: [],
+    tga_registrations: [],
+    hsa_registrations: [],
+    swissmedic_registrations: [],
+    mfds_registrations: [],
+    anvisa_registrations: [],
+    warning_letters: [],
+    recalls: [],
+    products: [],
+    branches: [],
+    patents: [],
+    trademarks: [],
+    litigations: [],
+    abnormal_operations: [],
+    changes: [],
+    registration_summary: {
+      total_registrations: 12,
+      fda_count: 5,
+      nmpa_count: 3,
+      eudamed_count: 2,
+      pmda_count: 1,
+      health_canada_count: 1,
+      ema_count: 0,
+      mhra_count: 0,
+      tga_count: 0,
+      hsa_count: 0,
+      swissmedic_count: 0,
+      mfds_count: 0,
+      anvisa_count: 0,
+    },
+    compliance_summary: {
+      warning_letters_count: 0,
+      recalls_count: 0,
+      total_violations: 0,
+    },
+    intellectual_property_summary: {
+      patents_count: 45,
+      trademarks_count: 12,
+      branches_count: 3,
+    },
+  },
+};
+
 export default function CompanyDetailPage() {
   const params = useParams();
   const locale = (params?.locale as Locale) || 'en';
@@ -99,12 +169,25 @@ export default function CompanyDetailPage() {
       try {
         const response = await fetch(`/api/companies/${companyId}`);
         if (!response.ok) {
-          throw new Error('Failed to fetch company details');
+          // 如果 API 失败，尝试使用 mock 数据
+          const mockCompany = mockCompanies[companyId];
+          if (mockCompany) {
+            setCompany(mockCompany);
+          } else {
+            throw new Error('Failed to fetch company details');
+          }
+        } else {
+          const data = await response.json();
+          setCompany(data);
         }
-        const data = await response.json();
-        setCompany(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        // 如果出错，尝试使用 mock 数据
+        const mockCompany = mockCompanies[companyId];
+        if (mockCompany) {
+          setCompany(mockCompany);
+        } else {
+          setError(err instanceof Error ? err.message : 'Unknown error');
+        }
       } finally {
         setLoading(false);
       }

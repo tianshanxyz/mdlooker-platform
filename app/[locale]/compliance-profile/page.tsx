@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { locales, type Locale } from '../../i18n-config';
 import { Building2, Package, ScanBarcode, Shield } from 'lucide-react';
@@ -8,14 +7,7 @@ import { Building2, Package, ScanBarcode, Shield } from 'lucide-react';
 export default function ComplianceProfilePage() {
   const params = useParams();
   const router = useRouter();
-  const [locale, setLocale] = useState<Locale>('en');
-
-  useState(() => {
-    const localeParam = params?.locale as string;
-    if (localeParam && locales.includes(localeParam as Locale)) {
-      setLocale(localeParam as Locale);
-    }
-  });
+  const locale = (params?.locale as Locale) || 'en';
 
   const isZh = locale === 'zh';
 
