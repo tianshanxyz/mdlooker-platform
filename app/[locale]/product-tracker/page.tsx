@@ -22,7 +22,23 @@ interface Product {
   company_name: string;
 }
 
-// 模拟数据
+// 扩展的类别列表（12个类别）
+const categories = [
+  { id: 'cardiovascular', nameEn: 'Cardiovascular Implants', nameZh: '心血管植入物' },
+  { id: 'orthopedic', nameEn: 'Orthopedic Devices', nameZh: '骨科器械' },
+  { id: 'surgical', nameEn: 'Surgical Instruments', nameZh: '手术器械' },
+  { id: 'imaging', nameEn: 'Medical Imaging', nameZh: '医学影像设备' },
+  { id: 'diagnostic', nameEn: 'In Vitro Diagnostics', nameZh: '体外诊断设备' },
+  { id: 'dental', nameEn: 'Dental Devices', nameZh: '牙科器械' },
+  { id: 'ophthalmic', nameEn: 'Ophthalmic Devices', nameZh: '眼科器械' },
+  { id: 'neurological', nameEn: 'Neurological Devices', nameZh: '神经外科器械' },
+  { id: 'robotic', nameEn: 'Surgical Robots', nameZh: '手术机器人' },
+  { id: 'patient-monitoring', nameEn: 'Patient Monitoring', nameZh: '患者监护设备' },
+  { id: 'consumables', nameEn: 'Medical Consumables', nameZh: '医用耗材' },
+  { id: 'rehabilitation', nameEn: 'Rehabilitation Devices', nameZh: '康复器械' },
+];
+
+// 扩展的模拟数据
 const mockProducts: Product[] = [
   {
     id: '1',
@@ -31,7 +47,7 @@ const mockProducts: Product[] = [
     product_name_zh: '血管内支架系统',
     model_number: 'STS-2024',
     udi_di: '00643169007221',
-    product_category: '心血管植入物',
+    product_category: 'cardiovascular',
     manufacturer_name: 'MedTech Solutions Inc.',
     manufacturer_country: 'United States',
     registration_status: 'active',
@@ -47,7 +63,7 @@ const mockProducts: Product[] = [
     product_name_zh: '数字化 X 射线成像系统',
     model_number: 'XR-5000',
     udi_di: '00643169007238',
-    product_category: '医学影像设备',
+    product_category: 'imaging',
     manufacturer_name: 'Global Imaging Corp.',
     manufacturer_country: 'Germany',
     registration_status: 'active',
@@ -63,7 +79,7 @@ const mockProducts: Product[] = [
     product_name_zh: '血糖监测系统',
     model_number: 'BGM-300',
     udi_di: '00643169007245',
-    product_category: '体外诊断设备',
+    product_category: 'diagnostic',
     manufacturer_name: 'DiabetesCare Technologies',
     manufacturer_country: 'Switzerland',
     registration_status: 'active',
@@ -79,7 +95,7 @@ const mockProducts: Product[] = [
     product_name_zh: '手术机器人系统',
     model_number: 'SR-2024',
     udi_di: '00643169007252',
-    product_category: '手术机器人',
+    product_category: 'robotic',
     manufacturer_name: 'RoboMed International',
     manufacturer_country: 'United States',
     registration_status: 'active',
@@ -87,6 +103,70 @@ const mockProducts: Product[] = [
     approved_countries: ['US', 'CN', 'EU', 'JP', 'KR', 'AU'],
     company_id: '4',
     company_name: 'RoboMed',
+  },
+  {
+    id: '5',
+    product_name: 'Hip Replacement Implant',
+    product_name_en: 'Hip Replacement Implant',
+    product_name_zh: '髋关节置换植入物',
+    model_number: 'HIP-PRO-500',
+    udi_di: '00643169007269',
+    product_category: 'orthopedic',
+    manufacturer_name: 'OrthoTech Medical',
+    manufacturer_country: 'Ireland',
+    registration_status: 'active',
+    total_registrations: 10,
+    approved_countries: ['US', 'CN', 'EU', 'JP', 'CA', 'AU', 'GB', 'CH'],
+    company_id: '5',
+    company_name: 'OrthoTech',
+  },
+  {
+    id: '6',
+    product_name: 'Dental Implant System',
+    product_name_en: 'Dental Implant System',
+    product_name_zh: '牙科种植系统',
+    model_number: 'DENT-IMPL-200',
+    udi_di: '00643169007276',
+    product_category: 'dental',
+    manufacturer_name: 'SmileTech Dental',
+    manufacturer_country: 'Sweden',
+    registration_status: 'active',
+    total_registrations: 9,
+    approved_countries: ['US', 'CN', 'EU', 'JP', 'CA', 'AU', 'KR', 'SG', 'BR'],
+    company_id: '6',
+    company_name: 'SmileTech',
+  },
+  {
+    id: '7',
+    product_name: 'Cataract Surgery System',
+    product_name_en: 'Cataract Surgery System',
+    product_name_zh: '白内障手术系统',
+    model_number: 'EYE-CAT-100',
+    udi_di: '00643169007283',
+    product_category: 'ophthalmic',
+    manufacturer_name: 'VisionCare Medical',
+    manufacturer_country: 'United States',
+    registration_status: 'active',
+    total_registrations: 11,
+    approved_countries: ['US', 'CN', 'EU', 'JP', 'CA', 'AU', 'KR', 'SG', 'IN'],
+    company_id: '7',
+    company_name: 'VisionCare',
+  },
+  {
+    id: '8',
+    product_name: 'Spinal Fusion Device',
+    product_name_en: 'Spinal Fusion Device',
+    product_name_zh: '脊柱融合器械',
+    model_number: 'SPINE-FUSE-300',
+    udi_di: '00643169007290',
+    product_category: 'neurological',
+    manufacturer_name: 'NeuroSpine Technologies',
+    manufacturer_country: 'United States',
+    registration_status: 'active',
+    total_registrations: 7,
+    approved_countries: ['US', 'CN', 'EU', 'JP', 'CA', 'AU'],
+    company_id: '8',
+    company_name: 'NeuroSpine',
   },
 ];
 
@@ -140,10 +220,14 @@ export default function ProductTrackerPage() {
     totalProducts: locale === 'zh' ? '共收录' : 'Total',
     products: locale === 'zh' ? '个产品' : 'products',
     category: locale === 'zh' ? '产品类别' : 'Category',
+    avgRegistrations: locale === 'zh' ? '平均注册国家' : 'Avg. Registrations',
   };
 
-  // 获取唯一类别列表
-  const categories = Array.from(new Set(mockProducts.map(p => p.product_category))).sort();
+  // 获取类别显示名称
+  const getCategoryName = (categoryId: string) => {
+    const cat = categories.find(c => c.id === categoryId);
+    return locale === 'zh' ? cat?.nameZh : cat?.nameEn;
+  };
 
   // 过滤数据
   const filteredProducts = mockProducts.filter(product => {
@@ -159,8 +243,8 @@ export default function ProductTrackerPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-16">
+      {/* Hero Section - 统一使用网站主色调 */}
+      <div className="bg-gradient-to-r from-[#339999] to-[#2a7a7a] text-white py-16">
         <div className="max-w-6xl mx-auto px-6">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">{t.title}</h1>
           <p className="text-xl opacity-90">{t.subtitle}</p>
@@ -169,16 +253,16 @@ export default function ProductTrackerPage() {
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-6 py-8">
-        {/* Statistics */}
+        {/* Statistics - 统一卡片样式 */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-2xl shadow-lg p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">{t.totalProducts}</p>
-                <p className="text-3xl font-bold text-blue-600">{mockProducts.length}</p>
+                <p className="text-3xl font-bold text-[#339999]">{mockProducts.length}</p>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 bg-[#339999]/10 rounded-xl flex items-center justify-center">
+                <svg className="w-6 h-6 text-[#339999]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
               </div>
@@ -200,7 +284,7 @@ export default function ProductTrackerPage() {
           <div className="bg-white rounded-2xl shadow-lg p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">平均注册国家</p>
+                <p className="text-sm text-gray-600 mb-1">{t.avgRegistrations}</p>
                 <p className="text-3xl font-bold text-purple-600">
                   {(mockProducts.reduce((sum, p) => sum + p.total_registrations, 0) / mockProducts.length).toFixed(1)}
                 </p>
@@ -225,22 +309,24 @@ export default function ProductTrackerPage() {
                   placeholder={t.searchPlaceholder}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-[#339999] focus:ring-2 focus:ring-[#339999]/20 outline-none transition-all"
                 />
                 <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
 
-              {/* Category Filter */}
+              {/* Category Filter - 使用扩展的类别 */}
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all bg-white"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#339999] focus:ring-2 focus:ring-[#339999]/20 outline-none transition-all bg-white"
               >
                 <option value="all">{t.allCategories}</option>
                 {categories.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
+                  <option key={cat.id} value={cat.id}>
+                    {locale === 'zh' ? cat.nameZh : cat.nameEn}
+                  </option>
                 ))}
               </select>
 
@@ -248,7 +334,7 @@ export default function ProductTrackerPage() {
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all bg-white"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#339999] focus:ring-2 focus:ring-[#339999]/20 outline-none transition-all bg-white"
               >
                 <option value="all">{t.allStatuses}</option>
                 <option value="active">{t.active}</option>
@@ -257,13 +343,13 @@ export default function ProductTrackerPage() {
               </select>
             </div>
 
-            {/* View Toggle */}
+            {/* View Toggle - 统一按钮样式 */}
             <div className="flex gap-2">
               <button
                 onClick={() => setViewMode('list')}
                 className={`px-4 py-3 rounded-xl font-medium transition-all flex items-center gap-2 ${
                   viewMode === 'list'
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                    ? 'bg-[#339999] text-white shadow-lg shadow-[#339999]/30'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
@@ -276,7 +362,7 @@ export default function ProductTrackerPage() {
                 onClick={() => setViewMode('map')}
                 className={`px-4 py-3 rounded-xl font-medium transition-all flex items-center gap-2 ${
                   viewMode === 'map'
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                    ? 'bg-[#339999] text-white shadow-lg shadow-[#339999]/30'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
@@ -313,8 +399,8 @@ export default function ProductTrackerPage() {
                           {locale === 'zh' ? product.product_name_zh : product.product_name_en}
                         </h3>
                         <div className="flex flex-wrap gap-2">
-                          <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full">
-                            {product.product_category}
+                          <span className="px-3 py-1 bg-[#339999]/10 text-[#339999] text-sm rounded-full">
+                            {getCategoryName(product.product_category)}
                           </span>
                           <span className="px-3 py-1 bg-green-100 text-green-700 text-sm rounded-full flex items-center gap-1">
                             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
@@ -347,7 +433,7 @@ export default function ProductTrackerPage() {
                     <div className="mb-4">
                       <div className="flex items-center justify-between mb-2">
                         <p className="text-sm font-semibold text-gray-700">{t.approvedCountries}</p>
-                        <p className="text-lg font-bold text-blue-600">{product.total_registrations}</p>
+                        <p className="text-lg font-bold text-[#339999]">{product.total_registrations}</p>
                       </div>
                       <div className="flex flex-wrap gap-1">
                         {product.approved_countries.slice(0, 12).map((code) => (
@@ -360,7 +446,7 @@ export default function ProductTrackerPage() {
                           </span>
                         ))}
                         {product.total_registrations > 12 && (
-                          <span className="w-8 h-8 flex items-center justify-center bg-blue-100 text-blue-700 rounded-lg text-xs font-bold">
+                          <span className="w-8 h-8 flex items-center justify-center bg-[#339999]/10 text-[#339999] rounded-lg text-xs font-bold">
                             +{product.total_registrations - 12}
                           </span>
                         )}
@@ -368,8 +454,8 @@ export default function ProductTrackerPage() {
                     </div>
 
                     <Link
-                      href={`/${params.locale}/products/${product.id}`}
-                      className="block w-full text-center py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:shadow-lg hover:shadow-blue-600/30 transition-all font-medium"
+                      href={`/${locale}/products/${product.id}`}
+                      className="block w-full text-center py-2.5 bg-gradient-to-r from-[#339999] to-[#2a7a7a] text-white rounded-xl hover:shadow-lg hover:shadow-[#339999]/30 transition-all font-medium"
                     >
                       {t.viewDetail}
                     </Link>
@@ -381,16 +467,16 @@ export default function ProductTrackerPage() {
         ) : (
           /* Map View Placeholder */
           <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-            <div className="w-full h-96 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl flex items-center justify-center mb-6">
+            <div className="w-full h-96 bg-gradient-to-br from-[#339999]/10 to-[#339999]/5 rounded-2xl flex items-center justify-center mb-6">
               <div className="text-center">
-                <svg className="w-20 h-20 text-blue-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-20 h-20 text-[#339999] mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
                 </svg>
-                <p className="text-lg text-gray-600">交互式全球注册地图</p>
-                <p className="text-sm text-gray-500 mt-2">展示产品在各国的注册状态分布</p>
+                <p className="text-lg text-gray-600">{locale === 'zh' ? '交互式全球注册地图' : 'Interactive Global Registration Map'}</p>
+                <p className="text-sm text-gray-500 mt-2">{locale === 'zh' ? '展示产品在各国的注册状态分布' : 'Display product registration status distribution across countries'}</p>
               </div>
             </div>
-            <p className="text-gray-500">地图视图开发中...</p>
+            <p className="text-gray-500">{locale === 'zh' ? '地图视图开发中...' : 'Map view under development...'}</p>
           </div>
         )}
       </div>

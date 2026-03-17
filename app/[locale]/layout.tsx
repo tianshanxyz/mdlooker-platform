@@ -36,12 +36,6 @@ export default function LocaleLayout({
     { href: `/${locale}/toolkit`, labelEn: 'Toolkit', labelZh: '工具箱' },
   ];
 
-  // 用户工具菜单（监控、统计）
-  const userTools = [
-    { href: `/${locale}/monitoring`, labelEn: 'Monitoring', labelZh: '竞品监控', icon: '❤️' },
-    { href: `/${locale}/stats`, labelEn: 'Statistics', labelZh: '数据统计', icon: '📊' },
-  ];
-
   return (
     <>
       {/* 页面加载动画 */}
@@ -88,29 +82,7 @@ export default function LocaleLayout({
                 );
               })}
               
-              {/* 用户工具菜单 */}
-              <div className="relative group ml-2">
-                <button className="px-4 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-[#339999]/10 hover:text-[#339999] transition-all flex items-center gap-2">
-                  <span>工具</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right">
-                  <div className="py-2">
-                    {userTools.map((tool) => (
-                      <Link
-                        key={tool.href}
-                        href={tool.href}
-                        className="px-4 py-2 text-sm text-gray-700 hover:bg-[#339999]/10 hover:text-[#339999] flex items-center gap-2 transition-colors"
-                      >
-                        <span>{tool.icon}</span>
-                        <span>{locale === 'zh' ? tool.labelZh : tool.labelEn}</span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              </div>
+
             </div>
           </div>
           

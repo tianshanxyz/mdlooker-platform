@@ -4,180 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import ExportButton from '../../components/ExportButton';
-
-// 监管机构数据类型
-interface RegulatoryAgency {
-  id: string;
-  country: string;
-  country_code: string;
-  agency_name: string;
-  agency_name_en: string;
-  agency_name_zh: string;
-  agency_type: string;
-  official_website: string;
-  database_url: string;
-  contact_email: string;
-  contact_phone: string;
-  description: string;
-  description_zh: string;
-  verified: boolean;
-}
-
-// 国家名称映射
-const countryNames: Record<string, { zh: string; en: string }> = {
-  'United States': { zh: '美国', en: 'United States' },
-  'China': { zh: '中国', en: 'China' },
-  'European Union': { zh: '欧盟', en: 'European Union' },
-  'Japan': { zh: '日本', en: 'Japan' },
-  'Canada': { zh: '加拿大', en: 'Canada' },
-  'Australia': { zh: '澳大利亚', en: 'Australia' },
-  'South Korea': { zh: '韩国', en: 'South Korea' },
-  'Singapore': { zh: '新加坡', en: 'Singapore' },
-  'Brazil': { zh: '巴西', en: 'Brazil' },
-  'India': { zh: '印度', en: 'India' },
-  'Saudi Arabia': { zh: '沙特阿拉伯', en: 'Saudi Arabia' },
-  'Mexico': { zh: '墨西哥', en: 'Mexico' },
-  'United Kingdom': { zh: '英国', en: 'United Kingdom' },
-  'Switzerland': { zh: '瑞士', en: 'Switzerland' },
-  'Turkey': { zh: '土耳其', en: 'Turkey' },
-  'Russia': { zh: '俄罗斯', en: 'Russia' },
-  'South Africa': { zh: '南非', en: 'South Africa' },
-  'Thailand': { zh: '泰国', en: 'Thailand' },
-  'Vietnam': { zh: '越南', en: 'Vietnam' },
-  'Indonesia': { zh: '印度尼西亚', en: 'Indonesia' },
-};
-
-// 模拟数据 (实际应从数据库获取)
-const mockAgencies: RegulatoryAgency[] = [
-  {
-    id: '1',
-    country: 'United States',
-    country_code: 'US',
-    agency_name: 'Food and Drug Administration',
-    agency_name_en: 'Food and Drug Administration',
-    agency_name_zh: '美国食品药品监督管理局',
-    agency_type: 'national',
-    official_website: 'https://www.fda.gov',
-    database_url: 'https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfRL/rl.cfm',
-    contact_email: 'info@fda.gov',
-    contact_phone: '+1-888-463-6332',
-    description: 'The FDA is responsible for protecting the public health by ensuring the safety, efficacy, and security of human drugs, biological products, and medical devices.',
-    description_zh: 'FDA 负责通过确保人用药品、生物制品和医疗器械的安全性、有效性和安全性来保护公众健康。',
-    verified: true,
-  },
-  {
-    id: '2',
-    country: 'China',
-    country_code: 'CN',
-    agency_name: 'National Medical Products Administration',
-    agency_name_en: 'National Medical Products Administration',
-    agency_name_zh: '国家药品监督管理局',
-    agency_type: 'national',
-    official_website: 'https://www.nmpa.gov.cn',
-    database_url: 'https://www.nmpa.gov.cn/datasearch/home-index.html',
-    contact_email: 'webmaster@nmpa.gov.cn',
-    contact_phone: '+86-10-88330000',
-    description: 'NMPA is responsible for the supervision and administration of drugs, medical devices, and cosmetics in China.',
-    description_zh: 'NMPA 负责中国境内药品、医疗器械和化妆品的监督管理。',
-    verified: true,
-  },
-  {
-    id: '3',
-    country: 'European Union',
-    country_code: 'EU',
-    agency_name: 'European Commission - DG SANTE',
-    agency_name_en: 'European Commission - DG SANTE',
-    agency_name_zh: '欧盟委员会 - 卫生与食品安全总局',
-    agency_type: 'regional',
-    official_website: 'https://health.ec.europa.eu',
-    database_url: 'https://eudamed.ec.europa.eu',
-    contact_email: 'sante-info@ec.europa.eu',
-    contact_phone: '+32-2-2991111',
-    description: 'DG SANTE develops and implements EU policies on health and food safety, including medical devices regulation.',
-    description_zh: 'DG SANTE 制定和实施欧盟卫生与食品安全政策，包括医疗器械法规。',
-    verified: true,
-  },
-  {
-    id: '4',
-    country: 'Japan',
-    country_code: 'JP',
-    agency_name: 'Pharmaceuticals and Medical Devices Agency',
-    agency_name_en: 'Pharmaceuticals and Medical Devices Agency',
-    agency_name_zh: '独立行政法人医药品医疗器械综合机构',
-    agency_type: 'national',
-    official_website: 'https://www.pmda.go.jp',
-    database_url: 'https://www.pmda.go.jp/english/',
-    contact_email: 'info@pmda.go.jp',
-    contact_phone: '+81-3-3506-9494',
-    description: 'PMDA conducts scientific reviews and on-site inspections for pharmaceuticals and medical devices.',
-    description_zh: 'PMDA 对药品和医疗器械进行科学审查和现场检查。',
-    verified: true,
-  },
-  {
-    id: '5',
-    country: 'Canada',
-    country_code: 'CA',
-    agency_name: 'Health Canada - Medical Devices Bureau',
-    agency_name_en: 'Health Canada - Medical Devices Bureau',
-    agency_name_zh: '加拿大卫生部 - 医疗器械局',
-    agency_type: 'national',
-    official_website: 'https://www.canada.ca/en/health-canada',
-    database_url: 'https://health-products.canada.ca/mdall-limh',
-    contact_email: 'mdbh-dimsc@hc-sc.gc.ca',
-    contact_phone: '+1-613-957-2911',
-    description: 'Health Canada regulates medical devices to ensure their safety, efficacy, and quality.',
-    description_zh: '加拿大卫生部监管医疗器械，确保其安全性、有效性和质量。',
-    verified: true,
-  },
-  {
-    id: '6',
-    country: 'Australia',
-    country_code: 'AU',
-    agency_name: 'Therapeutic Goods Administration',
-    agency_name_en: 'Therapeutic Goods Administration',
-    agency_name_zh: '澳大利亚治疗用品管理局',
-    agency_type: 'national',
-    official_website: 'https://www.tga.gov.au',
-    database_url: 'https://www.tga.gov.au/resources/artg',
-    contact_email: 'info@tga.gov.au',
-    contact_phone: '+61-2-6289-3000',
-    description: 'TGA regulates therapeutic goods including medicines, medical devices, and biologicals.',
-    description_zh: 'TGA 监管治疗用品，包括药品、医疗器械和生物制品。',
-    verified: true,
-  },
-  {
-    id: '7',
-    country: 'South Korea',
-    country_code: 'KR',
-    agency_name: 'Ministry of Food and Drug Safety',
-    agency_name_en: 'Ministry of Food and Drug Safety',
-    agency_name_zh: '食品医药品安全部',
-    agency_type: 'national',
-    official_website: 'https://www.mfds.go.kr',
-    database_url: 'https://www.nifds.go.kr',
-    contact_email: 'webmaster@mfds.go.kr',
-    contact_phone: '+82-43-719-0000',
-    description: 'MFDS ensures the safety and efficacy of food, drugs, and medical devices.',
-    description_zh: 'MFDS 确保食品、药品和医疗器械的安全性和有效性。',
-    verified: true,
-  },
-  {
-    id: '8',
-    country: 'Singapore',
-    country_code: 'SG',
-    agency_name: 'Health Sciences Authority',
-    agency_name_en: 'Health Sciences Authority',
-    agency_name_zh: '新加坡卫生科学局',
-    agency_type: 'national',
-    official_website: 'https://www.hsa.gov.sg',
-    database_url: 'https://www.hsa.gov.sg/medical-devices',
-    contact_email: 'hsa_info@hsa.gov.sg',
-    contact_phone: '+65-6866-3488',
-    description: 'HSA regulates health products including medical devices in Singapore.',
-    description_zh: 'HSA 监管新加坡的健康产品，包括医疗器械。',
-    verified: true,
-  },
-];
+import { regulatoryAgenciesData, countryNames, type RegulatoryAgency } from '../../lib/regulatory-agencies-data';
 
 export default function RegulatorsPage() {
   const params = useParams();
@@ -210,10 +37,10 @@ export default function RegulatorsPage() {
   };
 
   // 获取唯一国家列表
-  const countries = Array.from(new Set(mockAgencies.map(a => a.country))).sort();
+  const countries = Array.from(new Set(regulatoryAgenciesData.map(a => a.country))).sort();
 
   // 过滤数据
-  const filteredAgencies = mockAgencies.filter(agency => {
+  const filteredAgencies = regulatoryAgenciesData.filter(agency => {
     const matchesSearch = agency.agency_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          agency.agency_name_zh.includes(searchTerm) ||
                          agency.country.toLowerCase().includes(searchTerm.toLowerCase());
@@ -224,6 +51,16 @@ export default function RegulatorsPage() {
 
   const getCountryName = (country: string) => {
     return countryNames[country]?.[locale === 'zh' ? 'zh' : 'en'] || country;
+  };
+
+  const getCountryFlag = (countryCode: string) => {
+    const flags: Record<string, string> = {
+      'US': '🇺🇸', 'CN': '🇨🇳', 'EU': '🇪🇺', 'JP': '🇯🇵', 'CA': '🇨🇦',
+      'AU': '🇦🇺', 'KR': '🇰🇷', 'SG': '🇸🇬', 'GB': '🇬🇧', 'BR': '🇧🇷',
+      'IN': '🇮🇳', 'CH': '🇨🇭', 'SA': '🇸🇦', 'MX': '🇲🇽', 'TR': '🇹🇷',
+      'RU': '🇷🇺', 'ZA': '🇿🇦', 'TH': '🇹🇭', 'VN': '🇻🇳', 'ID': '🇮🇩',
+    };
+    return flags[countryCode] || '🌍';
   };
 
   return (
@@ -243,11 +80,11 @@ export default function RegulatorsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">{t.totalAgencies}</p>
-              <p className="text-3xl font-bold text-[#339999]">{mockAgencies.length}</p>
+              <p className="text-3xl font-bold text-[#339999]">{regulatoryAgenciesData.length}</p>
             </div>
             <div className="text-right">
               <p className="text-sm text-gray-600 mb-1">{t.verified}</p>
-              <p className="text-3xl font-bold text-green-600">{mockAgencies.filter(a => a.verified).length}</p>
+              <p className="text-3xl font-bold text-green-600">{regulatoryAgenciesData.filter(a => a.verified).length}</p>
             </div>
             <div className="hidden md:block">
               <div className="text-sm text-gray-600">
@@ -338,16 +175,7 @@ export default function RegulatorsPage() {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-2xl">
-                        {agency.country_code === 'US' ? '🇺🇸' :
-                         agency.country_code === 'CN' ? '🇨🇳' :
-                         agency.country_code === 'EU' ? '🇪🇺' :
-                         agency.country_code === 'JP' ? '🇯🇵' :
-                         agency.country_code === 'CA' ? '🇨🇦' :
-                         agency.country_code === 'AU' ? '🇦🇺' :
-                         agency.country_code === 'KR' ? '🇰🇷' :
-                         agency.country_code === 'SG' ? '🇸🇬' : '🌍'}
-                      </span>
+                      <span className="text-2xl">{getCountryFlag(agency.country_code)}</span>
                       <h3 className="text-xl font-bold text-gray-900">
                         {locale === 'zh' ? agency.agency_name_zh : agency.agency_name_en}
                       </h3>
@@ -427,7 +255,7 @@ export default function RegulatorsPage() {
 
                 {/* View Detail Button */}
                 <Link
-                  href={`/${params.locale}/regulators/${agency.id}`}
+                  href={`/${locale}/regulators/${agency.id}`}
                   className="mt-4 block w-full text-center py-2.5 bg-gradient-to-r from-[#339999] to-[#2a7a7a] text-white rounded-xl hover:shadow-lg hover:shadow-[#339999]/30 transition-all font-medium"
                 >
                   {t.viewDetail}
