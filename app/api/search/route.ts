@@ -102,119 +102,149 @@ function calculateComplianceScore(
   recalls: number
 ): number {
   let score = 50; // 基础分
-  
+
   // 注册数量加分
   score += Math.min(fdaCount * 2, 20);
   score += Math.min(nmpaCount * 2, 15);
   score += Math.min(eudamedCount * 2, 15);
   score += Math.min(otherCount * 1, 10);
-  
+
   // 合规历史减分
   score -= warningLetters * 5;
   score -= recalls * 10;
-  
+
   return Math.max(0, Math.min(100, score));
 }
 
-// 获取公司完整信息（包括注册统计）
-async function getCompanyFullInfo(supabase: any, companyId: string) {
-  // 并行获取所有注册信息
-  const [
-    { count: fdaCount },
-    { count: nmpaCount },
-    { count: eudamedCount },
-    { count: pmdaCount },
-    { count: hsaCount },
-    { count: tgaCount },
-    { count: healthCanadaCount },
-    { count: mhraCount },
-    { count: emaCount },
-    { count: swissmedicCount },
-    { count: mfdsCount },
-    { count: anvisaCount },
-    { data: warningLetters },
-    { data: recalls }
-  ] = await Promise.all([
-    supabase.from('fda_registrations').select('*', { count: 'exact', head: true }).eq('company_id', companyId),
-    supabase.from('nmpa_registrations').select('*', { count: 'exact', head: true }).eq('company_id', companyId),
-    supabase.from('eudamed_registrations').select('*', { count: 'exact', head: true }).eq('company_id', companyId),
-    supabase.from('pmda_registrations').select('*', { count: 'exact', head: true }).eq('company_id', companyId),
-    supabase.from('hsa_registrations').select('*', { count: 'exact', head: true }).eq('company_id', companyId),
-    supabase.from('tga_registrations').select('*', { count: 'exact', head: true }).eq('company_id', companyId),
-    supabase.from('health_canada_registrations').select('*', { count: 'exact', head: true }).eq('company_id', companyId),
-    supabase.from('mhra_registrations').select('*', { count: 'exact', head: true }).eq('company_id', companyId),
-    supabase.from('ema_registrations').select('*', { count: 'exact', head: true }).eq('company_id', companyId),
-    supabase.from('swissmedic_registrations').select('*', { count: 'exact', head: true }).eq('company_id', companyId),
-    supabase.from('mfds_registrations').select('*', { count: 'exact', head: true }).eq('company_id', companyId),
-    supabase.from('anvisa_registrations').select('*', { count: 'exact', head: true }).eq('company_id', companyId),
+// 监管机构配置
+const REGULATORY_AGENCIES = [
+  { table: 'fda_registrations', market: 'USA', key: 'fda' },
+  { table: 'nmpa_registrations', market: 'China', key: 'nmpa' },
+  { table: 'eudamed_registrations', market: 'EU', key: 'eudamed' },
+  { table: 'pmda_registrations', market: 'Japan', key: 'pmda' },
+  { table: 'hsa_registrations', market: 'Singapore', key: 'hsa' },
+  { table: 'tga_registrations', market: 'Australia', key: 'tga' },
+  { table: 'health_canada_registrations', market: 'Canada', key: 'health_canada' },
+  { table: 'mhra_registrations', market: 'UK', key: 'mhra' },
+  { table: 'ema_registrations', market: 'EU', key: 'ema' },
+  { table: 'swissmedic_registrations', market: 'Switzerland', key: 'swissmedic' },
+  { table: 'mfds_registrations', market: 'Korea', key: 'mfds' },
+  { table: 'anvisa_registrations', market: 'Brazil', key: 'anvisa' }
+] as const;
+
+// 获取单个监管机构的注册数量
+async function getRegistrationCount(
+  supabase: any,
+  companyId: string,
+  table: string
+): Promise<number> {
+  const { count } = await supabase
+    .from(table)
+    .select('*', { count: 'exact', head: true })
+    .eq('company_id', companyId);
+  return count || 0;
+}
+
+// 并行获取所有监管机构的注册数量
+async function getAllRegistrationCounts(
+  supabase: any,
+  companyId: string
+): Promise<Record<string, number>> {
+  const counts = await Promise.all(
+    REGULATORY_AGENCIES.map(async (agency) => ({
+      key: agency.key,
+      count: await getRegistrationCount(supabase, companyId, agency.table)
+    }))
+  );
+
+  return counts.reduce((acc, { key, count }) => {
+    acc[key] = count;
+    return acc;
+  }, {} as Record<string, number>);
+}
+
+// 获取监管历史记录
+async function getRegulatoryHistory(
+  supabase: any,
+  companyId: string
+): Promise<{ warningLetters: any[]; recalls: any[] }> {
+  const [warningLetters, recalls] = await Promise.all([
     supabase.from('regulatory_warning_letters').select('*').eq('company_id', companyId),
     supabase.from('regulatory_recalls').select('*').eq('company_id', companyId)
   ]);
 
-  const totalRegistrations = 
-    (fdaCount || 0) + 
-    (nmpaCount || 0) + 
-    (eudamedCount || 0) + 
-    (pmdaCount || 0) + 
-    (hsaCount || 0) + 
-    (tgaCount || 0) + 
-    (healthCanadaCount || 0) + 
-    (mhraCount || 0) + 
-    (emaCount || 0) + 
-    (swissmedicCount || 0) + 
-    (mfdsCount || 0) + 
-    (anvisaCount || 0);
+  return {
+    warningLetters: warningLetters.data || [],
+    recalls: recalls.data || []
+  };
+}
 
-  const markets: string[] = [];
-  if (fdaCount && fdaCount > 0) markets.push('USA');
-  if (nmpaCount && nmpaCount > 0) markets.push('China');
-  if (eudamedCount && eudamedCount > 0) markets.push('EU');
-  if (pmdaCount && pmdaCount > 0) markets.push('Japan');
-  if (hsaCount && hsaCount > 0) markets.push('Singapore');
-  if (tgaCount && tgaCount > 0) markets.push('Australia');
-  if (healthCanadaCount && healthCanadaCount > 0) markets.push('Canada');
-  if (mhraCount && mhraCount > 0) markets.push('UK');
+// 构建市场列表
+function buildMarkets(counts: Record<string, number>): string[] {
+  return REGULATORY_AGENCIES
+    .filter(agency => counts[agency.key] > 0)
+    .map(agency => agency.market);
+}
 
+// 计算总注册数
+function calculateTotalRegistrations(counts: Record<string, number>): number {
+  return Object.values(counts).reduce((sum, count) => sum + count, 0);
+}
+
+// 格式化监管历史记录
+function formatRegulatoryHistory(
+  warningLetters: any[],
+  recalls: any[]
+): Array<{ type: string; date: string; description: string }> {
+  return [
+    ...warningLetters.map(w => ({
+      type: 'alert',
+      date: w.letter_date,
+      description: w.subject || 'Warning Letter'
+    })),
+    ...recalls.map(r => ({
+      type: 'recall',
+      date: r.recall_initiation_date,
+      description: r.product_description || 'Product Recall'
+    }))
+  ].slice(0, 5);
+}
+
+// 构建注册摘要
+function buildRegistrationSummary(counts: Record<string, number>): Record<string, number> {
+  return counts;
+}
+
+// 获取公司完整信息（包括注册统计）
+async function getCompanyFullInfo(supabase: any, companyId: string) {
+  // 1. 并行获取所有数据
+  const [counts, { warningLetters, recalls }] = await Promise.all([
+    getAllRegistrationCounts(supabase, companyId),
+    getRegulatoryHistory(supabase, companyId)
+  ]);
+
+  // 2. 计算总注册数和市场列表
+  const totalRegistrations = calculateTotalRegistrations(counts);
+  const markets = buildMarkets(counts);
+
+  // 3. 计算合规评分
   const complianceScore = calculateComplianceScore(
-    fdaCount || 0,
-    nmpaCount || 0,
-    eudamedCount || 0,
-    (pmdaCount || 0) + (hsaCount || 0) + (tgaCount || 0),
-    warningLetters?.length || 0,
-    recalls?.length || 0
+    counts.fda,
+    counts.nmpa,
+    counts.eudamed,
+    counts.pmda + counts.hsa + counts.tga,
+    warningLetters.length,
+    recalls.length
   );
 
+  // 4. 返回结果
   return {
     registration_count: totalRegistrations,
     compliance_score: complianceScore,
     markets: markets,
     device_classes: ['Class II', 'Class III'], // 简化处理
-    regulatory_history: [
-      ...(warningLetters || []).map((w: any) => ({
-        type: 'alert',
-        date: w.letter_date,
-        description: w.subject || 'Warning Letter'
-      })),
-      ...(recalls || []).map((r: any) => ({
-        type: 'recall',
-        date: r.recall_initiation_date,
-        description: r.product_description || 'Product Recall'
-      }))
-    ].slice(0, 5),
-    registration_summary: {
-      fda: fdaCount || 0,
-      nmpa: nmpaCount || 0,
-      eudamed: eudamedCount || 0,
-      pmda: pmdaCount || 0,
-      hsa: hsaCount || 0,
-      tga: tgaCount || 0,
-      health_canada: healthCanadaCount || 0,
-      mhra: mhraCount || 0,
-      ema: emaCount || 0,
-      swissmedic: swissmedicCount || 0,
-      mfds: mfdsCount || 0,
-      anvisa: anvisaCount || 0
-    }
+    regulatory_history: formatRegulatoryHistory(warningLetters, recalls),
+    registration_summary: buildRegistrationSummary(counts)
   };
 }
 
