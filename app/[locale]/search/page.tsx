@@ -95,41 +95,39 @@ export default function SearchPage() {
     },
   ], [locale, t]);
 
-  // 模拟搜索结果
-  const mockResults: SearchResult[] = useMemo(() => [
-    {
-      id: '1',
-      type: 'company',
-      name: 'MedTech Solutions',
-      name_zh: '医疗科技解决方案公司',
-      description: 'Leading medical device manufacturer specializing in cardiovascular implants',
-      country: 'United States',
-      logo_url: '/logos/medtech.png',
-      match_score: 95,
-    },
-    {
-      id: '2',
-      type: 'product',
-      name: 'Intravascular Stent System',
-      name_zh: '血管内支架系统',
-      description: 'Advanced drug-eluting stent for coronary artery disease',
-      country: 'United States',
-      match_score: 90,
-    },
-    {
-      id: '3',
-      type: 'regulator',
-      name: 'Food and Drug Administration',
-      name_zh: '美国食品药品监督管理局',
-      description: 'U.S. regulatory agency responsible for protecting public health',
-      country: 'United States',
-      match_score: 85,
-    },
-  ], []);
+  // 真实的搜索结果
+  const [realResults, setRealResults] = useState<SearchResult[]>([]);
+
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+    
+    setIsLoading(true);
+    setHasSearched(true);
+    
+    try {
+      // 调用真实 API
+      const params = new URLSearchParams({
+        q: searchQuery,
+        page: '1',
+        pageSize: '20',
+        type: resultType !== 'all' ? resultType : 'auto',
+      });
+      
+      const response = await fetch(`/api/search?${params.toString()}`);
+      if (response.ok) {
+        const data = await response.json();
+        setRealResults(data.results || []);
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // 过滤结果
   const filteredResults = useMemo(() => {
-    let results = mockResults;
+    let results = realResults;
 
     // 按类型过滤
     if (resultType !== 'all') {
@@ -142,19 +140,7 @@ export default function SearchPage() {
     }
 
     return results;
-  }, [mockResults, resultType, selectedFilters]);
-
-  const handleSearch = () => {
-    if (!searchQuery.trim()) return;
-    
-    setIsLoading(true);
-    setHasSearched(true);
-    
-    // 模拟搜索延迟
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 800);
-  };
+  }, [realResults, resultType, selectedFilters]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
