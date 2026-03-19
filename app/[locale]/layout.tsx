@@ -33,7 +33,14 @@ export default function LocaleLayout({
     { href: `/${locale}/market-access`, labelEn: 'Market Access', labelZh: '准入导航' },
     { href: `/${locale}/regulators`, labelEn: 'Regulators', labelZh: '监管数据库' },
     { href: `/${locale}/guides`, labelEn: 'Guides', labelZh: '指南' },
-    { href: `/${locale}/toolkit`, labelEn: 'Toolkit', labelZh: '工具箱' },
+  ];
+
+  const toolkitItems = [
+    { href: `/${locale}/market-access-wizard`, labelEn: 'Market Access Wizard', labelZh: '市场准入向导', icon: '🌍' },
+    { href: `/${locale}/templates`, labelEn: 'Document Templates', labelZh: '资料模板库', icon: '📄' },
+    { href: `/${locale}/compare-markets`, labelEn: 'Compare Markets', labelZh: '市场对比', icon: '📊' },
+    { href: `/${locale}/monitoring`, labelEn: 'Competitor Monitoring', labelZh: '竞争对手监控', icon: '👁️' },
+    { href: `/${locale}/stats`, labelEn: 'Statistics', labelZh: '数据统计', icon: '📈' },
   ];
 
   return (
@@ -82,6 +89,31 @@ export default function LocaleLayout({
                 );
               })}
               
+              {/* Toolkit Dropdown */}
+              <div className="relative group">
+                <button className="px-4 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-[#339999]/10 hover:text-[#339999] transition-all duration-200 flex items-center gap-1">
+                  <span>{locale === 'zh' ? '工具箱' : 'Toolkit'}</span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <div className="absolute left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-left z-50">
+                  <div className="py-2">
+                    {toolkitItems.map((tool) => (
+                      <Link
+                        key={tool.href}
+                        href={tool.href}
+                        className="px-4 py-3 text-sm text-gray-700 hover:bg-[#339999]/10 hover:text-[#339999] flex items-center gap-3 transition-colors"
+                      >
+                        <span className="text-xl">{tool.icon}</span>
+                        <div>
+                          <div className="font-medium">{locale === 'zh' ? tool.labelZh : tool.labelEn}</div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
 
             </div>
           </div>
@@ -190,6 +222,25 @@ export default function LocaleLayout({
                   </Link>
                 );
               })}
+              
+              {/* Mobile Toolkit */}
+              <div className="mt-2 pt-2 border-t border-slate-200">
+                <div className="px-4 py-2 text-xs font-medium text-slate-500 uppercase">
+                  {locale === 'zh' ? '工具箱' : 'Toolkit'}
+                </div>
+                {toolkitItems.map((tool) => (
+                  <Link
+                    key={tool.href}
+                    href={tool.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-4 py-3 text-sm text-slate-600 hover:bg-[#339999]/10 hover:text-[#339999] flex items-center gap-3 transition-colors"
+                  >
+                    <span className="text-xl">{tool.icon}</span>
+                    <span>{locale === 'zh' ? tool.labelZh : tool.labelEn}</span>
+                  </Link>
+                ))}
+              </div>
+              
               {/* Mobile language switcher */}
               <div className="flex gap-2 mt-2 pt-2 border-t border-slate-200 sm:hidden">
                 {locales.map(loc => (
