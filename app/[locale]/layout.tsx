@@ -33,6 +33,7 @@ export default function LocaleLayout({
     { href: `/${locale}/market-access`, labelEn: 'Market Access', labelZh: '准入导航' },
     { href: `/${locale}/regulations`, labelEn: 'Regulations', labelZh: '法规动态' },
     { href: `/${locale}/regulators`, labelEn: 'Regulators', labelZh: '监管数据库' },
+    { href: `/${locale}/help`, labelEn: 'Help Center', labelZh: '帮助中心' },
     { href: `/${locale}/guides`, labelEn: 'Guides', labelZh: '指南' },
   ];
 
