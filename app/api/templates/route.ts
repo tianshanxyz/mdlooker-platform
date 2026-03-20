@@ -4,12 +4,25 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
+// 缓存机制
+const cache = new Map<string, { data: any; timestamp: number }>()
+const CACHE_TTL = 10 * 60 * 1000 // 10 分钟缓存（模板数据变化较少）
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const category = searchParams.get('category')
     const country = searchParams.get('country')
     const search = searchParams.get('search')
+
+    // 生成缓存键
+    const cacheKey = `templates:${category || ''}:${country || ''}:${search || ''}`
+    
+    // 检查缓存
+    const cached = cache.get(cacheKey)
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      return NextResponse.json(cached.data)
+    }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
@@ -28,7 +41,6 @@ export async function GET(request: NextRequest) {
     }
 
     if (search) {
-      // Simple search in title and description
       query = query.or(`title.ilike.%${search}%,title_zh.ilike.%${search}%,description.ilike.%${search}%`)
     }
 
@@ -42,11 +54,19 @@ export async function GET(request: NextRequest) {
       }, { status: 500 })
     }
 
-    return NextResponse.json({
+    const responseData = {
       success: true,
       data: data || [],
       total: data?.length || 0
+    }
+
+    // 写入缓存
+    cache.set(cacheKey, {
+      data: responseData,
+      timestamp: Date.now()
     })
+
+    return NextResponse.json(responseData)
 
   } catch (error) {
     console.error('Error in templates API:', error)
@@ -88,8 +108,8 @@ export async function POST(request: NextRequest) {
       }, { status: 500 })
     }
 
-    // Increment download count
-    await supabase.rpc('increment_template_download', { template_id })
+    // 清除缓存
+    cache.clear()
 
     return NextResponse.json({
       success: true,

@@ -31,6 +31,7 @@ export default function LocaleLayout({
     { href: `/${locale}/compliance-profile`, labelEn: 'Compliance Profile', labelZh: '合规档案' },
     { href: `/${locale}/product-tracker`, labelEn: 'Product Tracker', labelZh: '产品追踪' },
     { href: `/${locale}/market-access`, labelEn: 'Market Access', labelZh: '准入导航' },
+    { href: `/${locale}/regulations`, labelEn: 'Regulations', labelZh: '法规动态' },
     { href: `/${locale}/regulators`, labelEn: 'Regulators', labelZh: '监管数据库' },
     { href: `/${locale}/guides`, labelEn: 'Guides', labelZh: '指南' },
   ];

@@ -78,8 +78,52 @@ export default function CompareMarketsPage() {
     setError(null)
   }
 
-  const handleExport = () => {
-    alert('导出功能开发中...\n\n将支持导出为 PDF/Excel 格式')
+  const handleExport = async (format: 'csv' | 'json') => {
+    if (comparisonData.length === 0) {
+      alert('没有可导出的数据')
+      return
+    }
+
+    try {
+      const response = await fetch('/api/export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          data: comparisonData.map(item => ({
+            国家：item.country_name,
+            分类：item.classification,
+            官方费用_USD: item.official_fees_usd,
+            注册周期_天：item.estimated_days_avg,
+            证书有效期_月：item.validity_period,
+            GMP 要求：item.gmp_required ? '需要' : '不需要',
+            本地代理：item.local_agent_required ? '需要' : '不需要',
+            临床数据：item.clinical_data_required ? '需要' : '不需要',
+            准入难度：item.difficulty_index,
+            文件数量：item.required_documents?.length || 0,
+            流程步骤：item.process_steps?.length || 0,
+          })),
+          format
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('导出失败')
+      }
+
+      // 触发下载
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `market_comparison.${format === 'csv' ? 'csv' : 'json'}`
+      a.click()
+      window.URL.revokeObjectURL(url)
+
+      alert(`成功导出 ${comparisonData.length} 个市场的数据`)
+    } catch (err) {
+      console.error('Error exporting data:', err)
+      alert('导出失败，请稍后重试')
+    }
   }
 
   return (
@@ -153,12 +197,29 @@ export default function CompareMarketsPage() {
             重置
           </button>
           {comparisonData.length > 0 && (
-            <button
-              onClick={handleExport}
-              className="px-8 py-3 rounded-lg font-medium text-purple-600 bg-white border border-purple-300 hover:bg-purple-50 transition-colors"
-            >
-              导出对比表
-            </button>
+            <div className="relative group">
+              <button
+                className="px-8 py-3 rounded-lg font-medium text-purple-600 bg-white border border-purple-300 hover:bg-purple-50 transition-colors"
+              >
+                导出对比表
+              </button>
+              <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                <div className="py-2">
+                  <button
+                    onClick={() => handleExport('csv')}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+                  >
+                    📊 导出为 CSV
+                  </button>
+                  <button
+                    onClick={() => handleExport('json')}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+                  >
+                    📄 导出为 JSON
+                  </button>
+                </div>
+              </div>
+            </div>
           )}
         </div>
 

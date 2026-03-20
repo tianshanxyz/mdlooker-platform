@@ -1,111 +1,62 @@
-import { NextRequest, NextResponse } from 'next/server';
-
-interface ExportData {
-  type: 'company' | 'product' | 'search-results' | 'regulator';
-  format: 'csv' | 'json';
-  data: any;
-  filename?: string;
-}
-
-function escapeCSV(value: any): string {
-  if (value === null || value === undefined) {
-    return '';
-  }
-  const stringValue = String(value);
-  if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
-    return `"${stringValue.replace(/"/g, '""')}"`;
-  }
-  return stringValue;
-}
-
-function convertToCSV(data: any[]): string {
-  if (!data || data.length === 0) {
-    return '';
-  }
-
-  const headers = Object.keys(data[0]);
-  const headerRow = headers.map(escapeCSV).join(',');
-  
-  const rows = data.map(row => 
-    headers.map(header => escapeCSV(row[header])).join(',')
-  );
-  
-  return [headerRow, ...rows].join('\n');
-}
-
-function convertToJSON(data: any): string {
-  return JSON.stringify(data, null, 2);
-}
+import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
   try {
-    const body: ExportData = await request.json();
-    const { type, format, data, filename } = body;
+    const body = await request.json()
+    const { data, format = 'csv' } = body
 
-    if (!type || !format || !data) {
-      return NextResponse.json(
-        { error: 'Missing required parameters: type, format, data' },
-        { status: 400 }
-      );
+    if (!data || !Array.isArray(data)) {
+      return NextResponse.json({
+        success: false,
+        error: 'Invalid data format'
+      }, { status: 400 })
     }
 
-    if (!['csv', 'json'].includes(format)) {
-      return NextResponse.json(
-        { error: 'Invalid format. Supported formats: csv, json' },
-        { status: 400 }
-      );
-    }
-
-    let content: string;
-    let contentType: string;
-    let fileExtension: string;
+    let content: string
+    let contentType: string
+    let fileExtension: string
 
     if (format === 'csv') {
-      const arrayData = Array.isArray(data) ? data : [data];
-      content = convertToCSV(arrayData);
-      contentType = 'text/csv;charset=utf-8';
-      fileExtension = 'csv';
+      // 生成 CSV
+      const headers = Object.keys(data[0])
+      const rows = data.map((row: any) => 
+        headers.map(header => {
+          const value = row[header]
+          // 处理包含逗号或引号的字段
+          if (typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
+            return `"${value.replace(/"/g, '""')}"`
+          }
+          return value
+        }).join(',')
+      )
+      
+      content = [headers.join(','), ...rows].join('\n')
+      contentType = 'text/csv'
+      fileExtension = 'csv'
+    } else if (format === 'json') {
+      // 生成 JSON
+      content = JSON.stringify(data, null, 2)
+      contentType = 'application/json'
+      fileExtension = 'json'
     } else {
-      content = convertToJSON(data);
-      contentType = 'application/json;charset=utf-8';
-      fileExtension = 'json';
+      return NextResponse.json({
+        success: false,
+        error: 'Unsupported format'
+      }, { status: 400 })
     }
-
-    const defaultFilename = `${type}-export-${new Date().toISOString().split('T')[0]}`;
-    const exportFilename = filename || defaultFilename;
-
-    const headers = new Headers({
-      'Content-Type': contentType,
-      'Content-Disposition': `attachment; filename="${exportFilename}.${fileExtension}"`,
-      'Cache-Control': 'no-cache',
-    });
 
     return new NextResponse(content, {
-      status: 200,
-      headers,
-    });
-  } catch (error) {
-    console.error('Export error:', error);
-    return NextResponse.json(
-      { error: 'Failed to generate export file' },
-      { status: 500 }
-    );
-  }
-}
+      headers: {
+        'Content-Type': contentType,
+        'Content-Disposition': `attachment; filename="market_comparison.${fileExtension}"`,
+      },
+    })
 
-export async function GET() {
-  return NextResponse.json({
-    message: 'Export API',
-    supportedFormats: ['csv', 'json'],
-    supportedTypes: ['company', 'product', 'search-results', 'regulator'],
-    usage: {
-      method: 'POST',
-      body: {
-        type: 'company | product | search-results | regulator',
-        format: 'csv | json',
-        data: 'array | object',
-        filename: 'optional string'
-      }
-    }
-  });
+  } catch (error) {
+    console.error('Error generating export:', error)
+    return NextResponse.json({
+      success: false,
+      error: 'Internal server error'
+    }, { status: 500 })
+  }
 }

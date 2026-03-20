@@ -4,10 +4,14 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
+// 缓存机制
+const cache = new Map<string, { data: any; timestamp: number }>()
+const CACHE_TTL = 5 * 60 * 1000 // 5 分钟缓存
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
-    const countries = searchParams.get('countries') // Comma-separated country codes
+    const countries = searchParams.get('countries')
     const product = searchParams.get('product')
 
     if (!countries) {
@@ -15,6 +19,15 @@ export async function GET(request: NextRequest) {
         success: false,
         error: 'Please provide countries parameter'
       }, { status: 400 })
+    }
+
+    // 生成缓存键
+    const cacheKey = `compare:${countries}:${product || ''}`
+    
+    // 检查缓存
+    const cached = cache.get(cacheKey)
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      return NextResponse.json(cached.data)
     }
 
     const countryList = countries.split(',').map(c => c.trim())
@@ -48,11 +61,19 @@ export async function GET(request: NextRequest) {
       }, { status: 500 })
     }
 
-    return NextResponse.json({
+    const responseData = {
       success: true,
       data: data || [],
       total: data?.length || 0
+    }
+
+    // 写入缓存
+    cache.set(cacheKey, {
+      data: responseData,
+      timestamp: Date.now()
     })
+
+    return NextResponse.json(responseData)
 
   } catch (error) {
     console.error('Error in compare API:', error)

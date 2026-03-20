@@ -4,6 +4,10 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
+// 简单的内存缓存（生产环境建议使用 Redis）
+const cache = new Map<string, { data: any; timestamp: number }>()
+const CACHE_TTL = 5 * 60 * 1000 // 5 分钟缓存
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
@@ -18,6 +22,17 @@ export async function GET(request: NextRequest) {
       }, { status: 400 })
     }
 
+    // 生成缓存键
+    const cacheKey = `market-access:${product || ''}:${country || ''}:${keywords || ''}`
+    
+    // 检查缓存
+    const cached = cache.get(cacheKey)
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      console.log('Cache hit:', cacheKey)
+      return NextResponse.json(cached.data)
+    }
+
+    console.log('Cache miss:', cacheKey)
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     // Build query
@@ -68,12 +83,20 @@ export async function GET(request: NextRequest) {
       .eq('is_free', true)
       .limit(10)
 
-    return NextResponse.json({
+    const responseData = {
       success: true,
       data: data || [],
       templates: templates || [],
       total: data?.length || 0
+    }
+
+    // 写入缓存
+    cache.set(cacheKey, {
+      data: responseData,
+      timestamp: Date.now()
     })
+
+    return NextResponse.json(responseData)
 
   } catch (error) {
     console.error('Error in market-access API:', error)
