@@ -91,17 +91,17 @@ export default function CompareMarketsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           data: comparisonData.map(item => ({
-            国家：item.country_name,
-            分类：item.classification,
-            官方费用_USD: item.official_fees_usd,
-            注册周期_天：item.estimated_days_avg,
-            证书有效期_月：item.validity_period,
-            GMP 要求：item.gmp_required ? '需要' : '不需要',
-            本地代理：item.local_agent_required ? '需要' : '不需要',
-            临床数据：item.clinical_data_required ? '需要' : '不需要',
-            准入难度：item.difficulty_index,
-            文件数量：item.required_documents?.length || 0,
-            流程步骤：item.process_steps?.length || 0,
+            '国家': item.country_name,
+            '分类': item.classification,
+            '官方费用_USD': item.official_fees_usd,
+            '注册周期_天': item.estimated_days_avg,
+            '证书有效期_月': item.validity_period,
+            'GMP要求': item.gmp_required ? '需要' : '不需要',
+            '本地代理': item.local_agent_required ? '需要' : '不需要',
+            '临床数据': item.clinical_data_required ? '需要' : '不需要',
+            '准入难度': item.difficulty_index,
+            '文件数量': item.required_documents?.length || 0,
+            '流程步骤': item.process_steps?.length || 0,
           })),
           format
         })

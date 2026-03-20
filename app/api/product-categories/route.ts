@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Build category tree
-    const buildTree = (categories: any[], parentId: string | null = null) => {
+    const buildTree = (categories: any[], parentId: string | null = null): any[] => {
       return categories
         .filter(cat => cat.parent_id === parentId)
         .map(cat => ({

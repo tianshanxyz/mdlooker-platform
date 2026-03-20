@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseClient } from '../../lib/supabase';
+import { expandSearchQuery, normalizeSearchTerm, detectQueryCategories } from '../../lib/search-synonyms';
 
 // 计算字符串相似度 (Levenshtein Distance)
 function levenshteinDistance(str1: string, str2: string): number {
@@ -277,20 +278,29 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = getSupabaseClient();
     const detectedType = searchType === 'auto' ? detectSearchType(query) : searchType as any;
-    const searchTerms = query.split(/\s+/).filter(term => term.length > 0);
     const hasChinese = /[\u4e00-\u9fa5]/.test(query);
+    
+    // 使用同义词扩展搜索词
+    const expandedTerms = expandSearchQuery(query);
+    const searchTerms = query.split(/\s+/).filter(term => term.length > 0);
+    const queryCategories = detectQueryCategories(query);
+    
+    console.log('[Search] Original query:', query);
+    console.log('[Search] Expanded terms:', expandedTerms);
+    console.log('[Search] Detected categories:', queryCategories);
     
     let allResults: any[] = [];
     let totalCount = 0;
 
-    // 1. 搜索公司
+    // 1. 搜索公司 - 使用同义词扩展
     if ((detectedType === 'company' || detectedType === 'general') && (source === 'all' || source === 'companies')) {
       let companyQuery = supabase
         .from('companies')
         .select('*', { count: 'exact' });
 
-      if (searchTerms.length > 0) {
-        const orConditions = searchTerms.map(term => {
+      // 使用扩展后的搜索词
+      if (expandedTerms.length > 0) {
+        const orConditions = expandedTerms.map(term => {
           const cleanTerm = term.replace(/[%_]/g, '\\$&');
           return `name.ilike.%${cleanTerm}%,name_zh.ilike.%${cleanTerm}%,description.ilike.%${cleanTerm}%`;
         }).join(',');
@@ -322,7 +332,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // 2. 搜索产品
+    // 2. 搜索产品 - 使用同义词扩展
     if ((detectedType === 'product' || (detectedType === 'general' && allResults.length < 5)) && (source === 'all' || source === 'products')) {
       let productQuery = supabase
         .from('products')
@@ -331,10 +341,11 @@ export async function GET(request: NextRequest) {
           company:companies(id, name, name_zh, country)
         `, { count: 'exact' });
 
-      if (searchTerms.length > 0) {
-        const orConditions = searchTerms.map(term => {
+      // 使用扩展后的搜索词
+      if (expandedTerms.length > 0) {
+        const orConditions = expandedTerms.map(term => {
           const cleanTerm = term.replace(/[%_]/g, '\\$&');
-          return `name.ilike.%${cleanTerm}%,name_zh.ilike.%${cleanTerm}%,description.ilike.%${cleanTerm}%`;
+          return `name.ilike.%${cleanTerm}%,name_zh.ilike.%${cleanTerm}%,description.ilike.%${cleanTerm}%,category.ilike.%${cleanTerm}%`;
         }).join(',');
         productQuery = productQuery.or(orConditions);
       }
@@ -356,20 +367,21 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // 3. 搜索NMPA注册 (中国) - 通过产品/公司名称反查公司
+    // 3. 搜索 NMPA 注册 (中国) - 使用同义词扩展
     if ((hasChinese || detectedType === 'general' || detectedType === 'company' || source === 'nmpa') && (source === 'all' || source === 'nmpa')) {
       try {
-        console.log('[NMPA Search] Query:', query, 'hasChinese:', hasChinese, 'searchTerms:', searchTerms);
+        console.log('[NMPA Search] Query:', query, 'hasChinese:', hasChinese, 'expandedTerms:', expandedTerms);
         
         // NMPA 表的 company_id 都是 NULL，所以不关联 companies 表
         let nmpaQuery = supabase
           .from('nmpa_registrations')
           .select('*', { count: 'exact' });
 
-        if (searchTerms.length > 0) {
-          const orConditions = searchTerms.map(term => {
+        // 使用扩展后的搜索词
+        if (expandedTerms.length > 0) {
+          const orConditions = expandedTerms.map(term => {
             const cleanTerm = term.replace(/[%_]/g, '\\$&');
-            // NMPA表使用 manufacturer/registration_holder 而不是 company_name
+            // NMPA 表使用 manufacturer/registration_holder 而不是 company_name
             return `product_name.ilike.%${cleanTerm}%,product_name_zh.ilike.%${cleanTerm}%,manufacturer.ilike.%${cleanTerm}%,manufacturer_zh.ilike.%${cleanTerm}%,registration_holder.ilike.%${cleanTerm}%,registration_holder_zh.ilike.%${cleanTerm}%,registration_number.ilike.%${cleanTerm}%`;
           }).join(',');
           nmpaQuery = nmpaQuery.or(orConditions);
@@ -447,7 +459,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // 4. 搜索FDA注册
+    // 4. 搜索 FDA 注册 - 使用同义词扩展
     if ((source === 'all' || source === 'fda') && !hasNMPA && !hasEUDAMED) {
       const { data: fdaData, error } = await supabase
         .from('fda_registrations')
@@ -455,10 +467,10 @@ export async function GET(request: NextRequest) {
           *,
           company:companies(*)
         `)
-        .or(searchTerms.map(term => {
+        .or(expandedTerms.map(term => {
           const cleanTerm = term.replace(/[%_]/g, '\\$&');
-          // FDA表没有company_name字段，使用关联查询
-          return `device_name.ilike.%${cleanTerm}%,device_description.ilike.%${cleanTerm}%`;
+          // FDA 表没有 company_name 字段，使用关联查询
+          return `device_name.ilike.%${cleanTerm}%,device_description.ilike.%${cleanTerm}%,product_code.ilike.%${cleanTerm}%`;
         }).join(','))
         .limit(pageSize);
 
@@ -492,7 +504,7 @@ export async function GET(request: NextRequest) {
     // 去重 - 基于公司ID
     const uniqueResults = Array.from(new Map(allResults.map(item => [item.id, item])).values());
 
-    // 计算匹配分数并排序
+    // 计算匹配分数并排序 - 增强模糊匹配算法
     if (query && uniqueResults.length > 0) {
       const queryLower = query.toLowerCase();
       
@@ -502,24 +514,78 @@ export async function GET(request: NextRequest) {
         const nameZh = (item.name_zh || '').toLowerCase();
         const description = (item.description || '').toLowerCase();
         
+        // 1. 精确匹配 (100 分)
         if (name === queryLower || nameZh === queryLower) {
           score += 100;
-        } else if (name.startsWith(queryLower) || nameZh.startsWith(queryLower)) {
+        }
+        // 2. 前缀匹配 (80 分)
+        else if (name.startsWith(queryLower) || nameZh.startsWith(queryLower)) {
           score += 80;
-        } else if (name.includes(queryLower) || nameZh.includes(queryLower)) {
+        }
+        // 3. 包含匹配 (60 分)
+        else if (name.includes(queryLower) || nameZh.includes(queryLower)) {
           score += 60;
-        } else if (description.includes(queryLower)) {
+        }
+        // 4. 描述匹配 (40 分)
+        else if (description.includes(queryLower)) {
           score += 40;
-        } else {
+        }
+        // 5. 模糊匹配 - Levenshtein Distance (0-50 分)
+        else {
           const nameScore = similarityScore(name, queryLower);
           const nameZhScore = similarityScore(nameZh, queryLower);
-          score += Math.max(nameScore, nameZhScore) * 50;
+          const maxScore = Math.max(nameScore, nameZhScore);
+          score += maxScore * 50;
+          
+          // 部分匹配加分：如果查询词是名称的一部分
+          if (name.includes(queryLower) || nameZh.includes(queryLower)) {
+            score += 20;
+          }
+          
+          // 词根匹配：如果有共同的词根
+          const queryWords = queryLower.split(/\s+/);
+          const nameWords = name.split(/\s+/);
+          const nameZhWords = nameZh.split(/\s+/);
+          
+          queryWords.forEach((qWord: string) => {
+            nameWords.forEach((nWord: string) => {
+              if (nWord.startsWith(qWord) || qWord.startsWith(nWord)) {
+                score += 10;
+              }
+            });
+            nameZhWords.forEach((nWord: string) => {
+              if (nWord.startsWith(qWord) || qWord.startsWith(nWord)) {
+                score += 10;
+              }
+            });
+          });
         }
         
+        // 6. 类型匹配加分
         if (detectedType === 'product' && item.resultType === 'product') {
-          score += 10;
+          score += 15;
         } else if (detectedType === 'company' && item.resultType === 'company') {
-          score += 10;
+          score += 15;
+        } else if (detectedType === 'udi' && item.resultType === 'udi') {
+          score += 20;
+        }
+        
+        // 7. 同义词匹配加分
+        const normalizedQuery = normalizeSearchTerm(query);
+        if (normalizedQuery !== query) {
+          // 如果查询词有同义词映射，检查名称是否匹配标准词
+          if (name.includes(normalizedQuery.toLowerCase()) || nameZh.includes(normalizedQuery.toLowerCase())) {
+            score += 25;
+          }
+        }
+        
+        // 8. 分类匹配加分
+        if (queryCategories.length > 0 && item.category) {
+          const itemCategories = Array.isArray(item.category) ? item.category : [item.category];
+          const hasCategoryMatch = queryCategories.some(cat => itemCategories.includes(cat));
+          if (hasCategoryMatch) {
+            score += 10;
+          }
         }
         
         return { ...item, matchScore: score };
@@ -562,7 +628,18 @@ export async function GET(request: NextRequest) {
       suggestions,
       detectedType,
       query,
-      hasMore: allResults.length > pageSize
+      hasMore: allResults.length > pageSize,
+      // 增强信息
+      searchMetadata: {
+        originalQuery: query,
+        expandedTerms,
+        queryCategories,
+        normalizedTerm: normalizeSearchTerm(query),
+        matchedTypes: {
+          companies: allResults.filter((r: any) => r.resultType === 'company').length,
+          products: allResults.filter((r: any) => r.resultType === 'product').length,
+        }
+      }
     });
 
   } catch (error) {
