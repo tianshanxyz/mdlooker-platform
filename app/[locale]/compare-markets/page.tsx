@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Globe, ArrowRight, Download, RefreshCw, AlertCircle, Sparkles, CheckCircle2 } from 'lucide-react'
 import CountrySelector from '@/app/components/CountrySelector'
 
 interface MarketAccessData {
@@ -127,14 +128,20 @@ export default function CompareMarketsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative overflow-hidden bg-gradient-to-r from-[#339999] to-[#2a7a7a] text-white py-20">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full mb-6 backdrop-blur-sm">
+            <Globe className="w-4 h-4" />
+            <span className="text-sm font-medium">Market Comparison</span>
+          </div>
           <h1 className="text-4xl font-bold text-center mb-4">
             市场对比工具
           </h1>
-          <p className="text-xl text-purple-100 text-center max-w-3xl mx-auto">
+          <p className="text-xl text-white/90 text-center max-w-3xl mx-auto">
             一键对比多个市场的认证要求：分类标准、文件清单、费用周期横向对比，助您快速决策
           </p>
         </div>
@@ -144,11 +151,11 @@ export default function CompareMarketsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Country Selection */}
         <div className="mb-8">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">选择要对比的国家/地区</h3>
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-100 shadow-sm">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">选择要对比的国家/地区</h3>
             <div className="mb-4">
-              <p className="text-sm text-gray-600 mb-2">
-                已选择：<span className="font-medium text-purple-600">{selectedCountries.length}</span> 个
+              <p className="text-sm text-slate-600 mb-2">
+                已选择：<span className="font-medium text-[#339999]">{selectedCountries.length}</span> 个
                 （最多 4 个）
               </p>
               {selectedCountries.length > 0 && (
@@ -156,12 +163,12 @@ export default function CompareMarketsPage() {
                   {selectedCountries.map(code => (
                     <span
                       key={code}
-                      className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-700"
+                      className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-[#339999]/10 to-[#2a7a7a]/10 text-[#339999] border border-[#339999]/20"
                     >
                       {code}
                       <button
                         onClick={() => handleCountrySelect(code)}
-                        className="ml-2 hover:text-purple-900"
+                        className="ml-2 hover:text-[#2a7a7a] transition-colors"
                       >
                         ×
                       </button>
@@ -178,44 +185,57 @@ export default function CompareMarketsPage() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-center space-x-4 mb-8">
+        <div className="flex justify-center gap-4 mb-8">
           <button
             onClick={handleCompare}
             disabled={loading || selectedCountries.length < 2}
-            className={`px-8 py-3 rounded-lg font-medium text-white transition-colors ${
+            className={`px-8 py-3 rounded-xl font-medium text-white transition-all flex items-center gap-2 ${
               loading || selectedCountries.length < 2
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-purple-600 hover:bg-purple-700'
+                ? 'bg-slate-400 cursor-not-allowed'
+                : 'bg-gradient-to-r from-[#339999] to-[#2a7a7a] hover:shadow-lg hover:shadow-[#339999]/30'
             }`}
           >
-            {loading ? '对比中...' : '开始对比'}
+            {loading ? (
+              <>
+                <RefreshCw className="w-5 h-5 animate-spin" />
+                对比中...
+              </>
+            ) : (
+              <>
+                <ArrowRight className="w-5 h-5" />
+                开始对比
+              </>
+            )}
           </button>
           <button
             onClick={handleReset}
-            className="px-8 py-3 rounded-lg font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors"
+            className="px-8 py-3 rounded-xl font-medium text-slate-700 bg-white border border-slate-200 hover:border-[#339999]/30 hover:shadow-md transition-all"
           >
             重置
           </button>
           {comparisonData.length > 0 && (
             <div className="relative group">
               <button
-                className="px-8 py-3 rounded-lg font-medium text-purple-600 bg-white border border-purple-300 hover:bg-purple-50 transition-colors"
+                className="px-8 py-3 rounded-xl font-medium text-[#339999] bg-white border border-[#339999]/30 hover:bg-[#339999]/5 hover:shadow-md transition-all flex items-center gap-2"
               >
+                <Download className="w-5 h-5" />
                 导出对比表
               </button>
-              <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+              <div className="absolute right-0 mt-2 w-40 bg-white rounded-xl shadow-xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
                 <div className="py-2">
                   <button
                     onClick={() => handleExport('csv')}
-                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+                    className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-[#339999]/5 hover:text-[#339999] transition-colors flex items-center gap-2"
                   >
-                    📊 导出为 CSV
+                    <CheckCircle2 className="w-4 h-4" />
+                    导出为 CSV
                   </button>
                   <button
                     onClick={() => handleExport('json')}
-                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+                    className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-[#339999]/5 hover:text-[#339999] transition-colors flex items-center gap-2"
                   >
-                    📄 导出为 JSON
+                    <Download className="w-4 h-4" />
+                    导出为 JSON
                   </button>
                 </div>
               </div>
@@ -225,12 +245,10 @@ export default function CompareMarketsPage() {
 
         {/* Error Message */}
         {error && (
-          <div className="mb-8 bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg">
-            <div className="flex">
-              <svg className="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-              </svg>
-              <div className="ml-3">
+          <div className="mb-8 bg-red-50 border border-red-200 rounded-2xl p-4">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
                 <p className="text-sm text-red-700">{error}</p>
               </div>
             </div>
@@ -239,59 +257,59 @@ export default function CompareMarketsPage() {
 
         {/* Loading State */}
         {loading && (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
-            <p className="mt-4 text-gray-600">正在对比市场数据...</p>
+          <div className="text-center py-12 bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-100 shadow-sm">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#339999]"></div>
+            <p className="mt-4 text-slate-600">正在对比市场数据...</p>
           </div>
         )}
 
         {/* Comparison Table */}
         {comparisonData.length > 0 && !loading && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-900">市场对比结果</h2>
-              <p className="text-gray-600 mt-1">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-slate-100 bg-gradient-to-r from-[#339999]/5 to-[#2a7a7a]/5">
+              <h2 className="text-2xl font-bold text-slate-900">市场对比结果</h2>
+              <p className="text-slate-600 mt-1">
                 对比 {comparisonData.length} 个市场的准入要求
               </p>
             </div>
 
             {/* Comparison Table */}
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <table className="min-w-full">
+                <thead>
+                  <tr className="bg-slate-50">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
                       对比项
                     </th>
                     {comparisonData.map((data) => (
-                      <th key={data.id} className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th key={data.id} className="px-6 py-3 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider">
                         {data.country_name}
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="divide-y divide-slate-100">
                   {/* Classification */}
-                  <tr>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <tr className="hover:bg-slate-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900">
                       产品分类
                     </td>
                     {comparisonData.map((data) => (
-                      <td key={data.id} className="px-6 py-4 text-sm text-gray-900 text-center">
+                      <td key={data.id} className="px-6 py-4 text-sm text-slate-700 text-center">
                         {data.classification}
                       </td>
                     ))}
                   </tr>
 
                   {/* Official Fees */}
-                  <tr className="bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <tr className="bg-gradient-to-r from-[#339999]/5 to-[#2a7a7a]/5 hover:from-[#339999]/10 hover:to-[#2a7a7a]/10 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900">
                       官方费用
                     </td>
                     {comparisonData.map((data) => (
-                      <td key={data.id} className="px-6 py-4 text-sm text-gray-900 text-center">
-                        <div className="font-bold text-green-600">${data.official_fees_usd}</div>
-                        <div className="text-xs text-gray-500">
+                      <td key={data.id} className="px-6 py-4 text-sm text-slate-900 text-center">
+                        <div className="font-bold text-[#339999]">${data.official_fees_usd}</div>
+                        <div className="text-xs text-slate-500">
                           {data.currency} {data.official_fees}
                         </div>
                       </td>
@@ -299,14 +317,14 @@ export default function CompareMarketsPage() {
                   </tr>
 
                   {/* Estimated Days */}
-                  <tr>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <tr className="hover:bg-slate-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900">
                       注册周期
                     </td>
                     {comparisonData.map((data) => (
-                      <td key={data.id} className="px-6 py-4 text-sm text-gray-900 text-center">
-                        <div className="font-bold text-blue-600">{data.estimated_days_avg}天</div>
-                        <div className="text-xs text-gray-500">
+                      <td key={data.id} className="px-6 py-4 text-sm text-slate-700 text-center">
+                        <div className="font-bold text-[#339999]">{data.estimated_days_avg}天</div>
+                        <div className="text-xs text-slate-500">
                           {data.estimated_days_min}-{data.estimated_days_max}天
                         </div>
                       </td>
@@ -314,73 +332,73 @@ export default function CompareMarketsPage() {
                   </tr>
 
                   {/* Validity Period */}
-                  <tr className="bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <tr className="bg-gradient-to-r from-[#339999]/5 to-[#2a7a7a]/5 hover:from-[#339999]/10 hover:to-[#2a7a7a]/10 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900">
                       证书有效期
                     </td>
                     {comparisonData.map((data) => (
-                      <td key={data.id} className="px-6 py-4 text-sm text-gray-900 text-center">
+                      <td key={data.id} className="px-6 py-4 text-sm text-slate-700 text-center">
                         {data.validity_period}个月
                       </td>
                     ))}
                   </tr>
 
                   {/* GMP Required */}
-                  <tr>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <tr className="hover:bg-slate-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900">
                       GMP 要求
                     </td>
                     {comparisonData.map((data) => (
                       <td key={data.id} className="px-6 py-4 text-center">
                         {data.gmp_required ? (
-                          <span className="px-2 py-1 bg-red-100 text-red-600 text-xs font-medium rounded">需要</span>
+                          <span className="px-3 py-1 bg-red-50 text-red-600 text-xs font-medium rounded-full border border-red-200">需要</span>
                         ) : (
-                          <span className="px-2 py-1 bg-green-100 text-green-600 text-xs font-medium rounded">不需要</span>
+                          <span className="px-3 py-1 bg-green-50 text-green-600 text-xs font-medium rounded-full border border-green-200">不需要</span>
                         )}
                       </td>
                     ))}
                   </tr>
 
                   {/* Local Agent Required */}
-                  <tr className="bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <tr className="bg-gradient-to-r from-[#339999]/5 to-[#2a7a7a]/5 hover:from-[#339999]/10 hover:to-[#2a7a7a]/10 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900">
                       本地代理
                     </td>
                     {comparisonData.map((data) => (
                       <td key={data.id} className="px-6 py-4 text-center">
                         {data.local_agent_required ? (
-                          <span className="px-2 py-1 bg-yellow-100 text-yellow-600 text-xs font-medium rounded">需要</span>
+                          <span className="px-3 py-1 bg-amber-50 text-amber-600 text-xs font-medium rounded-full border border-amber-200">需要</span>
                         ) : (
-                          <span className="px-2 py-1 bg-green-100 text-green-600 text-xs font-medium rounded">不需要</span>
+                          <span className="px-3 py-1 bg-green-50 text-green-600 text-xs font-medium rounded-full border border-green-200">不需要</span>
                         )}
                       </td>
                     ))}
                   </tr>
 
                   {/* Clinical Data Required */}
-                  <tr>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <tr className="hover:bg-slate-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900">
                       临床数据
                     </td>
                     {comparisonData.map((data) => (
                       <td key={data.id} className="px-6 py-4 text-center">
                         {data.clinical_data_required ? (
-                          <span className="px-2 py-1 bg-red-100 text-red-600 text-xs font-medium rounded">需要</span>
+                          <span className="px-3 py-1 bg-red-50 text-red-600 text-xs font-medium rounded-full border border-red-200">需要</span>
                         ) : (
-                          <span className="px-2 py-1 bg-green-100 text-green-600 text-xs font-medium rounded">不需要</span>
+                          <span className="px-3 py-1 bg-green-50 text-green-600 text-xs font-medium rounded-full border border-green-200">不需要</span>
                         )}
                       </td>
                     ))}
                   </tr>
 
                   {/* Difficulty Index */}
-                  <tr className="bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <tr className="bg-gradient-to-r from-[#339999]/5 to-[#2a7a7a]/5 hover:from-[#339999]/10 hover:to-[#2a7a7a]/10 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900">
                       准入难度
                     </td>
                     {comparisonData.map((data) => {
                       const difficultyColor = data.difficulty_index <= 30 ? 'text-green-600' :
-                                             data.difficulty_index <= 60 ? 'text-yellow-600' : 'text-red-600'
+                                             data.difficulty_index <= 60 ? 'text-amber-600' : 'text-red-600'
                       return (
                         <td key={data.id} className="px-6 py-4 text-center">
                           <div className={`font-bold ${difficultyColor}`}>
@@ -392,24 +410,24 @@ export default function CompareMarketsPage() {
                   </tr>
 
                   {/* Document Count */}
-                  <tr>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <tr className="hover:bg-slate-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900">
                       文件数量
                     </td>
                     {comparisonData.map((data) => (
-                      <td key={data.id} className="px-6 py-4 text-sm text-gray-900 text-center">
+                      <td key={data.id} className="px-6 py-4 text-sm text-slate-700 text-center">
                         {data.required_documents?.length || 0} 项
                       </td>
                     ))}
                   </tr>
 
                   {/* Process Steps */}
-                  <tr className="bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <tr className="bg-gradient-to-r from-[#339999]/5 to-[#2a7a7a]/5 hover:from-[#339999]/10 hover:to-[#2a7a7a]/10 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900">
                       流程步骤
                     </td>
                     {comparisonData.map((data) => (
-                      <td key={data.id} className="px-6 py-4 text-sm text-gray-900 text-center">
+                      <td key={data.id} className="px-6 py-4 text-sm text-slate-700 text-center">
                         {data.process_steps?.length || 0} 步
                       </td>
                     ))}
@@ -422,12 +440,10 @@ export default function CompareMarketsPage() {
 
         {/* Empty State */}
         {!loading && comparisonData.length === 0 && !error && (
-          <div className="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-200">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">等待对比</h3>
-            <p className="mt-1 text-sm text-gray-500">
+          <div className="text-center py-12 bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-100 shadow-sm">
+            <Globe className="mx-auto h-12 w-12 text-slate-400" />
+            <h3 className="mt-2 text-sm font-medium text-slate-900">等待对比</h3>
+            <p className="mt-1 text-sm text-slate-500">
               请选择至少 2 个国家，然后点击"开始对比"按钮
             </p>
           </div>
