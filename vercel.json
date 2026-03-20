@@ -1,6 +1,12 @@
 {
-  "buildCommand": "next build",
-  "devCommand": "next dev",
-  "installCommand": "npm install",
-  "framework": "nextjs"
+  "crons": [
+    {
+      "path": "/api/cron/sync-fda",
+      "schedule": "0 2 * * 0"
+    },
+    {
+      "path": "/api/admin/storage-monitor",
+      "schedule": "0 6 * * *"
+    }
+  ]
 }
