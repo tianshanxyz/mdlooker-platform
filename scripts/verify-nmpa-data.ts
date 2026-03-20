@@ -6,6 +6,9 @@
  * npx ts-node scripts/verify-nmpa-data.ts
  */
 
+import dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
+
 import { getSupabaseClient } from '../app/lib/supabase';
 
 interface NMPAVerificationResult {
@@ -209,26 +212,24 @@ function calculateQualityScore(result: NMPAVerificationResult): number {
 }
 
 // CLI入口
-if (require.main === module) {
-  verifyNMPAData()
-    .then(result => {
-      const qualityScore = calculateQualityScore(result);
-      console.log(`\n📊 Data Quality Score: ${qualityScore}/100`);
-      
-      if (qualityScore >= 80) {
-        console.log('✅ Data quality is good');
-      } else if (qualityScore >= 60) {
-        console.log('⚠️  Data quality needs improvement');
-      } else {
-        console.log('❌ Data quality is poor, re-import recommended');
-      }
-      
-      process.exit(0);
-    })
-    .catch(error => {
-      console.error('Verification failed:', error);
-      process.exit(1);
-    });
-}
+verifyNMPAData()
+  .then(result => {
+    const qualityScore = calculateQualityScore(result);
+    console.log(`\n📊 Data Quality Score: ${qualityScore}/100`);
+    
+    if (qualityScore >= 80) {
+      console.log('✅ Data quality is good');
+    } else if (qualityScore >= 60) {
+      console.log('⚠️  Data quality needs improvement');
+    } else {
+      console.log('❌ Data quality is poor, re-import recommended');
+    }
+    
+    process.exit(0);
+  })
+  .catch(error => {
+    console.error('Verification failed:', error);
+    process.exit(1);
+  });
 
 export { verifyNMPAData };

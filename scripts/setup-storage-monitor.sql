@@ -27,16 +27,17 @@ RETURNS TABLE (
 BEGIN
     RETURN QUERY
     SELECT 
-        t.table_name::TEXT,
-        (SELECT COUNT(*) FROM pg_stat_user_tables WHERE relname = t.table_name)::BIGINT as row_count,
-        pg_size_pretty(pg_relation_size('"' || t.table_name || '"'::regclass)) as table_size,
-        pg_size_pretty(pg_indexes_size('"' || t.table_name || '"'::regclass)) as index_size,
-        pg_size_pretty(pg_total_relation_size('"' || t.table_name || '"'::regclass)) as total_size,
-        pg_total_relation_size('"' || t.table_name || '"'::regclass)::BIGINT as size_bytes
-    FROM information_schema.tables t
-    WHERE t.table_schema = 'public'
-    AND t.table_type = 'BASE TABLE'
-    ORDER BY pg_total_relation_size('"' || t.table_name || '"'::regclass) DESC;
+        c.relname::TEXT as table_name,
+        c.reltuples::BIGINT as row_count,
+        pg_size_pretty(pg_relation_size(c.oid)) as table_size,
+        pg_size_pretty(pg_indexes_size(c.oid)) as index_size,
+        pg_size_pretty(pg_total_relation_size(c.oid)) as total_size,
+        pg_total_relation_size(c.oid)::BIGINT as size_bytes
+    FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = 'public'
+    AND c.relkind = 'r'
+    ORDER BY pg_total_relation_size(c.oid) DESC;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 

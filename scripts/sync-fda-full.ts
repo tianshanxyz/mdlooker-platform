@@ -9,6 +9,9 @@
  * 注意: 完整同步可能需要数小时，取决于API速率限制
  */
 
+import dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
+
 import { getSupabaseClient } from '../app/lib/supabase';
 
 const FDA_API_BASE = 'https://api.fda.gov/device';
@@ -395,39 +398,37 @@ async function syncFDAFull(options: {
 }
 
 // CLI 入口
-if (require.main === module) {
-  const args = process.argv.slice(2);
-  const maxRecords = args[0] ? parseInt(args[0]) : undefined;
-  const startFrom = args[1] ? parseInt(args[1]) : 0;
-  
-  console.log('FDA Full Sync Tool');
-  console.log('==================\n');
-  
-  if (args.includes('--help') || args.includes('-h')) {
-    console.log('Usage:');
-    console.log('  npx ts-node scripts/sync-fda-full.ts [maxRecords] [startFrom]');
-    console.log('');
-    console.log('Examples:');
-    console.log('  npx ts-node scripts/sync-fda-full.ts           # Sync all records');
-    console.log('  npx ts-node scripts/sync-fda-full.ts 10000     # Sync first 10,000 records');
-    console.log('  npx ts-node scripts/sync-fda-full.ts 10000 50000 # Sync 10,000 records starting from 50,000');
-    console.log('');
-    console.log('Environment Variables:');
-    console.log('  FDA_API_KEY      - FDA API key (optional but recommended)');
-    console.log('  SUPABASE_URL     - Supabase URL');
-    console.log('  SUPABASE_KEY     - Supabase service key');
-    process.exit(0);
-  }
-  
-  syncFDAFull({ maxRecords, startFrom })
-    .then(result => {
-      console.log('\nSync completed:', result.status);
-      process.exit(result.success ? 0 : 1);
-    })
-    .catch(error => {
-      console.error('\nSync failed:', error);
-      process.exit(1);
-    });
+const args = process.argv.slice(2);
+const maxRecords = args[0] ? parseInt(args[0]) : undefined;
+const startFrom = args[1] ? parseInt(args[1]) : 0;
+
+console.log('FDA Full Sync Tool');
+console.log('==================\n');
+
+if (args.includes('--help') || args.includes('-h')) {
+  console.log('Usage:');
+  console.log('  npx ts-node scripts/sync-fda-full.ts [maxRecords] [startFrom]');
+  console.log('');
+  console.log('Examples:');
+  console.log('  npx ts-node scripts/sync-fda-full.ts           # Sync all records');
+  console.log('  npx ts-node scripts/sync-fda-full.ts 10000     # Sync first 10,000 records');
+  console.log('  npx ts-node scripts/sync-fda-full.ts 10000 50000 # Sync 10,000 records starting from 50,000');
+  console.log('');
+  console.log('Environment Variables:');
+  console.log('  FDA_API_KEY      - FDA API key (optional but recommended)');
+  console.log('  SUPABASE_URL     - Supabase URL');
+  console.log('  SUPABASE_KEY     - Supabase service key');
+  process.exit(0);
 }
+
+syncFDAFull({ maxRecords, startFrom })
+  .then(result => {
+    console.log('\nSync completed:', result.status);
+    process.exit(result.success ? 0 : 1);
+  })
+  .catch(error => {
+    console.error('\nSync failed:', error);
+    process.exit(1);
+  });
 
 export { syncFDAFull };

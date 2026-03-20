@@ -34,6 +34,7 @@ export default function LocaleLayout({
     { href: `/${locale}/regulations`, labelEn: 'Regulations', labelZh: '法规动态' },
     { href: `/${locale}/regulators`, labelEn: 'Regulators', labelZh: '监管数据库' },
     { href: `/${locale}/help`, labelEn: 'Help Center', labelZh: '帮助中心' },
+    { href: `/${locale}/cases`, labelEn: 'Cases', labelZh: '客户案例' },
     { href: `/${locale}/guides`, labelEn: 'Guides', labelZh: '指南' },
   ];
 

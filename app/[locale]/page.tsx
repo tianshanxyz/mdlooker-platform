@@ -7,7 +7,7 @@ import { translations, locales, type Locale } from '../i18n-config';
 import SEO from '../components/SEO';
 import { StructuredData } from '../components/StructuredData';
 import { combinedHomeSchema } from '../lib/schema-config';
-import { Building2, Package, ScanBarcode, Globe, Shield, Sparkles } from 'lucide-react';
+import { Building2, Package, ScanBarcode, Globe, Shield, Sparkles, Users, CheckCircle, TrendingUp, Clock } from 'lucide-react';
 
 export default function HomePage() {
   const params = useParams();
@@ -23,6 +23,24 @@ export default function HomePage() {
 
   const t = translations[locale];
   const isZh = locale === 'zh';
+
+  const [stats, setStats] = useState<any[]>([])
+
+  useEffect(() => {
+    fetchStats()
+  }, [locale])
+
+  const fetchStats = async () => {
+    try {
+      const response = await fetch('/api/stats')
+      const result = await response.json()
+      if (result.success) {
+        setStats(result.data)
+      }
+    } catch (err) {
+      console.error('Error fetching stats:', err)
+    }
+  }
 
   const handleSearch = (query: string) => {
     if (query.trim()) {
@@ -150,6 +168,32 @@ export default function HomePage() {
                 </Link>
               ))}
             </div>
+
+            {/* 数据统计展示 */}
+            {stats.length > 0 && (
+              <div className="mt-20">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+                  {stats.slice(0, 8).map((stat, index) => (
+                    <div key={index} className="text-center">
+                      <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-[#339999]/10 to-[#2a7a7a]/10 mb-3">
+                        {stat.stat_type === 'counter' && <Building2 className="w-7 h-7 text-[#339999]" />}
+                        {stat.stat_type === 'percentage' && <TrendingUp className="w-7 h-7 text-[#339999]" />}
+                        {stat.stat_type === 'days' && <Clock className="w-7 h-7 text-[#339999]" />}
+                      </div>
+                      <div className="text-2xl font-bold text-slate-900 mb-1">
+                        {stat.stat_type === 'percentage' ? `${stat.stat_value}%` : 
+                         stat.stat_type === 'days' ? `${stat.stat_value}d` :
+                         stat.stat_value >= 1000 ? `${(stat.stat_value / 1000).toFixed(1)}k+` : 
+                         stat.stat_value}
+                      </div>
+                      <div className="text-sm text-slate-500">
+                        {isZh ? stat.stat_label_zh : stat.stat_label_en}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
         </div>
       </main>
       </div>
