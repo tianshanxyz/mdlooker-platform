@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { Shield, Globe, AlertCircle, Calendar, FileText, Sparkles } from 'lucide-react'
 
 interface Regulation {
   id: string
@@ -23,6 +24,7 @@ const translations = {
   zh: {
     title: '法规动态',
     subtitle: '实时追踪全球医疗器械法规变化，掌握最新政策动态',
+    badge: '实时法规追踪',
     allCountries: '全部国家',
     allImportance: '全部级别',
     filter: '筛选',
@@ -38,11 +40,13 @@ const translations = {
     medium: '中等',
     low: '一般',
     subscribe: '订阅更新',
-    subscribeDesc: '获取最新法规更新推送'
+    subscribeDesc: '获取最新法规更新推送',
+    subscribeNow: '立即订阅'
   },
   en: {
     title: 'Regulation Updates',
     subtitle: 'Real-time tracking of global medical device regulation changes',
+    badge: 'Real-time Tracking',
     allCountries: 'All Countries',
     allImportance: 'All Levels',
     filter: 'Filter',
@@ -58,7 +62,8 @@ const translations = {
     medium: 'Medium',
     low: 'Low',
     subscribe: 'Subscribe',
-    subscribeDesc: 'Get latest regulation updates'
+    subscribeDesc: 'Get latest regulation updates',
+    subscribeNow: 'Subscribe Now'
   }
 }
 
@@ -140,33 +145,44 @@ export default function RegulationsPage({ params }: { params: { locale: string }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-[#339999]/5 via-transparent to-[#2a7a7a]/5">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold text-center mb-4">
-            {t.title}
-          </h1>
-          <p className="text-xl text-indigo-100 text-center max-w-3xl mx-auto">
-            {t.subtitle}
-          </p>
+      <div className="relative overflow-hidden bg-gradient-to-r from-[#339999] to-[#2a7a7a] text-white py-20">
+        {/* 背景装饰 */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+        
+        <div className="relative max-w-6xl mx-auto px-6">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full mb-6">
+              <Sparkles className="w-4 h-4" />
+              <span className="text-sm font-medium">{t.badge}</span>
+            </div>
+            
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
+              {t.title}
+            </h1>
+            <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
+              {t.subtitle}
+            </p>
+          </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-6xl mx-auto px-6 py-12">
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-100 shadow-sm mb-8">
           <div className="flex flex-wrap items-center gap-4">
             {/* Country Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
                 {locale === 'zh' ? '国家/地区' : 'Country/Region'}
               </label>
               <select
                 value={selectedCountry}
                 onChange={(e) => setSelectedCountry(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="px-4 py-2.5 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-[#339999]/20 focus:border-[#339999] bg-white transition-all"
               >
                 <option value="">{t.allCountries}</option>
                 {countries.map((code) => (
@@ -179,13 +195,13 @@ export default function RegulationsPage({ params }: { params: { locale: string }
 
             {/* Importance Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
                 {locale === 'zh' ? '重要程度' : 'Importance Level'}
               </label>
               <select
                 value={selectedImportance}
                 onChange={(e) => setSelectedImportance(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="px-4 py-2.5 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-[#339999]/20 focus:border-[#339999] bg-white transition-all"
               >
                 <option value="">{t.allImportance}</option>
                 {importanceLevels.map((level) => (
@@ -200,7 +216,7 @@ export default function RegulationsPage({ params }: { params: { locale: string }
             <div className="flex-1"></div>
             <button
               onClick={handleReset}
-              className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-6 py-2.5 text-sm font-medium text-slate-700 bg-white border-2 border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all"
             >
               {t.reset}
             </button>
@@ -210,19 +226,17 @@ export default function RegulationsPage({ params }: { params: { locale: string }
         {/* Loading State */}
         {loading && (
           <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-            <p className="mt-4 text-gray-600">Loading regulations...</p>
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#339999]"></div>
+            <p className="mt-4 text-slate-600">Loading regulations...</p>
           </div>
         )}
 
-        {/* Regulations List */}
+        {/* Empty State */}
         {!loading && regulations.length === 0 && (
-          <div className="text-center py-12 bg-white rounded-lg shadow-sm border border-gray-200">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">{t.noData}</h3>
-            <p className="mt-1 text-sm text-gray-500">{t.noDataDesc}</p>
+          <div className="text-center py-12 bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-100 shadow-sm">
+            <Globe className="mx-auto h-12 w-12 text-slate-400" />
+            <h3 className="mt-2 text-sm font-medium text-slate-900">{t.noData}</h3>
+            <p className="mt-1 text-sm text-slate-500">{t.noDataDesc}</p>
           </div>
         )}
 
@@ -232,7 +246,7 @@ export default function RegulationsPage({ params }: { params: { locale: string }
             {regulations.map((regulation) => (
               <div
                 key={regulation.id}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+                className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-lg hover:border-[#339999]/20 transition-all"
               >
                 {/* Header */}
                 <div className="flex items-start justify-between mb-4">
@@ -241,10 +255,10 @@ export default function RegulationsPage({ params }: { params: { locale: string }
                       {countryFlags[regulation.country] || '🌍'}
                     </span>
                     <div>
-                      <div className="text-sm font-medium text-gray-500">
+                      <div className="text-sm font-medium text-slate-600">
                         {regulation.country_name}
                       </div>
-                      <div className="text-xs text-gray-400">
+                      <div className="text-xs text-slate-400">
                         {regulation.regulation_type}
                       </div>
                     </div>
@@ -257,27 +271,23 @@ export default function RegulationsPage({ params }: { params: { locale: string }
                 </div>
 
                 {/* Title */}
-                <h3 className="text-lg font-bold text-gray-900 mb-2">
+                <h3 className="text-lg font-bold text-slate-900 mb-2">
                   {locale === 'zh' && regulation.title_zh ? regulation.title_zh : regulation.title}
                 </h3>
 
                 {/* Summary */}
-                <p className="text-sm text-gray-600 mb-4 line-clamp-3">
+                <p className="text-sm text-slate-600 mb-4 line-clamp-3">
                   {locale === 'zh' && regulation.summary_zh ? regulation.summary_zh : regulation.summary}
                 </p>
 
                 {/* Meta Info */}
-                <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-4">
+                <div className="flex flex-wrap gap-4 text-sm text-slate-500 mb-4">
                   <div className="flex items-center space-x-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
+                    <Calendar className="w-4 h-4" />
                     <span>{t.effectiveDate}: {formatDate(regulation.effective_date)}</span>
                   </div>
                   <div className="flex items-center space-x-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                    <FileText className="w-4 h-4" />
                     <span>{t.publishedDate}: {formatDate(regulation.published_date)}</span>
                   </div>
                 </div>
@@ -286,25 +296,23 @@ export default function RegulationsPage({ params }: { params: { locale: string }
                 {regulation.action_required && (
                   <div className="mb-4">
                     <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
-                      <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                      </svg>
+                      <AlertCircle className="w-3 h-3 mr-1" />
                       {locale === 'zh' ? '需要采取行动' : 'Action Required'}
                     </div>
                   </div>
                 )}
 
                 {/* Source */}
-                <div className="text-xs text-gray-500 mb-4">
+                <div className="text-xs text-slate-500 mb-4">
                   {t.source}: {regulation.source_organization}
                 </div>
 
                 {/* Actions */}
                 <div className="flex gap-3">
-                  <button className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium">
+                  <button className="flex-1 px-4 py-2.5 bg-gradient-to-r from-[#339999] to-[#2a7a7a] text-white rounded-xl hover:shadow-lg hover:shadow-[#339999]/30 transition-all text-sm font-medium">
                     {t.readMore}
                   </button>
-                  <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium">
+                  <button className="px-4 py-2.5 border-2 border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all text-sm font-medium">
                     {t.subscribe}
                   </button>
                 </div>
@@ -314,22 +322,21 @@ export default function RegulationsPage({ params }: { params: { locale: string }
         )}
 
         {/* Subscribe Section */}
-        <div className="mt-12 bg-indigo-50 border-l-4 border-indigo-400 p-6 rounded-r-lg">
+        <div className="mt-12 bg-gradient-to-r from-[#339999]/5 to-[#2a7a7a]/5 border-l-4 border-[#339999] p-6 rounded-2xl">
           <div className="flex items-start">
-            <svg className="w-6 h-6 text-indigo-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-              <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-            </svg>
+            <div className="flex-shrink-0">
+              <Shield className="h-6 w-6 text-[#339999]" />
+            </div>
             <div className="ml-3">
-              <h3 className="text-lg font-medium text-indigo-800">
+              <h3 className="text-lg font-medium text-slate-800">
                 {t.subscribe}
               </h3>
-              <p className="mt-2 text-sm text-indigo-700">
+              <p className="mt-2 text-sm text-slate-600">
                 {t.subscribeDesc}
               </p>
               <div className="mt-4">
-                <button className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium">
-                  {locale === 'zh' ? '立即订阅' : 'Subscribe Now'}
+                <button className="px-6 py-2.5 bg-gradient-to-r from-[#339999] to-[#2a7a7a] text-white rounded-xl hover:shadow-lg hover:shadow-[#339999]/30 transition-all font-medium">
+                  {t.subscribeNow}
                 </button>
               </div>
             </div>
