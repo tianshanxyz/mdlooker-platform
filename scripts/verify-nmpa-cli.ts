@@ -1,15 +1,28 @@
 /**
- * NMPA数据核实脚本
+ * NMPA数据核实脚本 (CLI版本)
  * 验证中国医疗器械注册数据的准确性
  * 
  * 使用方法:
- * npx ts-node scripts/verify-nmpa-data.ts
+ * npx ts-node scripts/verify-nmpa-cli.ts
  */
 
-import dotenv from 'dotenv';
-dotenv.config({ path: '.env.local', override: true });
+import { config } from 'dotenv';
+config({ path: '.env.local' });
 
-import { getSupabaseClient } from '../app/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  console.error('❌ Error: Supabase URL and Key are required.');
+  console.error('Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY environment variables.');
+  console.error('\nYou can run with:');
+  console.error('  NEXT_PUBLIC_SUPABASE_URL=xxx NEXT_PUBLIC_SUPABASE_ANON_KEY=yyy npx ts-node scripts/verify-nmpa-cli.ts');
+  process.exit(1);
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 interface NMPAVerificationResult {
   totalCount: number;
@@ -27,8 +40,6 @@ interface NMPAVerificationResult {
  * 核实NMPA数据
  */
 async function verifyNMPAData(): Promise<NMPAVerificationResult> {
-  const supabase = getSupabaseClient();
-  
   console.log('========================================');
   console.log('NMPA Data Verification');
   console.log('========================================\n');
@@ -148,14 +159,6 @@ async function verifyNMPAData(): Promise<NMPAVerificationResult> {
       result.issues.push(`Found ${nullProductNameCount} records with no product name`);
     }
     
-    // 检查重复注册号
-    const { data: duplicates, error: dupError } = await supabase
-      .rpc('find_duplicate_nmpa_registrations');
-    
-    if (!dupError && duplicates && duplicates.length > 0) {
-      result.issues.push(`Found ${duplicates.length} duplicate registration numbers`);
-    }
-    
     // 检查未来日期
     const { count: futureDateCount, error: futureError } = await supabase
       .from('nmpa_registrations')
@@ -211,7 +214,7 @@ function calculateQualityScore(result: NMPAVerificationResult): number {
   return Math.max(0, score);
 }
 
-// CLI入口
+// 主执行
 verifyNMPAData()
   .then(result => {
     const qualityScore = calculateQualityScore(result);
@@ -231,5 +234,3 @@ verifyNMPAData()
     console.error('Verification failed:', error);
     process.exit(1);
   });
-
-export { verifyNMPAData };

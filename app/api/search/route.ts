@@ -280,14 +280,9 @@ export async function GET(request: NextRequest) {
     const detectedType = searchType === 'auto' ? detectSearchType(query) : searchType as any;
     const hasChinese = /[\u4e00-\u9fa5]/.test(query);
     
-    // 使用同义词扩展搜索词
     const expandedTerms = expandSearchQuery(query);
     const searchTerms = query.split(/\s+/).filter(term => term.length > 0);
     const queryCategories = detectQueryCategories(query);
-    
-    console.log('[Search] Original query:', query);
-    console.log('[Search] Expanded terms:', expandedTerms);
-    console.log('[Search] Detected categories:', queryCategories);
     
     let allResults: any[] = [];
     let totalCount = 0;
@@ -370,8 +365,6 @@ export async function GET(request: NextRequest) {
     // 3. 搜索 NMPA 注册 (中国) - 使用同义词扩展
     if ((hasChinese || detectedType === 'general' || detectedType === 'company' || source === 'nmpa') && (source === 'all' || source === 'nmpa')) {
       try {
-        console.log('[NMPA Search] Query:', query, 'hasChinese:', hasChinese, 'expandedTerms:', expandedTerms);
-        
         // NMPA 表的 company_id 都是 NULL，所以不关联 companies 表
         let nmpaQuery = supabase
           .from('nmpa_registrations')
@@ -394,16 +387,12 @@ export async function GET(request: NextRequest) {
         if (error) {
           console.error('NMPA search error:', error);
         } else if (nmpaData && nmpaData.length > 0) {
-          console.log('[NMPA Search] Found', nmpaData.length, 'records');
-          
           // 提取唯一的制造商名称
           const manufacturerNames = new Set<string>();
           nmpaData.forEach((n: any) => {
             const name = n.manufacturer_zh || n.manufacturer;
             if (name) manufacturerNames.add(name);
           });
-          
-          console.log('[NMPA Search] Manufacturers:', Array.from(manufacturerNames));
           
           // 为每个制造商创建公司记录
           for (const manufacturer of Array.from(manufacturerNames)) {
@@ -451,8 +440,6 @@ export async function GET(request: NextRequest) {
           }
           
           totalCount += (count || 0);
-        } else {
-          console.log('[NMPA Search] No data found');
         }
       } catch (err) {
         console.error('NMPA search exception:', err);

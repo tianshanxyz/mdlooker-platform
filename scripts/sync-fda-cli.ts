@@ -1,23 +1,33 @@
 /**
- * FDA完整数据同步脚本
+ * FDA完整数据同步脚本 (CLI版本)
  * 从openFDA API获取所有医疗器械注册数据
- * 
+ *
  * 使用方法:
- * 1. 确保已设置 FDA_API_KEY 环境变量（可选，但推荐）
- * 2. 运行: npx ts-node scripts/sync-fda-full.ts
- * 
+ * npx ts-node scripts/sync-fda-cli.ts [maxRecords] [startFrom]
+ *
  * 注意: 完整同步可能需要数小时，取决于API速率限制
  */
 
-import dotenv from 'dotenv';
-dotenv.config({ path: '.env.local', override: true });
+import { config } from 'dotenv';
+config({ path: '.env.local' });
 
-import { getSupabaseClient } from '../app/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  console.error('❌ Error: Supabase URL and Key are required.');
+  console.error('Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY environment variables.');
+  process.exit(1);
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const FDA_API_BASE = 'https://api.fda.gov/device';
-const BATCH_SIZE = 100; // FDA API最大限制
+const BATCH_SIZE = 100;
 const MAX_RETRIES = 3;
-const RATE_LIMIT_DELAY = 1000; // 1秒延迟
+const RATE_LIMIT_DELAY = 1000;
 
 interface FDADeviceRegistration {
   registration_number: string;
@@ -56,40 +66,33 @@ interface SyncProgress {
   errors: string[];
 }
 
-/**
- * 延迟函数
- */
 function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-/**
- * 从FDA API获取数据（带重试机制）
- */
 async function fetchFDADataWithRetry(
   limit: number,
   skip: number,
   retryCount: number = 0
 ): Promise<FDADeviceRegistration[]> {
   const apiKey = process.env.FDA_API_KEY;
-  
+
   try {
     const url = new URL(`${FDA_API_BASE}/registrationlisting.json`);
     url.searchParams.append('limit', limit.toString());
     url.searchParams.append('skip', skip.toString());
-    
+
     if (apiKey) {
       url.searchParams.append('api_key', apiKey);
     }
 
     console.log(`[FDA] Fetching: skip=${skip}, limit=${limit}`);
-    
+
     const response = await fetch(url.toString(), {
       headers: { 'Accept': 'application/json' },
     });
 
     if (response.status === 429) {
-      // 速率限制，增加延迟后重试
       console.log('[FDA] Rate limited, waiting 5 seconds...');
       await delay(5000);
       if (retryCount < MAX_RETRIES) {
@@ -108,7 +111,7 @@ async function fetchFDADataWithRetry(
 
     const data = await response.json();
     return data.results || [];
-    
+
   } catch (error) {
     if (retryCount < MAX_RETRIES) {
       console.log(`[FDA] Retry ${retryCount + 1}/${MAX_RETRIES} after error: ${error}`);
@@ -119,12 +122,9 @@ async function fetchFDADataWithRetry(
   }
 }
 
-/**
- * 压缩raw_data，只保留关键字段
- */
 function compressRawData(rawData: any): any {
   if (!rawData || typeof rawData !== 'object') return rawData;
-  
+
   return {
     registration_number: rawData.registration_number,
     fei_number: rawData.fei_number,
@@ -142,31 +142,25 @@ function compressRawData(rawData: any): any {
   };
 }
 
-/**
- * 导入单条FDA记录到Supabase
- */
 async function importFDARegistration(
-  supabase: any,
   data: FDADeviceRegistration,
   progress: SyncProgress
 ): Promise<{ inserted: boolean; updated: boolean }> {
   try {
-    // 查找或创建公司
     let companyId: string | null = null;
-    
+
     if (data.owner_operator?.name) {
       const { data: existingCompany } = await supabase
         .from('companies')
         .select('id')
         .ilike('name', data.owner_operator.name)
         .single();
-      
+
       if (existingCompany) {
         companyId = existingCompany.id;
       }
     }
 
-    // 如果没有找到公司，创建新公司
     if (!companyId && data.owner_operator?.name) {
       const { data: newCompany, error: companyError } = await supabase
         .from('companies')
@@ -187,7 +181,6 @@ async function importFDARegistration(
       }
     }
 
-    // 检查记录是否已存在
     const { data: existingReg } = await supabase
       .from('fda_registrations')
       .select('id')
@@ -196,7 +189,6 @@ async function importFDARegistration(
 
     const isUpdate = !!existingReg;
 
-    // 插入或更新注册记录
     const { error: regError } = await supabase
       .from('fda_registrations')
       .upsert({
@@ -230,27 +222,23 @@ async function importFDARegistration(
     }
 
     return { inserted: !isUpdate, updated: isUpdate };
-    
+
   } catch (error) {
     const errorMsg = `Failed to import ${data.registration_number}: ${error}`;
     progress.errors.push(errorMsg);
     if (progress.errors.length > 100) {
-      progress.errors.shift(); // 保持错误列表在合理大小
+      progress.errors.shift();
     }
     return { inserted: false, updated: false };
   }
 }
 
-/**
- * 记录同步日志
- */
 async function logSync(
-  supabase: any,
   progress: SyncProgress,
   status: 'success' | 'partial' | 'failed'
 ) {
   const duration = Date.now() - progress.startTime.getTime();
-  
+
   try {
     await supabase.from('sync_logs').insert({
       data_source: 'FDA_Full',
@@ -266,7 +254,7 @@ async function logSync(
   } catch (error) {
     console.error('[FDA] Failed to log sync:', error);
   }
-  
+
   console.log('\n========================================');
   console.log('FDA Full Sync Completed');
   console.log('========================================');
@@ -279,15 +267,10 @@ async function logSync(
   console.log(`Errors: ${progress.errors.length}`);
 }
 
-/**
- * 主同步函数
- */
 async function syncFDAFull(options: {
   maxRecords?: number;
   startFrom?: number;
 } = {}) {
-  const supabase = getSupabaseClient();
-  
   const progress: SyncProgress = {
     totalFetched: 0,
     totalInserted: 0,
@@ -299,7 +282,7 @@ async function syncFDAFull(options: {
   };
 
   const maxRecords = options.maxRecords || Infinity;
-  
+
   console.log('========================================');
   console.log('FDA Full Data Synchronization');
   console.log('========================================');
@@ -311,22 +294,20 @@ async function syncFDAFull(options: {
   try {
     let hasMoreData = true;
     let consecutiveErrors = 0;
-    
+
     while (hasMoreData && progress.totalFetched < maxRecords) {
       try {
-        // 获取数据
         const records = await fetchFDADataWithRetry(BATCH_SIZE, progress.lastSkip);
-        
+
         if (records.length === 0) {
           hasMoreData = false;
           console.log('[FDA] No more data to fetch');
           break;
         }
 
-        // 处理每条记录
         for (const record of records) {
-          const result = await importFDARegistration(supabase, record, progress);
-          
+          const result = await importFDARegistration(record, progress);
+
           if (result.inserted) {
             progress.totalInserted++;
           } else if (result.updated) {
@@ -334,10 +315,9 @@ async function syncFDAFull(options: {
           } else {
             progress.totalFailed++;
           }
-          
+
           progress.totalFetched++;
-          
-          // 每100条输出进度
+
           if (progress.totalFetched % 100 === 0) {
             const elapsed = (Date.now() - progress.startTime.getTime()) / 1000;
             const rate = progress.totalFetched / elapsed;
@@ -347,57 +327,52 @@ async function syncFDAFull(options: {
               `@ ${rate.toFixed(1)} rec/s`
             );
           }
-          
-          // 检查是否达到最大记录数
+
           if (progress.totalFetched >= maxRecords) {
             console.log(`[FDA] Reached max records limit: ${maxRecords}`);
             break;
           }
         }
 
-        // 更新skip位置
         progress.lastSkip += records.length;
         consecutiveErrors = 0;
-        
-        // 速率限制延迟
+
         await delay(RATE_LIMIT_DELAY);
-        
+
       } catch (error) {
         consecutiveErrors++;
         console.error(`[FDA] Error batch at skip=${progress.lastSkip}:`, error);
-        
+
         if (consecutiveErrors >= 3) {
           console.error('[FDA] Too many consecutive errors, stopping sync');
           break;
         }
-        
-        // 等待更长时间后重试
+
         await delay(RATE_LIMIT_DELAY * 5);
       }
     }
 
-    // 记录同步结果
-    const status = progress.totalFailed > 0 
+    const status = progress.totalFailed > 0
       ? (progress.totalInserted + progress.totalUpdated > 0 ? 'partial' : 'failed')
       : 'success';
-    
-    await logSync(supabase, progress, status);
-    
+
+    await logSync(progress, status);
+
     return {
       success: status !== 'failed',
       status,
       ...progress,
       duration: Date.now() - progress.startTime.getTime(),
     };
-    
+
   } catch (error) {
     console.error('[FDA] Fatal error:', error);
-    await logSync(supabase, progress, 'failed');
+    await logSync(progress, 'failed');
     throw error;
   }
 }
 
-// CLI 入口
+// CLI入口
 const args = process.argv.slice(2);
 const maxRecords = args[0] ? parseInt(args[0]) : undefined;
 const startFrom = args[1] ? parseInt(args[1]) : 0;
@@ -407,17 +382,17 @@ console.log('==================\n');
 
 if (args.includes('--help') || args.includes('-h')) {
   console.log('Usage:');
-  console.log('  npx ts-node scripts/sync-fda-full.ts [maxRecords] [startFrom]');
+  console.log('  npx ts-node scripts/sync-fda-cli.ts [maxRecords] [startFrom]');
   console.log('');
   console.log('Examples:');
-  console.log('  npx ts-node scripts/sync-fda-full.ts           # Sync all records');
-  console.log('  npx ts-node scripts/sync-fda-full.ts 10000     # Sync first 10,000 records');
-  console.log('  npx ts-node scripts/sync-fda-full.ts 10000 50000 # Sync 10,000 records starting from 50,000');
+  console.log('  npx ts-node scripts/sync-fda-cli.ts           # Sync all records');
+  console.log('  npx ts-node scripts/sync-fda-cli.ts 10000     # Sync first 10,000 records');
+  console.log('  npx ts-node scripts/sync-fda-cli.ts 10000 50000 # Sync 10,000 records starting from 50,000');
   console.log('');
   console.log('Environment Variables:');
   console.log('  FDA_API_KEY      - FDA API key (optional but recommended)');
-  console.log('  SUPABASE_URL     - Supabase URL');
-  console.log('  SUPABASE_KEY     - Supabase service key');
+  console.log('  NEXT_PUBLIC_SUPABASE_URL     - Supabase URL');
+  console.log('  NEXT_PUBLIC_SUPABASE_ANON_KEY     - Supabase anon key');
   process.exit(0);
 }
 
@@ -430,5 +405,3 @@ syncFDAFull({ maxRecords, startFrom })
     console.error('\nSync failed:', error);
     process.exit(1);
   });
-
-export { syncFDAFull };
