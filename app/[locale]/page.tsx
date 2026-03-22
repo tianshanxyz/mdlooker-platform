@@ -48,28 +48,31 @@ export default function HomePage() {
     }
   };
 
-  // 功能特性数据
+  // 功能特性数据 - 对应用户核心需求场景
   const features = [
-    {
-      icon: Building2,
-      title: isZh ? '企业合规档案' : 'Company Compliance',
-      description: isZh ? '查询全球医疗器械企业注册信息、认证状态和历史记录' : 'Query global medical device company registrations, certifications, and history',
-      href: `/${locale}/compliance-profile`,
-      color: 'blue'
-    },
     {
       icon: Globe,
       title: isZh ? '市场准入导航' : 'Market Access',
-      description: isZh ? '了解各国医疗器械注册要求和准入路径' : 'Understand medical device registration requirements and access pathways',
+      description: isZh ? '查询目标市场的准入要求、费用和周期' : 'Check requirements, costs & timelines for target markets',
       href: `/${locale}/market-access`,
-      color: 'teal'
+      color: 'teal',
+      tag: isZh ? '核心功能' : 'Core'
+    },
+    {
+      icon: Building2,
+      title: isZh ? '竞品合规调研' : 'Competitor Analysis',
+      description: isZh ? '调研竞争对手在全球市场的合规布局' : 'Research competitor compliance across global markets',
+      href: `/${locale}/compliance-profile`,
+      color: 'blue',
+      tag: isZh ? '市场调研' : 'Research'
     },
     {
       icon: Shield,
-      title: isZh ? '法规指南' : 'Regulatory Guides',
-      description: isZh ? '详细的FDA、NMPA、EU MDR等注册指南' : 'Detailed FDA, NMPA, EU MDR registration guides',
-      href: `/${locale}/guides`,
-      color: 'purple'
+      title: isZh ? '市场对比决策' : 'Market Comparison',
+      description: isZh ? '对比多国准入门槛，选择最优市场' : 'Compare entry barriers across markets',
+      href: `/${locale}/compare-markets`,
+      color: 'purple',
+      tag: isZh ? '决策支持' : 'Decision'
     }
   ];
 
@@ -130,7 +133,7 @@ export default function HomePage() {
                 <input
                   name="q"
                   type="text"
-                  placeholder={isZh ? '搜索公司、产品或 UDI...' : 'Search companies, products or UDI...'}
+                  placeholder={isZh ? '例如：出口口罩到新加坡需要什么准备？' : 'e.g. What do I need to export masks to Singapore?'}
                   className="flex-1 py-4 pr-4 bg-transparent border-none outline-none text-slate-700 placeholder:text-slate-400 text-base"
                 />
                 <button

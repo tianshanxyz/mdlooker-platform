@@ -8,8 +8,8 @@ export interface Permission {
   allowed: boolean;
 }
 
-// 调试模式开关 - 设置为 true 时，所有用户都有 VIP 权限
-const DEBUG_MODE = process.env.NEXT_PUBLIC_DEBUG_MODE === 'true';
+// 调试模式开关 - 仅在服务端可访问，不暴露给客户端
+const DEBUG_MODE = process.env.DEBUG_MODE === 'true';
 
 // Check if user has permission
 export async function checkPermission(

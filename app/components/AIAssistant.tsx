@@ -41,27 +41,32 @@ export default function AIAssistant() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
+  const [isZh, setIsZh] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const isZh = typeof window !== 'undefined' && window.location.pathname.startsWith('/zh');
+  // Safe SSR check for locale
+  useEffect(() => {
+    setIsZh(window.location.pathname.startsWith('/zh'));
+  }, []);
+
   const isLoggedIn = !!session?.user;
   const isVip = session?.user?.role === 'vip';
 
-  // 快速操作选项
+  // 快速操作选项 - 市场准入相关
   const quickActions: QuickAction[] = [
     {
       id: 'fda',
-      label: 'FDA Registration',
-      labelZh: 'FDA注册流程',
+      label: 'FDA 510(k)',
+      labelZh: 'FDA 510(k)流程',
       icon: Shield,
-      prompt: isZh 
+      prompt: isZh
         ? '请详细解释FDA 510(k)注册流程，包括所需文件、时间线和费用'
         : 'Please explain the FDA 510(k) registration process in detail, including required documents, timeline, and fees'
     },
     {
       id: 'eu',
-      label: 'EU MDR Compliance',
+      label: 'EU MDR',
       labelZh: '欧盟MDR合规',
       icon: Globe,
       prompt: isZh
@@ -70,8 +75,8 @@ export default function AIAssistant() {
     },
     {
       id: 'china',
-      label: 'NMPA Guidelines',
-      labelZh: 'NMPA指南',
+      label: 'NMPA',
+      labelZh: 'NMPA注册',
       icon: FileText,
       prompt: isZh
         ? '进口医疗器械在中国NMPA注册需要哪些步骤？'
@@ -79,12 +84,30 @@ export default function AIAssistant() {
     },
     {
       id: 'market',
-      label: 'Market Access',
-      labelZh: '市场准入建议',
+      label: 'Market Selection',
+      labelZh: '市场选择建议',
       icon: Lightbulb,
       prompt: isZh
-        ? '我的产品应该优先进入哪个市场？请分析美国、欧盟和中国的优劣势'
-        : 'Which market should I prioritize for my product? Please analyze the pros and cons of USA, EU, and China'
+        ? '我的口罩产品应该优先进入哪个市场？请分析美国、欧盟、新加坡和中国的优劣势'
+        : 'Which market should I prioritize for my mask product? Please analyze the pros and cons of USA, EU, Singapore and China'
+    },
+    {
+      id: 'compare',
+      label: 'Compare Markets',
+      labelZh: '市场对比',
+      icon: BookOpen,
+      prompt: isZh
+        ? '请对比新加坡、马来西亚和泰国对口罩的市场准入要求，包括费用、周期和所需文件'
+        : 'Please compare the market access requirements for masks in Singapore, Malaysia and Thailand, including costs, timeline and required documents'
+    },
+    {
+      id: 'competitor',
+      label: 'Competitor Research',
+      labelZh: '竞品调研',
+      icon: Globe,
+      prompt: isZh
+        ? '如何调研竞争对手在全球市场的合规布局？'
+        : 'How can I research competitor compliance layout across global markets?'
     }
   ];
 

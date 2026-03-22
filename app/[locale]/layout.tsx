@@ -28,22 +28,18 @@ export default function LocaleLayout({
 
   const navItems = [
     { href: `/${locale}`, labelEn: 'Home', labelZh: '首页' },
-    { href: `/${locale}/compliance-profile`, labelEn: 'Compliance Profile', labelZh: '合规档案' },
-    { href: `/${locale}/product-tracker`, labelEn: 'Product Tracker', labelZh: '产品追踪' },
-    { href: `/${locale}/market-access`, labelEn: 'Market Access', labelZh: '准入导航' },
-    { href: `/${locale}/regulations`, labelEn: 'Regulations', labelZh: '法规动态' },
-    { href: `/${locale}/regulators`, labelEn: 'Regulators', labelZh: '监管数据库' },
-    { href: `/${locale}/help`, labelEn: 'Help Center', labelZh: '帮助中心' },
-    { href: `/${locale}/cases`, labelEn: 'Cases', labelZh: '客户案例' },
-    { href: `/${locale}/guides`, labelEn: 'Guides', labelZh: '指南' },
+    { href: `/${locale}/market-access`, labelEn: 'Market Access', labelZh: '市场准入' },
+    { href: `/${locale}/compliance-profile`, labelEn: 'Compliance', labelZh: '合规档案' },
+    { href: `/${locale}/compare-markets`, labelEn: 'Compare', labelZh: '市场对比' },
   ];
 
   const toolkitItems = [
-    { href: `/${locale}/market-access-wizard`, labelEn: 'Market Access Wizard', labelZh: '市场准入向导', icon: '🌍' },
-    { href: `/${locale}/templates`, labelEn: 'Document Templates', labelZh: '资料模板库', icon: '📄' },
-    { href: `/${locale}/compare-markets`, labelEn: 'Compare Markets', labelZh: '市场对比', icon: '📊' },
-    { href: `/${locale}/monitoring`, labelEn: 'Competitor Monitoring', labelZh: '竞争对手监控', icon: '👁️' },
-    { href: `/${locale}/stats`, labelEn: 'Statistics', labelZh: '数据统计', icon: '📈' },
+    { href: `/${locale}/market-access-wizard`, labelEn: 'Access Wizard', labelZh: '准入向导', icon: '🌍' },
+    { href: `/${locale}/templates`, labelEn: 'Templates', labelZh: '资料模板', icon: '📄' },
+    { href: `/${locale}/regulations`, labelEn: 'Regulations', labelZh: '法规动态', icon: '📋' },
+    { href: `/${locale}/help`, labelEn: 'Help Center', labelZh: '帮助中心', icon: '❓' },
+    { href: `/${locale}/monitoring`, labelEn: 'Competitors', labelZh: '竞品监控', icon: '👁️' },
+    { href: `/${locale}/product-tracker`, labelEn: 'Products', labelZh: '产品追踪', icon: '📦' },
   ];
 
   return (
